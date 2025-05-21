@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>道路ツール</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+    }
+    .tabs {
+      display: flex;
+      background-color: #007acc;
+    }
+    .tab {
+      flex: 1;
+      padding: 14px;
+      text-align: center;
+      color: white;
+      cursor: pointer;
+    }
+    .tab.active {
+      background-color: #005a99;
+    }
+    .container {
+      display: none;
+      padding: 16px;
+    }
+    .container.active {
+      display: block;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      background: white;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      text-align: left;
+    }
+    input, select, button {
+      font-size: 16px;
+      margin: 4px 0;
+      padding: 6px;
+      box-sizing: border-box;
+    }
+    .record {
+      background-color: white;
+      padding: 12px;
+      margin-top: 16px;
+      border: 1px solid #ccc;
+    }
+    .buttons {
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('cross')">横断測量（野帳）</div>
+    <div class="tab" onclick="switchTab('long')">縦断測量</div>
+    <div class="tab" onclick="switchTab('curve')">道路曲線計算</div>
+  </div>
+
+  <!-- 横断測量 -->
+  <div id="cross" class="container active">
+    <label>測点：</label><input type="text" id="point">
+    <label>方向：</label>
+    <select id="direction">
+      <option value="左">左</option>
+      <option value="右">右</option>
+    </select>
+    <table id="crossTable">
+      <thead><tr><th>横(m)</th><th>縦(m)</th><th>備考</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="buttons">
+      <button onclick="registerCross()">登録</button>
+      <button onclick="clearCross()">クリア</button>
+    </div>
+    <div id="crossLog" class="record"></div>
+  </div>
+
+  <!-- 縦断測量 -->
+  <div id="long" class="container">
+    <table id="longTable">
+      <thead>
+        <tr><th>Point</th><th>BS</th><th>FS</th><th>IH</th><th>GH</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div class="buttons">
+      <button onclick="addLongRow()">行を追加</button>
+      <button onclick="clearLong()">クリア</button>
+    </div>
+  </div>
+
+  <!-- 道路曲線計算 -->
+  <div id="curve" class="container">
+    <label>IA（例: 331900）</label><br>
+    <input type="number" id="ia"><br>
+    <label>R（半径）</label><br>
+    <input type="number" id="r"><br>
+    <button onclick="calculateCurve()">計算する</button>
+    <div id="curveResult" class="record"></div>
+  </div>
+
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".container").forEach(c => c.classList.remove("active"));
+      document.querySelector(`.tab[onclick*="${tabId}"]`).classList.add("active");
+      document.getElementById(tabId).classList.add("active");
+    }
+
+    function initializeCrossTable() {
+      const tbody = document.querySelector("#crossTable tbody");
+      tbody.innerHTML = "";
+      for (let i = 0; i < 10; i++) {
+        const row = tbody.insertRow();
+        for (let j = 0; j < 3; j++) {
+          const cell = row.insertCell();
+          const input = document.createElement("input");
+          input.type = j === 2 ? "text" : "number";
+          cell.appendChild(input);
+        }
+      }
+    }
+
+    function registerCross() {
+      const point = document.getElementById("point").value.trim();
+      const dir = document.getElementById("direction").value;
+      if (!point) return alert("測点を入力してください");
+
+      const rows = document.querySelectorAll("#crossTable tbody tr");
+      let content = `<h4>【${point} - ${dir}】</h4><table><tr><th>横</th><th>縦</th><th>備考</th></tr>`;
+      rows.forEach(row => {
+        const inputs = row.querySelectorAll("input");
+        const values = Array.from(inputs).map(input => input.value.trim());
+        if (values.some(v => v)) {
+          content += `<tr><td>${values[0]}</td><td>${values[1]}</td><td>${values[2]}</td></tr>`;
+        }
+      });
+      content += "</table>";
+
+      document.getElementById("crossLog").innerHTML += content;
+      initializeCrossTable();
+      document.getElementById("point").value = "";
+    }
+
+    function clearCross() {
+      if (confirm("すべての入力内容を削除します。よろしいですか？")) {
+        document.getElementById("point").value = "";
+        initializeCrossTable();
+      }
+    }
+
+    let initialGH = null;
+
+    function addLongRow() {
+      const tbody = document.querySelector("#longTable tbody");
+      const row = tbody.insertRow();
+
+      const point = row.insertCell();
+      const bs = row.insertCell();
+      const fs = row.insertCell();
+      const ih = row.insertCell();
+      const gh = row.insertCell();
+
+      point.innerHTML = `<input type="text">`;
+      bs.innerHTML = `<input type="number" step="any">`;
+      fs.innerHTML = `<input type="number" step="any">`;
+      ih.textContent = "";
+      gh.textContent = "";
+
+      const inputs = row.querySelectorAll("input");
+      inputs.forEach(input => {
+        input.addEventListener("input", () => calculateLong());
+      });
+    }
+
+    function calculateLong() {
+      const rows = document.querySelectorAll("#longTable tbody tr");
+      let baseIH = 0;
+      rows.forEach((row, i) => {
+        const inputs = row.querySelectorAll("input");
+        const bs = parseFloat(inputs[1]?.value || "");
+        const fs = parseFloat(inputs[2]?.value || "");
+        const ihCell = row.cells[3];
+        const ghCell = row.cells[4];
+
+        if (i === 0) {
+          if (!isNaN(bs)) {
+            if (initialGH === null) {
+              const ghInput = prompt("初期GHを入力してください");
+              if (ghInput === null || ghInput.trim() === "" || isNaN(parseFloat(ghInput))) {
+                ihCell.textContent = "";
+                ghCell.textContent = "";
+                return;
+              }
+              initialGH = parseFloat(ghInput);
+            }
+            baseIH = initialGH + bs;
+            ihCell.textContent = baseIH.toFixed(2);
+            ghCell.textContent = initialGH.toFixed(2);
+          } else {
+            ihCell.textContent = "";
+            ghCell.textContent = "";
+          }
+        } else {
+          const prevIH = parseFloat(rows[i - 1].cells[3].textContent || "0");
+          if (!isNaN(fs)) {
+            const gh = prevIH - fs;
+            ghCell.textContent = gh.toFixed(2);
+            ihCell.textContent = prevIH.toFixed(2);
+          } else {
+            ihCell.textContent = "";
+            ghCell.textContent = "";
+          }
+        }
+      });
+    }
+
+    function clearLong() {
+      if (confirm("縦断測量のすべてのデータを削除します。よろしいですか？")) {
+        document.querySelector("#longTable tbody").innerHTML = "";
+        initialGH = null;
+      }
+    }
+
+    function dmsToDecimal(dms) {
+      const deg = Math.floor(dms / 10000);
+      const min = Math.floor((dms % 10000) / 100);
+      const sec = dms % 100;
+      return deg + min / 60 + sec / 3600;
+    }
+
+    function decimalToDMS(deg) {
+      const d = Math.floor(deg);
+      const mFloat = (deg - d) * 60;
+      const m = Math.floor(mFloat);
+      let s = Math.round((mFloat - m) * 60);
+      if (s === 60) { s = 0; m += 1; }
+      if (m === 60) { m = 0; d += 1; }
+      return `${d}°${m}′${s}″`;
+    }
+
+    function calculateCurve() {
+      const iaInput = document.getElementById("ia").value;
+      const r = parseFloat(document.getElementById("r").value);
+      if (!iaInput || !r || isNaN(r)) return;
+
+      const iaDecimal = dmsToDecimal(parseInt(iaInput, 10));
+      const tl = r * Math.tan((iaDecimal * Math.PI / 180) / 2);
+      const sl = r * (1 / Math.cos((iaDecimal * Math.PI / 180) / 2) - 1);
+      const cl = r * (iaDecimal * Math.PI / 180);
+      const clHalf = cl / 2;
+      const mcDMS = decimalToDMS((180 - iaDecimal) / 2);
+
+      document.getElementById("curveResult").innerHTML = `
+        <p><strong>TL:</strong> ${tl.toFixed(2)} m</p>
+        <p><strong>SL:</strong> ${sl.toFixed(2)} m</p>
+        <p><strong>CL:</strong> ${cl.toFixed(2)} m</p>
+        <p><strong>MC:</strong> ${mcDMS}</p>
+        <p><strong>CL/2:</strong> ${clHalf.toFixed(2)} m</p>
+      `;
+    }
+
+    window.onload = () => {
+      initializeCrossTable();
+      for (let i = 0; i < 5; i++) addLongRow();
+    };
+  </script>
+</body>
+</html>
+
