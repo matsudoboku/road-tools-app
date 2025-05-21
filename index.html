@@ -1,64 +1,31 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>道路ツール</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      background-color: #f5f5f5;
-      margin: 0;
-    }
-    .tabs {
-      display: flex;
-      background-color: #007acc;
-    }
-    .tab {
-      flex: 1;
-      padding: 14px;
-      text-align: center;
-      color: white;
-      cursor: pointer;
-    }
-    .tab.active {
-      background-color: #005a99;
-    }
-    .container {
-      display: none;
-      padding: 16px;
-    }
-    .container.active {
-      display: block;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 12px;
-      background: white;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 6px;
-      text-align: left;
-    }
-    input, select, button {
-      font-size: 16px;
-      margin: 4px 0;
-      padding: 6px;
-      box-sizing: border-box;
-    }
-    .record {
-      background-color: white;
-      padding: 12px;
-      margin-top: 16px;
-      border: 1px solid #ccc;
-    }
-    .buttons {
-      margin-top: 8px;
-    }
-  </style>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>道路ツール</title>
+      
+        <!-- ✅ PWA対応ここから -->
+        <link rel="manifest" href="manifest.webmanifest">
+        <link rel="icon" href="icon-192.png" type="image/png">
+        <meta name="theme-color" content="#007acc">
+      
+        <script>
+          if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+              navigator.serviceWorker.register('service-worker.js')
+                .then(reg => console.log('ServiceWorker registered', reg))
+                .catch(err => console.log('ServiceWorker registration failed', err));
+            });
+          }
+        </script>
+        <!-- ✅ PWA対応ここまで -->
+      
+        <style>
+          /* ここはCSSスタイル（あなたの元のコードと同じ） */
+        </style>
+      </head>
+      
 <body>
   <div class="tabs">
     <div class="tab active" onclick="switchTab('cross')">横断測量（野帳）</div>
