@@ -207,9 +207,9 @@
     }
 
     function decimalToDMS(deg) {
-      const d = Math.floor(deg);
+      let d = Math.floor(deg);
       const mFloat = (deg - d) * 60;
-      const m = Math.floor(mFloat);
+      let m = Math.floor(mFloat);
       let s = Math.round((mFloat - m) * 60);
       if (s === 60) { s = 0; m += 1; }
       if (m === 60) { m = 0; d += 1; }
