@@ -562,7 +562,7 @@ function showSummary() {
   const headerRow1 = [
     { label: "箇所名", colspan: 1, rowspan: 3 },
     { label: "土工", colspan: 2, rowspan: 1 },
-    { label: "取り壊し工", colspan: 3, rowspan: 1 },
+    { label: "取り壊し工", colspan: 7, rowspan: 1 },
     { label: "舗装工", colspan: 7, rowspan: 1 }
   ];
   // 2段目
@@ -571,7 +571,11 @@ function showSummary() {
     { label: "残土処理", colspan: 1, rowspan: 2 },
     { label: "舗装版切断", colspan: 1, rowspan: 2 },
     { label: "舗装版破砕As", colspan: 1, rowspan: 2 },
+    { label: "廃材運搬As", colspan: 1, rowspan: 2 },
+    { label: "廃材処理As", colspan: 1, rowspan: 2 },
     { label: "舗装版破砕Con", colspan: 1, rowspan: 2 },
+    { label: "廃材運搬Con", colspan: 1, rowspan: 2 },
+    { label: "廃材処理Con", colspan: 1, rowspan: 2 },
     { label: "アスファルト", colspan: 3, rowspan: 1 },
     { label: "オーバーレイ", colspan: 3, rowspan: 1 },
     { label: "コンクリート", colspan: 1, rowspan: 2 }
@@ -590,8 +594,8 @@ function showSummary() {
   const dataCols = [
     "site",
     "machine_excavation", "residual_soil",
-    "cutting", "break_as", "break_con",
-    "as_lt1_4", "as_ge1_4", "as_ge3_0",
+    "cutting", "break_as", "haizan_unpan_as", "haizan_shori_as",
+    "break_con", "haizan_unpan_con", "haizan_shori_con",    "as_lt1_4", "as_ge1_4", "as_ge3_0",
     "ovl_lt1_4", "ovl_ge1_4", "ovl_ge3_0",
     "con_total"
   ];
@@ -638,7 +642,11 @@ function showSummary() {
     });
     row.cutting = cutting > 0 ? cutting.toFixed(1) : "";
     row.break_as = break_as > 0 ? break_as.toFixed(1) : "";
+    row.haizan_unpan_as = break_as > 0 ? break_as.toFixed(1) : "";
+    row.haizan_shori_as = break_as > 0 ? break_as.toFixed(1) : "";
     row.break_con = break_con > 0 ? break_con.toFixed(1) : "";
+    row.haizan_unpan_con = break_con > 0 ? break_con.toFixed(1) : "";
+    row.haizan_shori_con = break_con > 0 ? break_con.toFixed(1) : "";
     row.dummy_demo = "";
     // 舗装工
     let paveList = allSites[site].pave || [];
