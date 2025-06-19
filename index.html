@@ -173,6 +173,7 @@
     <div class="tab active" id="tabPave" onclick="showTab('pave')">舗装工</div>
     <div class="tab" id="tabEarth" onclick="showTab('earth')">土工</div>
     <div class="tab" id="tabDemo" onclick="showTab('demo')">取り壊し工</div>
+    <div class="tab" id="tabDisclaimer" onclick="showTab('disclaimer')">免責事項</div>
   </div>
 
   <!-- 舗装工タブ -->
@@ -257,6 +258,10 @@
     <div class="sum" id="sumDemo"></div>
     <div id="demoAlert" class="alert"></div>
   </div>
+  <!-- 免責事項タブ -->
+  <div id="panelDisclaimer" class="block hidden">
+    <p>本Webアプリは現状のまま無保証で提供しています。利用による一切の損害について、作者は責任を負いません。業務・商用利用の際は必ずご自身で検証してください。</p>
+  </div>
   <div class="block">
     <button class="btn" onclick="showSummary()">ss形式で合計表示</button>
     <div id="summary"></div>
@@ -326,18 +331,23 @@ function showTab(tab) {
   document.getElementById('tabPave').classList.remove('active');
   document.getElementById('tabEarth').classList.remove('active');
   document.getElementById('tabDemo').classList.remove('active');
+  document.getElementById('tabDisclaimer').classList.remove('active');
   document.getElementById('panelPave').classList.add('hidden');
   document.getElementById('panelEarth').classList.add('hidden');
   document.getElementById('panelDemo').classList.add('hidden');
+  document.getElementById('panelDisclaimer').classList.add('hidden');
   if(tab === 'pave') {
     document.getElementById('tabPave').classList.add('active');
     document.getElementById('panelPave').classList.remove('hidden');
   } else if(tab === 'earth') {
     document.getElementById('tabEarth').classList.add('active');
     document.getElementById('panelEarth').classList.remove('hidden');
-  } else {
+  } else if(tab === 'demo') {
     document.getElementById('tabDemo').classList.add('active');
     document.getElementById('panelDemo').classList.remove('hidden');
+  } else {
+    document.getElementById('tabDisclaimer').classList.add('active');
+    document.getElementById('panelDisclaimer').classList.remove('hidden');
   }
 }
 function addRow(type) {
