@@ -577,17 +577,15 @@ function showSummary() {
     { label: "コンクリート", colspan: 1, rowspan: 2 }
   ];
   // 3段目
+  // 1～5列目および最終列は上段セルがrowspan=2のため、ここでは追加しない
+  // アスファルト3区分・オーバーレイ3区分のみ定義
   const headerRow3 = [
-    { label: "" }, { label: "" },
-    { label: "" }, { label: "" }, { label: "" },
-
     { label: "t=4cm 1.4未満" },
     { label: "t=4cm 1.4以上" },
     { label: "t=4cm 3.0以上" },
     { label: "t=4cm 1.4未満" },
     { label: "t=4cm 1.4以上" },
-    { label: "t=4cm 3.0以上" },
-    { label: "" }
+    { label: "t=4cm 3.0以上" }
   ];
   const dataCols = [
     "site",
