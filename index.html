@@ -561,27 +561,25 @@ function showSummary() {
   // 1段目
   const headerRow1 = [
     { label: "箇所名", colspan: 1, rowspan: 3 },
-    { label: "土工", colspan: 3, rowspan: 1 },
-    { label: "取り壊し工", colspan: 4, rowspan: 1 },
+    { label: "土工", colspan: 2, rowspan: 1 },
+    { label: "取り壊し工", colspan: 3, rowspan: 1 },
     { label: "舗装工", colspan: 7, rowspan: 1 }
   ];
   // 2段目
   const headerRow2 = [
     { label: "機械掘削", colspan: 1, rowspan: 2 },
     { label: "残土処理", colspan: 1, rowspan: 2 },
-    { label: "", colspan: 1, rowspan: 2 },
     { label: "舗装版切断", colspan: 1, rowspan: 2 },
     { label: "舗装版破砕As", colspan: 1, rowspan: 2 },
     { label: "舗装版破砕Con", colspan: 1, rowspan: 2 },
-    { label: "", colspan: 1, rowspan: 2 },
     { label: "アスファルト", colspan: 3, rowspan: 1 },
     { label: "オーバーレイ", colspan: 3, rowspan: 1 },
     { label: "コンクリート", colspan: 1, rowspan: 2 }
   ];
   // 3段目
   const headerRow3 = [
+    { label: "" }, { label: "" },
     { label: "" }, { label: "" }, { label: "" },
-    { label: "" }, { label: "" }, { label: "" }, { label: "" },
     { label: "t=4cm 1.4未満" },
     { label: "t=4cm 1.4以上" },
     { label: "t=4cm 3.0以上" },
@@ -592,8 +590,8 @@ function showSummary() {
   ];
   const dataCols = [
     "site",
-    "machine_excavation", "residual_soil", "dummy_soil",
-    "cutting", "break_as", "break_con", "dummy_demo",
+    "machine_excavation", "residual_soil",
+    "cutting", "break_as", "break_con",
     "as_lt1_4", "as_ge1_4", "as_ge3_0",
     "ovl_lt1_4", "ovl_ge1_4", "ovl_ge3_0",
     "con_total"
@@ -628,7 +626,6 @@ function showSummary() {
     });
     row.machine_excavation = machine_excavation > 0 ? machine_excavation.toFixed(1) : "";
     row.residual_soil = residual_soil > 0 ? residual_soil.toFixed(1) : "";
-    row.dummy_soil = "";
     // 取壊し工
     let demoList = allSites[site].demo || [];
     let cutting = 0, break_as = 0, break_con = 0;
