@@ -158,6 +158,14 @@
     }
     .ss-table tr:last-child td { border-bottom: none; }
     .ss-table tr td:last-child, .ss-table tr th:last-child { border-right: none; }
+    @media (max-width: 600px) {
+      .container { width: 100%; max-width: none; margin: 10px 0; padding: 5px; }
+      .block { margin: 10px 0; padding: 8px 5px; }
+      table, .ss-table { width: 100%; min-width: 0; display: block; }
+      input, select { padding: 2px 3px; }
+      .siteName { width: 100%; max-width: none; }
+      input[type="number"] { width: 55px; }
+    }
   </style>
 </head>
 <body>
@@ -165,7 +173,7 @@
 
   <div class="block" style="margin-bottom:26px">
     <label>現場名:</label>
-    <input id="siteName" placeholder="例：〇〇号線" style="width:170px;">
+    <input id="siteName" class="siteName" placeholder="例：〇〇号線" style="width:170px;">
     <button class="btn" onclick="addSite()">追加</button>
     <select id="siteList" onchange="switchSite()" style="margin-left:12px;"></select>
   </div>
@@ -565,7 +573,7 @@ function renderAll() {
 
 // ---- ss形式で合計表示（設計請数量集計表風/項目例付き・必要に応じて調整可）
 function showSummary() {
-  const tableStyle = "min-width:1280px;border-collapse:collapse;border:2px solid #555;background:#fff;";
+  const tableStyle = "min-width:600px;border-collapse:collapse;border:2px solid #555;background:#fff;width:100%;";
   const thStyle1 = "border:2px solid #555;background:#e6eef5;color:#007acc;font-weight:bold;text-align:center;padding:8px 5px;";
   const thStyle2 = "border:2px solid #555;background:#f7fbff;color:#007acc;font-weight:bold;text-align:center;padding:5px 5px;";
   const tdStyle = "border:2px solid #555;text-align:center;padding:6px 5px;";
