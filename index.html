@@ -628,11 +628,13 @@ function showSummary() {
     // 取壊し工
     let demoList = allSites[site].demo || [];
     let cutting = 0, break_as = 0, break_con = 0;
+    let mode = allSites[site].demoType;
+    let mode = allSites[site].demoType;
     demoList.forEach(r => {
       let area = parseFloat(r.面積) || 0;
-      if (r.種別 === "舗装版切断") cutting += area;
-      if (r.種別 === "舗装版破砕As") break_as += area;
-      if (r.種別 === "舗装版破砕Con") break_con += area;
+      if (mode === "As") break_as += area;
+      else if (mode === "Con") break_con += area;
+      else if (mode === "As+Con") { break_as += area; break_con += area; }
     });
     row.cutting = cutting > 0 ? cutting.toFixed(1) : "";
     row.break_as = break_as > 0 ? break_as.toFixed(1) : "";
