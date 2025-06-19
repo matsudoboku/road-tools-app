@@ -580,20 +580,21 @@ function showSummary() {
   const headerRow3 = [
     { label: "" }, { label: "" },
     { label: "" }, { label: "" }, { label: "" },
-    { label: "t=4cm 1.4未満" },
-    { label: "t=4cm 1.4以上" },
+
     { label: "t=4cm 3.0以上" },
-    { label: "t=4cm 1.4未満" },
     { label: "t=4cm 1.4以上" },
+    { label: "t=4cm 1.4未満" },
     { label: "t=4cm 3.0以上" },
+    { label: "t=4cm 1.4以上" },
+    { label: "t=4cm 1.4未満" },
     { label: "" }
   ];
   const dataCols = [
     "site",
     "machine_excavation", "residual_soil",
     "cutting", "break_as", "break_con",
-    "as_lt1_4", "as_ge1_4", "as_ge3_0",
-    "ovl_lt1_4", "ovl_ge1_4", "ovl_ge3_0",
+    "as_ge3_0", "as_ge1_4", "as_lt1_4",
+    "ovl_ge3_0", "ovl_ge1_4", "ovl_lt1_4",
     "con_total"
   ];
   let html = `<table class="ss-table" style="${tableStyle}">`;
