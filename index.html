@@ -29,6 +29,9 @@
       display: flex;
       gap: 10px;
       margin-bottom: 20px;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      -webkit-overflow-scrolling: touch;
     }
     .tab {
       padding: 8px 28px;
@@ -40,6 +43,7 @@
       color: #007acc;
       border-bottom: 2px solid transparent;
       transition: all 0.15s;
+      white-space: nowrap;
     }
     .tab.active, .tab:hover {
       background: #007acc;
