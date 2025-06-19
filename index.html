@@ -1,247 +1,724 @@
 <!DOCTYPE html>
 <html lang="ja">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>道路ツール</title>
-      
-        <!-- ✅ PWA対応ここから -->
-        <link rel="manifest" href="manifest.webmanifest">
-        <link rel="icon" href="icon-192.png" type="image/png">
-        <meta name="theme-color" content="#007acc">
-      
-        <script>
-          if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-              navigator.serviceWorker.register('service-worker.js')
-                .then(reg => console.log('ServiceWorker registered', reg))
-                .catch(err => console.log('ServiceWorker registration failed', err));
-            });
-          }
-        </script>
-        <!-- ✅ PWA対応ここまで -->
-      
-        <style>
-          /* ここはCSSスタイル（あなたの元のコードと同じ） */
-        </style>
-      </head>
-      
+<head>
+  <meta charset="UTF-8">
+  <title>舗装数量・土工・取壊し 数量/DXFツール</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Segoe UI', 'Meiryo', sans-serif;
+      background: #f5f8fa;
+      margin: 0;
+      color: #222;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 30px 10px 40px 10px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px #0002;
+    }
+    h4 {
+      font-size: 1.13em;
+      color: #007acc;
+      margin-bottom: 0.6em;
+      margin-top: 0.5em;
+    }
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .tab {
+      padding: 8px 28px;
+      background: #e6eef5;
+      border-radius: 12px 12px 0 0;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1.04em;
+      color: #007acc;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .tab.active, .tab:hover {
+      background: #007acc;
+      color: #fff;
+      border-bottom: 2px solid #007acc;
+      box-shadow: 0 2px 10px #007acc22;
+    }
+    .block {
+      margin: 12px 0 24px 0;
+      padding: 18px 10px 14px 10px;
+      background: #fafdff;
+      border-radius: 12px;
+      box-shadow: 0 1px 4px #007acc15;
+      overflow-x: auto;
+    }
+    .block label {
+      font-weight: bold;
+      margin-right: 8px;
+    }
+    input, select {
+      padding: 3px 4px;
+      font-size: 0.98em;
+      border: 1.2px solid #ccd8e6;
+      border-radius: 5px;
+      outline: none;
+      transition: border 0.15s;
+      background: #fff;
+      max-width: 90px;
+      box-sizing: border-box;
+    }
+    input[type="number"] { width: 60px; }
+    input:focus, select:focus {
+      border: 1.2px solid #007acc;
+      background: #f3f9ff;
+    }
+    .btn {
+      padding: 6px 18px;
+      background: #007acc;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-right: 10px;
+      box-shadow: 0 2px 6px #007acc23;
+      transition: background 0.18s;
+    }
+    .btn:hover { background: #005e99; }
+    table {
+      border-collapse: separate;
+      border-spacing: 0;
+      width: 100%;
+      margin-top: 12px;
+      background: #fafdff;
+      box-shadow: 0 2px 8px #007acc0a;
+      border-radius: 9px;
+      overflow: hidden;
+      min-width: 680px;
+    }
+    th, td {
+      border-bottom: 1px solid #e6eef5;
+      padding: 7px 5px;
+      text-align: center;
+      white-space: nowrap;
+    }
+    th {
+      background: #e6eef5;
+      color: #007acc;
+      font-size: 1.01em;
+    }
+    tr:last-child td { border-bottom: none; }
+    .readonly {
+      background: #f5f7fa !important;
+      color: #888;
+      pointer-events: none;
+    }
+    .sum {
+      margin-top: 12px;
+      font-weight: bold;
+      color: #2471a3;
+      font-size: 1.1em;
+      letter-spacing: 0.5px;
+    }
+    .hidden { display: none;}
+    .alert { color: #e12b43; font-weight: bold;}
+    @media (max-width: 900px) {
+      .container {padding: 5px;}
+      .block {padding: 5px;}
+      table {font-size: 12px;}
+      input, select { font-size: 0.96em; }
+    }
+    .ss-table {
+      margin-top: 10px;
+      background: #fafdff;
+      border-radius: 9px;
+      border: 1.2px solid #e6eef5;
+      box-shadow: 0 2px 8px #007acc0a;
+      min-width: 920px;
+      width: auto;
+      display: inline-block;
+      font-size: 1em;
+    }
+    .ss-table th, .ss-table td {
+      border-bottom: 1px solid #e6eef5;
+      border-right: 1px solid #e6eef5;
+      padding: 7px 14px;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .ss-table th {
+      background: #e6eef5;
+      color: #007acc;
+      font-weight: bold;
+      font-size: 1.02em;
+    }
+    .ss-table tr:last-child td { border-bottom: none; }
+    .ss-table tr td:last-child, .ss-table tr th:last-child { border-right: none; }
+  </style>
+</head>
 <body>
+<div class="container">
+
+  <div class="block" style="margin-bottom:26px">
+    <label>現場名:</label>
+    <input id="siteName" placeholder="例：〇〇号線" style="width:170px;">
+    <button class="btn" onclick="addSite()">追加</button>
+    <select id="siteList" onchange="switchSite()" style="margin-left:12px;"></select>
+  </div>
+
   <div class="tabs">
-    <div class="tab active" onclick="switchTab('cross')">横断測量（野帳）</div>
-    <div class="tab" onclick="switchTab('long')">縦断測量</div>
-    <div class="tab" onclick="switchTab('curve')">道路曲線計算</div>
+    <div class="tab active" id="tabPave" onclick="showTab('pave')">舗装工</div>
+    <div class="tab" id="tabEarth" onclick="showTab('earth')">土工</div>
+    <div class="tab" id="tabDemo" onclick="showTab('demo')">取り壊し工</div>
   </div>
 
-  <!-- 横断測量 -->
-  <div id="cross" class="container active">
-    <label>測点：</label><input type="text" id="point">
-    <label>方向：</label>
-    <select id="direction">
-      <option value="左">左</option>
-      <option value="右">右</option>
-    </select>
-    <table id="crossTable">
-      <thead><tr><th>横(m)</th><th>縦(m)</th><th>備考</th></tr></thead>
-      <tbody></tbody>
-    </table>
-    <div class="buttons">
-      <button onclick="registerCross()">登録</button>
-      <button onclick="clearCross()">クリア</button>
-    </div>
-    <div id="crossLog" class="record"></div>
-  </div>
-
-  <!-- 縦断測量 -->
-  <div id="long" class="container">
-    <table id="longTable">
+  <!-- 舗装工タブ -->
+  <div id="panelPave" class="block">
+    <h4>舗装工</h4>
+    <button class="btn" onclick="addRow('pave')">行追加</button>
+    <button class="btn" onclick="exportDXF()">DXFエクスポート</button>
+    <div style="overflow-x:auto;">
+    <table>
       <thead>
-        <tr><th>Point</th><th>BS</th><th>FS</th><th>IH</th><th>GH</th></tr>
+        <tr>
+          <th>種別</th>
+          <th>測点</th>
+          <th>単距</th>
+          <th>追距</th>
+          <th>幅員</th>
+          <th>平均幅員</th>
+          <th>面積</th>
+        </tr>
       </thead>
-      <tbody></tbody>
+      <tbody id="tbodyPave"></tbody>
     </table>
-    <div class="buttons">
-      <button onclick="addLongRow()">行を追加</button>
-      <button onclick="clearLong()">クリア</button>
     </div>
+    <div class="sum" id="sumPave"></div>
   </div>
-
-  <!-- 道路曲線計算 -->
-  <div id="curve" class="container">
-    <label>IA（例: 331900）</label><br>
-    <input type="number" id="ia"><br>
-    <label>R（半径）</label><br>
-    <input type="number" id="r"><br>
-    <button onclick="calculateCurve()">計算する</button>
-    <div id="curveResult" class="record"></div>
+  <!-- 土工タブ -->
+  <div id="panelEarth" class="block hidden">
+    <h4>土工（体積計算）</h4>
+    <label>土工の有無：<input type="checkbox" id="chkEarth" onchange="toggleEarth()"></label>
+    <select id="earthType">
+      <option>標準掘削</option>
+      <option>標準以下掘削</option>
+    </select>
+    <label style="margin-left:10px;">掘削厚（cm）：<input type="number" id="earthThick" min="0" style="width:60px;" onchange="earthThickChange()"></label>
+    <label style="margin-left:10px;">舗装面積と同じ<input type="checkbox" id="earthSamePave" onchange="earthSameChange()"></label>
+    <div id="earthTableBlock" class="hidden">
+      <button class="btn" onclick="addRow('earth')">行追加</button>
+      <table>
+        <thead>
+          <tr>
+            <th>測点</th>
+            <th>単距</th>
+            <th>追距</th>
+            <th>幅員</th>
+            <th>平均幅員</th>
+            <th>面積</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyEarth"></tbody>
+      </table>
+    </div>
+    <div class="sum" id="sumEarth"></div>
+    <div id="earthAlert" class="alert"></div>
   </div>
+  <!-- 取り壊し工タブ -->
+  <div id="panelDemo" class="block hidden">
+    <h4>取り壊し工</h4>
+    <label>取り壊し工の有無：<input type="checkbox" id="chkDemo" onchange="toggleDemo()"></label>
+    <select id="demoType">
+      <option>As</option>
+      <option>Con</option>
+      <option>As+Con</option>
+    </select>
+    <label style="margin-left:10px;">取壊し厚（cm）：<input type="number" id="demoThick" min="0" style="width:60px;" onchange="demoThickChange()"></label>
+    <label style="margin-left:10px;">舗装面積と同じ<input type="checkbox" id="demoSamePave" onchange="demoSameChange()"></label>
+    <div id="demoTableBlock" class="hidden">
+      <button class="btn" onclick="addRow('demo')">行追加</button>
+      <table>
+        <thead>
+          <tr>
+            <th>測点</th>
+            <th>単距</th>
+            <th>追距</th>
+            <th>幅員</th>
+            <th>平均幅員</th>
+            <th>面積</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyDemo"></tbody>
+      </table>
+    </div>
+    <div class="sum" id="sumDemo"></div>
+    <div id="demoAlert" class="alert"></div>
+  </div>
+  <div class="block">
+    <button class="btn" onclick="showSummary()">ss形式で合計表示</button>
+    <div id="summary"></div>
+  </div>
+</div>
+<script>
+let allSites = {};
+let currentSite = '';
+const paveTypes = ["アスファルト", "コンクリート", "オーバーレイ"];
 
-  <script>
-    function switchTab(tabId) {
-      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-      document.querySelectorAll(".container").forEach(c => c.classList.remove("active"));
-      document.querySelector(`.tab[onclick*="${tabId}"]`).classList.add("active");
-      document.getElementById(tabId).classList.add("active");
-    }
-
-    function initializeCrossTable() {
-      const tbody = document.querySelector("#crossTable tbody");
-      tbody.innerHTML = "";
-      for (let i = 0; i < 10; i++) {
-        const row = tbody.insertRow();
-        for (let j = 0; j < 3; j++) {
-          const cell = row.insertCell();
-          const input = document.createElement("input");
-          input.type = j === 2 ? "text" : "number";
-          cell.appendChild(input);
-        }
+// ▼ ローカルストレージ保存/復元
+const LS_KEY = 'paveAppAllSites_v2';
+function saveData() {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(allSites));
+  } catch(e) {}
+}
+function loadData() {
+  try {
+    const dat = JSON.parse(localStorage.getItem(LS_KEY));
+    if (dat && typeof dat === "object") {
+      allSites = dat;
+      // 選択現場復元（なければ最初の現場に）
+      const siteList = Object.keys(allSites);
+      if (siteList.length) {
+        currentSite = siteList[0];
+        let opt = '';
+        for (const s of siteList) opt += `<option>${s}</option>`;
+        document.getElementById('siteList').innerHTML = opt;
+        document.getElementById('siteList').value = currentSite;
       }
     }
+  } catch(e){}
+}
+function renderAllAndSave() {
+  renderAll();
+  saveData();
+}
 
-    function registerCross() {
-      const point = document.getElementById("point").value.trim();
-      const dir = document.getElementById("direction").value;
-      if (!point) return alert("測点を入力してください");
-
-      const rows = document.querySelectorAll("#crossTable tbody tr");
-      let content = `<h4>【${point} - ${dir}】</h4><table><tr><th>横</th><th>縦</th><th>備考</th></tr>`;
-      rows.forEach(row => {
-        const inputs = row.querySelectorAll("input");
-        const values = Array.from(inputs).map(input => input.value.trim());
-        if (values.some(v => v)) {
-          content += `<tr><td>${values[0]}</td><td>${values[1]}</td><td>${values[2]}</td></tr>`;
-        }
-      });
-      content += "</table>";
-
-      document.getElementById("crossLog").innerHTML += content;
-      initializeCrossTable();
-      document.getElementById("point").value = "";
+// ---- ここから以降は通常の管理関数（ローカルストレージ統合済み）
+function addSite() {
+  const name = document.getElementById('siteName').value.trim();
+  if (!name || allSites[name]) return;
+  allSites[name] = {
+    pave: [],
+    earth: [],
+    demo: [],
+    earthOn: false,
+    earthType: '標準掘削',
+    earthSame: true,
+    earthThick: 0,
+    demoOn: false,
+    demoType: 'As',
+    demoSame: true,
+    demoThick: 0
+  };
+  document.getElementById('siteList').innerHTML += `<option>${name}</option>`;
+  document.getElementById('siteList').value = name;
+  currentSite = name;
+  renderAllAndSave();
+}
+function switchSite() {
+  currentSite = document.getElementById('siteList').value;
+  renderAllAndSave();
+}
+function showTab(tab) {
+  document.getElementById('tabPave').classList.remove('active');
+  document.getElementById('tabEarth').classList.remove('active');
+  document.getElementById('tabDemo').classList.remove('active');
+  document.getElementById('panelPave').classList.add('hidden');
+  document.getElementById('panelEarth').classList.add('hidden');
+  document.getElementById('panelDemo').classList.add('hidden');
+  if(tab === 'pave') {
+    document.getElementById('tabPave').classList.add('active');
+    document.getElementById('panelPave').classList.remove('hidden');
+  } else if(tab === 'earth') {
+    document.getElementById('tabEarth').classList.add('active');
+    document.getElementById('panelEarth').classList.remove('hidden');
+  } else {
+    document.getElementById('tabDemo').classList.add('active');
+    document.getElementById('panelDemo').classList.remove('hidden');
+  }
+}
+function addRow(type) {
+  if (!currentSite) return;
+  if(type==='pave'){
+    allSites[currentSite][type].push({
+      種別: "アスファルト", 測点:'',単距:'',追距:'',幅員:'',平均幅員:'',面積:''
+    });
+  }else{
+    allSites[currentSite][type].push({測点:'',単距:'',追距:'',幅員:'',平均幅員:'',面積:''});
+  }
+  renderAllAndSave();
+}
+function getAveWidthLabel(val){
+  val = parseFloat(val)||0;
+  if(val<1.4) return "1.4未満";
+  if(val<3.0) return "1.4以上";
+  return "3.0以上";
+}
+function getAveWidthValue(val){
+  val = parseFloat(val)||0;
+  if(val<1.4) return 1.2;
+  if(val<3.0) return 1.4;
+  return 3.0;
+}
+function renderTablePave() {
+  const list = allSites[currentSite].pave;
+  for(let i=0;i<list.length;i++) {
+    let r = list[i];
+    r.追距 = (i===0) ? (parseFloat(r.単距)||0)
+      : ((parseFloat(list[i-1].追距)||0)+(parseFloat(r.単距)||0));
+    if(r.種別==="アスファルト"||r.種別==="オーバーレイ") {
+      let w = parseFloat(r.幅員)||0;
+      r.平均幅員 = getAveWidthLabel(w);
+      r._平均幅員値 = getAveWidthValue(w);
     }
-
-    function clearCross() {
-      if (confirm("すべての入力内容を削除します。よろしいですか？")) {
-        document.getElementById("point").value = "";
-        initializeCrossTable();
+    if(r.種別==="コンクリート") {
+      r.平均幅員="";
+      r._平均幅員値 = '';
+    }
+    if (i === 0) {
+      r.面積 = (r.単距 && r.幅員) ? (parseFloat(r.単距)*parseFloat(r.幅員)).toFixed(2) : '';
+    } else {
+      let 上幅員 = parseFloat(list[i-1].幅員)||0;
+      let 幅員 = parseFloat(r.幅員)||0;
+      let 単距 = parseFloat(r.単距)||0;
+      if (幅員 > 0 && 上幅員 > 0 && 単距 > 0) {
+        r.面積 = (((幅員 + 上幅員)/2)*単距).toFixed(2);
+      } else {
+        r.面積 = '';
       }
     }
-
-    let initialGH = null;
-
-    function addLongRow() {
-      const tbody = document.querySelector("#longTable tbody");
-      const row = tbody.insertRow();
-
-      const point = row.insertCell();
-      const bs = row.insertCell();
-      const fs = row.insertCell();
-      const ih = row.insertCell();
-      const gh = row.insertCell();
-
-      point.innerHTML = `<input type="text">`;
-      bs.innerHTML = `<input type="number" step="any">`;
-      fs.innerHTML = `<input type="number" step="any">`;
-      ih.textContent = "";
-      gh.textContent = "";
-
-      const inputs = row.querySelectorAll("input");
-      inputs.forEach(input => {
-        input.addEventListener("input", () => calculateLong());
-      });
+  }
+  let tbody = '';
+  list.forEach((r,idx)=>{
+    tbody += `<tr>
+      <td>
+        <select onchange="editRow('pave',${idx},'種別',this.value)">
+          ${paveTypes.map(tp=>`<option value="${tp}"${r.種別===tp?' selected':''}>${tp}</option>`).join('')}
+        </select>
+      </td>
+      <td><input value="${r.測点||''}" onchange="editRow('pave',${idx},'測点',this.value)"></td>
+      <td><input value="${r.単距||''}" onchange="editRow('pave',${idx},'単距',this.value)"></td>
+      <td><input value="${r.追距||''}" class="readonly" readonly></td>
+      <td><input value="${r.幅員||''}" onchange="editRow('pave',${idx},'幅員',this.value)"></td>
+      <td>${
+        (r.種別==="コンクリート")
+        ? `<input class="readonly" value="" readonly>`
+        : `<input value="${r.平均幅員||''}" class="readonly" readonly>`
+      }</td>
+      <td><input value="${r.面積||''}" class="readonly" readonly></td>
+    </tr>`;
+  });
+  document.getElementById('tbodyPave').innerHTML = tbody;
+  // 合計
+  let sum = {アスファルト:0, コンクリート:0, オーバーレイ:0};
+  list.forEach(r=>{
+    if(!isNaN(parseFloat(r.面積))){
+      sum[r.種別] += parseFloat(r.面積);
     }
-
-    function calculateLong() {
-      const rows = document.querySelectorAll("#longTable tbody tr");
-      let baseIH = 0;
-      rows.forEach((row, i) => {
-        const inputs = row.querySelectorAll("input");
-        const bs = parseFloat(inputs[1]?.value || "");
-        const fs = parseFloat(inputs[2]?.value || "");
-        const ihCell = row.cells[3];
-        const ghCell = row.cells[4];
-
-        if (i === 0) {
-          if (!isNaN(bs)) {
-            if (initialGH === null) {
-              const ghInput = prompt("初期GHを入力してください");
-              if (ghInput === null || ghInput.trim() === "" || isNaN(parseFloat(ghInput))) {
-                ihCell.textContent = "";
-                ghCell.textContent = "";
-                return;
-              }
-              initialGH = parseFloat(ghInput);
-            }
-            baseIH = initialGH + bs;
-            ihCell.textContent = baseIH.toFixed(2);
-            ghCell.textContent = initialGH.toFixed(2);
-          } else {
-            ihCell.textContent = "";
-            ghCell.textContent = "";
-          }
-        } else {
-          const prevIH = parseFloat(rows[i - 1].cells[3].textContent || "0");
-          if (!isNaN(fs)) {
-            const gh = prevIH - fs;
-            ghCell.textContent = gh.toFixed(2);
-            ihCell.textContent = prevIH.toFixed(2);
-          } else {
-            ihCell.textContent = "";
-            ghCell.textContent = "";
-          }
-        }
-      });
-    }
-
-    function clearLong() {
-      if (confirm("縦断測量のすべてのデータを削除します。よろしいですか？")) {
-        document.querySelector("#longTable tbody").innerHTML = "";
-        initialGH = null;
+  });
+  document.getElementById('sumPave').innerHTML =
+    `<table class="ss-table">
+      <tr>
+        <th>現場名</th>
+        <th>アスファルト合計</th>
+        <th>コンクリート合計</th>
+        <th>オーバーレイ合計</th>
+      </tr>
+      <tr>
+        <td>${currentSite}</td>
+        <td>${sum.アスファルト.toFixed(2)}</td>
+        <td>${sum.コンクリート.toFixed(2)}</td>
+        <td>${sum.オーバーレイ.toFixed(2)}</td>
+      </tr>
+    </table>`;
+}
+function renderTable(type, tbodyId, sumId, thick, isDemo) {
+  const list = allSites[currentSite][type];
+  for (let i = 0; i < list.length; i++) {
+    let row = list[i];
+    row.追距 = (i === 0)
+      ? (parseFloat(row.単距)||0)
+      : (parseFloat(list[i-1].追距)||0) + (parseFloat(row.単距)||0);
+    if (i === 0) {
+      row.面積 = (row.単距 && row.幅員) ? (parseFloat(row.単距)*parseFloat(row.幅員)).toFixed(2) : '';
+    } else {
+      let 上幅員 = parseFloat(list[i-1].幅員)||0;
+      let 幅員 = parseFloat(row.幅員)||0;
+      let 単距 = parseFloat(row.単距)||0;
+      if (幅員 > 0 && 上幅員 > 0 && 単距 > 0) {
+        row.面積 = (((幅員 + 上幅員)/2)*単距).toFixed(2);
+      } else {
+        row.面積 = '';
       }
     }
-
-    function dmsToDecimal(dms) {
-      const deg = Math.floor(dms / 10000);
-      const min = Math.floor((dms % 10000) / 100);
-      const sec = dms % 100;
-      return deg + min / 60 + sec / 3600;
+  }
+  let tbody = '';
+  list.forEach((row, idx) => {
+    tbody += `<tr>
+      <td><input value="${row.測点||''}" onchange="editRow('${type}',${idx},'測点',this.value)"></td>
+      <td><input value="${row.単距||''}" onchange="editRow('${type}',${idx},'単距',this.value)"></td>
+      <td><input value="${row.追距||''}" class="readonly" readonly></td>
+      <td><input value="${row.幅員||''}" onchange="editRow('${type}',${idx},'幅員',this.value)"></td>
+      <td><input value="${row.平均幅員||''}" onchange="editRow('${type}',${idx},'平均幅員',this.value)"></td>
+      <td><input value="${row.面積||''}" class="readonly" readonly></td>
+    </tr>`;
+  });
+  document.getElementById(tbodyId).innerHTML = tbody;
+  let sum = 0;
+  list.forEach(row => { if (!isNaN(parseFloat(row.面積))) sum += parseFloat(row.面積); });
+  const vol = (thick && sum) ? (sum * thick / 100).toFixed(2) : '0.00';
+  document.getElementById(sumId).textContent =
+    isDemo
+      ? `合計体積：${vol} m³　（面積：${sum.toFixed(2)}㎡ × 厚さ：${thick}cm）`
+      : `合計体積：${vol} m³　（面積：${sum.toFixed(2)}㎡ × 掘削厚さ：${thick}cm）`;
+}
+function editRow(type, idx, key, val) {
+  allSites[currentSite][type][idx][key] = val;
+  renderAllAndSave();
+}
+function toggleEarth() {
+  allSites[currentSite].earthOn = document.getElementById('chkEarth').checked;
+  renderAllAndSave();
+}
+function earthSameChange() {
+  allSites[currentSite].earthSame = document.getElementById('earthSamePave').checked;
+  renderAllAndSave();
+}
+function earthThickChange() {
+  allSites[currentSite].earthThick = document.getElementById('earthThick').value;
+  renderAllAndSave();
+}
+function toggleDemo() {
+  allSites[currentSite].demoOn = document.getElementById('chkDemo').checked;
+  renderAllAndSave();
+}
+function demoSameChange() {
+  allSites[currentSite].demoSame = document.getElementById('demoSamePave').checked;
+  renderAllAndSave();
+}
+function demoThickChange() {
+  allSites[currentSite].demoThick = document.getElementById('demoThick').value;
+  renderAllAndSave();
+}
+function renderAll() {
+  if(!currentSite) return;
+  renderTablePave();
+  document.getElementById('chkEarth').checked = allSites[currentSite].earthOn;
+  document.getElementById('earthType').value = allSites[currentSite].earthType;
+  document.getElementById('earthSamePave').checked = allSites[currentSite].earthSame;
+  document.getElementById('earthThick').value = allSites[currentSite].earthThick;
+  if(allSites[currentSite].earthOn) {
+    if(allSites[currentSite].earthSame) {
+      document.getElementById('earthTableBlock').classList.add('hidden');
+      let paveSum = 0;
+      allSites[currentSite].pave.forEach(row=>paveSum+=parseFloat(row.面積)||0);
+      const thick = parseFloat(allSites[currentSite].earthThick)||0;
+      const vol = thick ? (paveSum * thick / 100).toFixed(2) : '0.00';
+      document.getElementById('sumEarth').textContent = `合計体積：${vol} m³　（面積：${paveSum.toFixed(2)}㎡ × 厚さ：${thick}cm）`;
+      document.getElementById('earthAlert').textContent = '';
+    } else {
+      document.getElementById('earthTableBlock').classList.remove('hidden');
+      renderTable('earth','tbodyEarth','sumEarth',parseFloat(allSites[currentSite].earthThick)||0,false);
     }
-
-    function decimalToDMS(deg) {
-      const d = Math.floor(deg);
-      const mFloat = (deg - d) * 60;
-      const m = Math.floor(mFloat);
-      let s = Math.round((mFloat - m) * 60);
-      if (s === 60) { s = 0; m += 1; }
-      if (m === 60) { m = 0; d += 1; }
-      return `${d}°${m}′${s}″`;
+  } else {
+    document.getElementById('earthTableBlock').classList.add('hidden');
+    document.getElementById('sumEarth').textContent = '';
+    document.getElementById('earthAlert').textContent = '';
+  }
+  document.getElementById('chkDemo').checked = allSites[currentSite].demoOn;
+  document.getElementById('demoType').value = allSites[currentSite].demoType;
+  document.getElementById('demoSamePave').checked = allSites[currentSite].demoSame;
+  document.getElementById('demoThick').value = allSites[currentSite].demoThick;
+  if(allSites[currentSite].demoOn) {
+    if(allSites[currentSite].demoSame) {
+      document.getElementById('demoTableBlock').classList.add('hidden');
+      let paveSum = 0;
+      allSites[currentSite].pave.forEach(row=>paveSum+=parseFloat(row.面積)||0);
+      const thick = parseFloat(allSites[currentSite].demoThick)||0;
+      const vol = thick ? (paveSum * thick / 100).toFixed(2) : '0.00';
+      document.getElementById('sumDemo').textContent = `合計体積：${vol} m³　（面積：${paveSum.toFixed(2)}㎡ × 厚さ：${thick}cm）`;
+      document.getElementById('demoAlert').textContent = '';
+    } else {
+      document.getElementById('demoTableBlock').classList.remove('hidden');
+      renderTable('demo','tbodyDemo','sumDemo',parseFloat(allSites[currentSite].demoThick)||0,true);
     }
+  } else {
+    document.getElementById('demoTableBlock').classList.add('hidden');
+    document.getElementById('sumDemo').textContent = '';
+    document.getElementById('demoAlert').textContent = '';
+  }
+}
 
-    function calculateCurve() {
-      const iaInput = document.getElementById("ia").value;
-      const r = parseFloat(document.getElementById("r").value);
-      if (!iaInput || !r || isNaN(r)) return;
-
-      const iaDecimal = dmsToDecimal(parseInt(iaInput, 10));
-      const tl = r * Math.tan((iaDecimal * Math.PI / 180) / 2);
-      const sl = r * (1 / Math.cos((iaDecimal * Math.PI / 180) / 2) - 1);
-      const cl = r * (iaDecimal * Math.PI / 180);
-      const clHalf = cl / 2;
-      const mcDMS = decimalToDMS((180 - iaDecimal) / 2);
-
-      document.getElementById("curveResult").innerHTML = `
-        <p><strong>TL:</strong> ${tl.toFixed(2)} m</p>
-        <p><strong>SL:</strong> ${sl.toFixed(2)} m</p>
-        <p><strong>CL:</strong> ${cl.toFixed(2)} m</p>
-        <p><strong>MC:</strong> ${mcDMS}</p>
-        <p><strong>CL/2:</strong> ${clHalf.toFixed(2)} m</p>
-      `;
-    }
-
-    window.onload = () => {
-      initializeCrossTable();
-      for (let i = 0; i < 5; i++) addLongRow();
-    };
-  </script>
+// ---- ss形式で合計表示（設計請数量集計表風/項目例付き・必要に応じて調整可）
+function showSummary() {
+  const tableStyle = "min-width:1280px;border-collapse:collapse;border:2px solid #555;background:#fff;";
+  const thStyle1 = "border:2px solid #555;background:#e6eef5;color:#007acc;font-weight:bold;text-align:center;padding:8px 5px;";
+  const thStyle2 = "border:2px solid #555;background:#f7fbff;color:#007acc;font-weight:bold;text-align:center;padding:5px 5px;";
+  const tdStyle = "border:2px solid #555;text-align:center;padding:6px 5px;";
+  // 1段目
+  const headerRow1 = [
+    { label: "箇所名", colspan: 1, rowspan: 3 },
+    { label: "土工", colspan: 3, rowspan: 1 },
+    { label: "取り壊し工", colspan: 4, rowspan: 1 },
+    { label: "舗装工", colspan: 7, rowspan: 1 }
+  ];
+  // 2段目
+  const headerRow2 = [
+    { label: "機械掘削", colspan: 1, rowspan: 2 },
+    { label: "残土処理", colspan: 1, rowspan: 2 },
+    { label: "", colspan: 1, rowspan: 2 },
+    { label: "舗装版切断", colspan: 1, rowspan: 2 },
+    { label: "舗装版破砕As", colspan: 1, rowspan: 2 },
+    { label: "舗装版破砕Con", colspan: 1, rowspan: 2 },
+    { label: "", colspan: 1, rowspan: 2 },
+    { label: "アスファルト", colspan: 3, rowspan: 1 },
+    { label: "オーバーレイ", colspan: 3, rowspan: 1 },
+    { label: "コンクリート", colspan: 1, rowspan: 2 }
+  ];
+  // 3段目
+  const headerRow3 = [
+    { label: "" }, { label: "" }, { label: "" },
+    { label: "" }, { label: "" }, { label: "" }, { label: "" },
+    { label: "t=4cm 1.4未満" },
+    { label: "t=4cm 1.4以上" },
+    { label: "t=4cm 3.0以上" },
+    { label: "t=4cm 1.4未満" },
+    { label: "t=4cm 1.4以上" },
+    { label: "t=4cm 3.0以上" },
+    { label: "" }
+  ];
+  const dataCols = [
+    "site",
+    "machine_excavation", "residual_soil", "dummy_soil",
+    "cutting", "break_as", "break_con", "dummy_demo",
+    "as_lt1_4", "as_ge1_4", "as_ge3_0",
+    "ovl_lt1_4", "ovl_ge1_4", "ovl_ge3_0",
+    "con_total"
+  ];
+  let html = `<table class="ss-table" style="${tableStyle}">`;
+  html += "<tr>";
+  headerRow1.forEach(cell => {
+    html += `<th style="${thStyle1}" colspan="${cell.colspan}" rowspan="${cell.rowspan}">${cell.label}</th>`;
+  });
+  html += "</tr>";
+  html += "<tr>";
+  for (let i = 0; i < headerRow2.length; i++) {
+    let cell = headerRow2[i];
+    html += `<th style="${thStyle2}" colspan="${cell.colspan}" rowspan="${cell.rowspan || 1}">${cell.label}</th>`;
+  }
+  html += "</tr>";
+  html += "<tr>";
+  headerRow3.forEach(cell=>{
+    html += `<th style="${thStyle2}">${cell.label}</th>`;
+  });
+  html += "</tr>";
+  Object.keys(allSites).forEach(site => {
+    let row = {};
+    row.site = site;
+    // 土工
+    let earthList = allSites[site].earth || [];
+    let machine_excavation = 0, residual_soil = 0;
+    earthList.forEach(r => {
+      let area = parseFloat(r.面積) || 0;
+      machine_excavation += area;
+      residual_soil += area;
+    });
+    row.machine_excavation = machine_excavation > 0 ? machine_excavation.toFixed(1) : "";
+    row.residual_soil = residual_soil > 0 ? residual_soil.toFixed(1) : "";
+    row.dummy_soil = "";
+    // 取壊し工
+    let demoList = allSites[site].demo || [];
+    let cutting = 0, break_as = 0, break_con = 0;
+    demoList.forEach(r => {
+      let area = parseFloat(r.面積) || 0;
+      if (r.種別 === "舗装版切断") cutting += area;
+      if (r.種別 === "舗装版破砕As") break_as += area;
+      if (r.種別 === "舗装版破砕Con") break_con += area;
+    });
+    row.cutting = cutting > 0 ? cutting.toFixed(1) : "";
+    row.break_as = break_as > 0 ? break_as.toFixed(1) : "";
+    row.break_con = break_con > 0 ? break_con.toFixed(1) : "";
+    row.dummy_demo = "";
+    // 舗装工
+    let paveList = allSites[site].pave || [];
+    let as_lt1_4 = 0, as_ge1_4 = 0, as_ge3_0 = 0,
+        con_total = 0, ovl_lt1_4 = 0, ovl_ge1_4 = 0, ovl_ge3_0 = 0;
+    paveList.forEach(r => {
+      let area = parseFloat(r.面積) || 0;
+      if (r.種別 === "アスファルト" && r.平均幅員 === "1.4未満") as_lt1_4 += area;
+      if (r.種別 === "アスファルト" && r.平均幅員 === "1.4以上") as_ge1_4 += area;
+      if (r.種別 === "アスファルト" && r.平均幅員 === "3.0以上") as_ge3_0 += area;
+      if (r.種別 === "コンクリート") con_total += area;
+      if (r.種別 === "オーバーレイ" && r.平均幅員 === "1.4未満") ovl_lt1_4 += area;
+      if (r.種別 === "オーバーレイ" && r.平均幅員 === "1.4以上") ovl_ge1_4 += area;
+      if (r.種別 === "オーバーレイ" && r.平均幅員 === "3.0以上") ovl_ge3_0 += area;
+    });
+    row.as_lt1_4 = as_lt1_4 > 0 ? as_lt1_4.toFixed(1) : "";
+    row.as_ge1_4 = as_ge1_4 > 0 ? as_ge1_4.toFixed(1) : "";
+    row.as_ge3_0 = as_ge3_0 > 0 ? as_ge3_0.toFixed(1) : "";
+    row.ovl_lt1_4 = ovl_lt1_4 > 0 ? ovl_lt1_4.toFixed(1) : "";
+    row.ovl_ge1_4 = ovl_ge1_4 > 0 ? ovl_ge1_4.toFixed(1) : "";
+    row.ovl_ge3_0 = ovl_ge3_0 > 0 ? ovl_ge3_0.toFixed(1) : "";
+    row.con_total = con_total > 0 ? con_total.toFixed(1) : "";
+    html += `<tr>${dataCols.map(k => `<td style="${tdStyle}">${row[k] || ""}</td>`).join("")}</tr>`;
+  });
+  html += '</table>';
+  document.getElementById('summary').innerHTML = html;
+}
+function exportDXF() {
+  const list = allSites[currentSite]?.pave || [];
+  let lines = [];
+  let x = 0, y = 0;
+  let scale = 100;
+  let sumA = 0, sumC = 0, sumO = 0;
+  for(let i=0;i<list.length;i++) {
+    let r = list[i];
+    let len = parseFloat(r.単距)||0;
+    let width = parseFloat(r.幅員)||0;
+    if(len<=0 || width<=0) continue;
+    let x0 = x, y0 = y, x1 = x+len*scale, y1 = y+width*scale;
+    lines.push(`0\nLINE\n8\n0\n10\n${x0}\n20\n${y0}\n11\n${x1}\n21\n${y0}\n`);
+    lines.push(`0\nLINE\n8\n0\n10\n${x1}\n20\n${y0}\n11\n${x1}\n21\n${y1}\n`);
+    lines.push(`0\nLINE\n8\n0\n10\n${x1}\n20\n${y1}\n11\n${x0}\n21\n${y1}\n`);
+    lines.push(`0\nLINE\n8\n0\n10\n${x0}\n20\n${y1}\n11\n${x0}\n21\n${y0}\n`);
+    lines.push(`0\nTEXT\n8\n0\n10\n${x+len*scale/2}\n20\n${y-18}\n40\n6\n1\n${len}\n`);
+    if(r.種別==="アスファルト") sumA += parseFloat(r.面積)||0;
+    if(r.種別==="コンクリート") sumC += parseFloat(r.面積)||0;
+    if(r.種別==="オーバーレイ") sumO += parseFloat(r.面積)||0;
+    x += len*scale;
+  }
+  let sumTextY = -38;
+  if(sumA>0) { lines.push(`0\nTEXT\n8\n0\n10\n50\n20\n${sumTextY}\n40\n7\n1\nアスファルト舗装 合計A=${sumA.toFixed(1)}㎡\n`); sumTextY-=26; }
+  if(sumC>0) { lines.push(`0\nTEXT\n8\n0\n10\n50\n20\n${sumTextY}\n40\n7\n1\nコンクリート舗装 合計A=${sumC.toFixed(1)}㎡\n`); sumTextY-=26; }
+  if(sumO>0) { lines.push(`0\nTEXT\n8\n0\n10\n50\n20\n${sumTextY}\n40\n7\n1\nオーバーレイ舗装 合計A=${sumO.toFixed(1)}㎡\n`);}
+  let dxf =
+    '0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nSECTION\n2\nTABLES\n0\nENDSEC\n0\nSECTION\n2\nBLOCKS\n0\nENDSEC\n0\nSECTION\n2\nENTITIES\n'
+    + lines.join('')
+    + '0\nENDSEC\n0\nEOF\n';
+  let blob = new Blob([dxf], {type:'text/plain'});
+  let a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = "pave.dxf";
+  a.click();
+}
+document.getElementById('earthType').onchange = function() {
+  if(!currentSite) return;
+  allSites[currentSite].earthType = this.value;
+  renderAllAndSave();
+};
+document.getElementById('demoType').onchange = function() {
+  if(!currentSite) return;
+  allSites[currentSite].demoType = this.value;
+  renderAllAndSave();
+};
+// ▼ 初回ロード時：ローカルストレージ復元＋初期表示
+window.addEventListener('DOMContentLoaded', ()=>{
+  loadData();
+  renderAll();
+});
+</script>
 </body>
 </html>
-
