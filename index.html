@@ -633,7 +633,6 @@ function showSummary() {
     let demoList = allSites[site].demo || [];
     let cutting = 0, break_as = 0, break_con = 0;
     let mode = allSites[site].demoType;
-    let mode = allSites[site].demoType;
     demoList.forEach(r => {
       let area = parseFloat(r.面積) || 0;
       if (mode === "As") break_as += area;
