@@ -290,6 +290,15 @@
     <div>
       <label>区画線設置 文字記号：<input type="number" id="anzenMark" min="0" onchange="editAnzen('mark', this.value)"></label>
     </div>
+    <div>
+      <label>アスカーブ 標準：<input type="number" id="anzenStdCurb" min="0" onchange="editAnzen('std_as_curb', this.value)"></label>
+    </div>
+    <div>
+      <label>アスカーブ 小型：<input type="number" id="anzenSmallCurb" min="0" onchange="editAnzen('small_as_curb', this.value)"></label>
+    </div>
+    <div>
+      <label>アスカーブ 手盛：<input type="number" id="anzenHandCurb" min="0" onchange="editAnzen('hand_as_curb', this.value)"></label>
+    </div>
   </div>
   <!-- 仮設工タブ -->
   <div id="panelKari" class="block hidden">
@@ -426,8 +435,15 @@ function loadData() {
     if (dat && typeof dat === "object") {
       allSites = dat;
       Object.keys(allSites).forEach(s => {
-        allSites[s].anzen = allSites[s].anzen || { outside:'', stop:'', mark:'' };
-        allSites[s].kari = allSites[s].kari || { guideB:'', signal:'', transport:'' };
+        const a = allSites[s].anzen || {};
+        allSites[s].anzen = {
+          outside: a.outside || '',
+          stop: a.stop || '',
+          mark: a.mark || '',
+          std_as_curb: a.std_as_curb || '',
+          small_as_curb: a.small_as_curb || '',
+          hand_as_curb: a.hand_as_curb || ''
+        };        allSites[s].kari = allSites[s].kari || { guideB:'', signal:'', transport:'' };
       });
       // サイトリスト描画
       const siteList = Object.keys(allSites);
@@ -452,7 +468,7 @@ function addSite() {
     pave: [],
     earth: [],
     demo: [],
-    anzen: { outside:'', stop:'', mark:'' },
+    anzen: { outside:'', stop:'', mark:'', std_as_curb:'', small_as_curb:'', hand_as_curb:'' },
     kari: { guideB:'', signal:'', transport:'' },
     earthSetting: { same: true, type: '標準掘削', thick: 0 },
     demoSetting: { same: true, type: 'As', thick: 0 }
@@ -625,6 +641,9 @@ function renderAnzen() {
   document.getElementById('anzenOutside').value = a.outside || '';
   document.getElementById('anzenStop').value = a.stop || '';
   document.getElementById('anzenMark').value = a.mark || '';
+  document.getElementById('anzenStdCurb').value = a.std_as_curb || '';
+  document.getElementById('anzenSmallCurb').value = a.small_as_curb || '';
+  document.getElementById('anzenHandCurb').value = a.hand_as_curb || '';
 }
 
 function renderKari() {
@@ -708,8 +727,7 @@ function showSummary() {
   <th colspan="2" style="${thStyle1}">土工</th>
   <th colspan="6" style="${thStyle1}">取り壊し工</th>
   <th colspan="10" style="${thStyle1}">舗装工</th>
-  <th colspan="3" style="${thStyle1}">安全施設工</th>
-  <th colspan="3" style="${thStyle1}">アスカーブ</th>
+  <th colspan="6" style="${thStyle1}">安全施設工</th>
   <th colspan="3" style="${thStyle1}">仮設工</th>
   <th rowspan="3" style="${thStyle1}">雑工</th>
 </tr>
@@ -726,9 +744,8 @@ function showSummary() {
   <th colspan="3" style="${thStyle1}">オーバーレイ</th>
   <th rowspan="2" style="${thStyle1}">コンクリート</th>
   <th colspan="3" style="${thStyle1}">区画線設置</th>
-  <th rowspan="2" style="${thStyle1}">標準</th>
-  <th rowspan="2" style="${thStyle1}">小型</th>
-  <th rowspan="2" style="${thStyle1}">手盛</th>
+  <th colspan="3" style="${thStyle1}">アスカーブ</th>
+
   <th rowspan="2" style="${thStyle1}">交通誘導員B</th>
   <th rowspan="2" style="${thStyle1}">仮設信号機</th>
   <th rowspan="2" style="${thStyle1}">重機運搬費</th>
@@ -743,6 +760,9 @@ function showSummary() {
   <th style="${thStyle2}">外側線</th>
   <th style="${thStyle2}">停止線</th>
   <th style="${thStyle2}">文字・記号</th>
+  <th style="${thStyle2}">標準</th>
+  <th style="${thStyle2}">小型</th>
+  <th style="${thStyle2}">手盛</th>
 </tr>`;
 
   let totalRow = {};
@@ -810,18 +830,17 @@ function showSummary() {
     row.ovl_ge3_0 = ovl_ge3_0 > 0 ? ovl_ge3_0.toFixed(1) : "";
     row.con_total = con_total > 0 ? con_total.toFixed(1) : "";
 
-    // 追加の工種（現状計算対象なし）
-    row.std_as_curb = "";
-    row.small_as_curb = "";
-    row.hand_as_curb = "";
-    row.kakusen_out = "";
-    row.kakusen_stop = "";
-    row.kakusen_char = "";
-    row.kari_guard_b = "";
-    row.kari_signal = "";
-    row.kari_heavy = "";
     const anzen = allSites[site].anzen || {};
     const kari = allSites[site].kari || {};
+    row.kakusen_out = anzen.outside || '';
+    row.kakusen_stop = anzen.stop || '';
+    row.kakusen_char = anzen.mark || '';
+    row.std_as_curb = anzen.std_as_curb || '';
+    row.small_as_curb = anzen.small_as_curb || '';
+    row.hand_as_curb = anzen.hand_as_curb || '';
+    row.kari_guard_b = kari.guideB || '';
+    row.kari_signal = kari.signal || '';
+    row.kari_heavy = kari.transport || '';
     let anzen_total = (parseFloat(anzen.outside)||0) + (parseFloat(anzen.stop)||0) + (parseFloat(anzen.mark)||0);
     let kari_total = (parseFloat(kari.guideB)||0) + (parseFloat(kari.signal)||0) + (parseFloat(kari.transport)||0);
     row.anzen_total = anzen_total > 0 ? anzen_total.toFixed(1) : "";
