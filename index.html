@@ -236,13 +236,6 @@
       <div id="worksAnzenSetting" class="works-setting hidden"></div>
     </div>
     <div>
-      <label><input type="checkbox" id="chkWorksKari" onchange="renderTabs()"> 仮設工</label>
-      <div id="worksKariSetting" class="works-setting hidden">
-        <label>交通誘導員B：<input type="number" id="kariGuideB" min="0" onchange="editKari('guideB', this.value)"></label>
-        <label>仮設信号機：<input type="number" id="kariSignal" min="0" onchange="editKari('signal', this.value)"></label>
-        <label>重機運搬費：<input type="number" id="kariTransport" min="0" onchange="editKari('transport', this.value)"></label>
-      </div>    </div>
-    <div>
       <label><input type="checkbox" id="chkWorksZatsu" onchange="renderTabs()"> 雑工</label>
     </div>
   </div>
@@ -303,6 +296,15 @@
       <label>アスカーブ 手盛：<input type="number" id="anzenHandCurb" min="0" onchange="editAnzen('hand_as_curb', this.value)"></label>
     </div>
   </div>
+  <div>
+    <label>交通誘導員B：<input type="number" id="kariGuideB" min="0" onchange="editKari('guideB', this.value)"></label>
+  </div>
+  <div>
+    <label>仮設信号機：<input type="number" id="kariSignal" min="0" onchange="editKari('signal', this.value)"></label>
+  </div>
+  <div>
+    <label>重機運搬費：<input type="number" id="kariTransport" min="0" onchange="editKari('transport', this.value)"></label>
+  </div>
   <!-- 免責事項タブ -->
   <div id="panelDisclaimer" class="block hidden">
     <p>
@@ -355,7 +357,6 @@ const worksList = [
   { id: "Pave", label: "舗装工", always: true, panel: "panelPave" },
   { id: "Demo", label: "取り壊し工", chk: "chkWorksDemo", setting: "worksDemoSetting", panel: "panelDemo" },
   { id: "Anzen", label: "安全施設工", chk: "chkWorksAnzen", setting: "worksAnzenSetting", panel: "panelAnzen" },
-  { id: "Kari", label: "仮設工", chk: "chkWorksKari", setting: "worksKariSetting", panel: null },
   { id: "Zatsu", label: "雑工", chk: "chkWorksZatsu", panel: null },
   { id: "Disclaimer", label: "免責事項", always: true, panel: "panelDisclaimer"}
 ];
