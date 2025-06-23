@@ -696,8 +696,8 @@ function showSummary() {
     "as_lt1_4", "as_ge1_4", "as_ge3_0",
     "ovl_lt1_4", "ovl_ge1_4", "ovl_ge3_0",
     "con_total",
-    "std_as_curb", "small_as_curb", "hand_as_curb",
     "kakusen_out", "kakusen_stop", "kakusen_char",
+    "std_as_curb", "small_as_curb", "hand_as_curb",
     "kari_guard_b", "kari_signal", "kari_heavy",
     "zatsu_total"
     ];
@@ -709,9 +709,8 @@ function showSummary() {
   <th colspan="6" style="${thStyle1}">取り壊し工</th>
   <th colspan="10" style="${thStyle1}">舗装工</th>
   <th colspan="3" style="${thStyle1}">安全施設工</th>
-  <th rowspan="3" style="${thStyle1}">交通誘導員B</th>
-  <th rowspan="3" style="${thStyle1}">仮設信号機</th>
-  <th rowspan="3" style="${thStyle1}">重機運搬費</th>
+  <th colspan="3" style="${thStyle1}">アスカーブ</th>
+  <th colspan="3" style="${thStyle1}">仮設工</th>
   <th rowspan="3" style="${thStyle1}">雑工</th>
 </tr>
 <tr>
@@ -726,10 +725,13 @@ function showSummary() {
   <th colspan="3" style="${thStyle1}">アスファルト</th>
   <th colspan="3" style="${thStyle1}">オーバーレイ</th>
   <th rowspan="2" style="${thStyle1}">コンクリート</th>
-  <th rowspan="2" style="${thStyle1}">As縁石(標準)</th>
-  <th rowspan="2" style="${thStyle1}">As縁石(小型)</th>
-  <th rowspan="2" style="${thStyle1}">As縁石(手設置)</th>
   <th colspan="3" style="${thStyle1}">区画線設置</th>
+  <th rowspan="2" style="${thStyle1}">標準</th>
+  <th rowspan="2" style="${thStyle1}">小型</th>
+  <th rowspan="2" style="${thStyle1}">手盛</th>
+  <th rowspan="2" style="${thStyle1}">交通誘導員B</th>
+  <th rowspan="2" style="${thStyle1}">仮設信号機</th>
+  <th rowspan="2" style="${thStyle1}">重機運搬費</th>
 </tr>
 <tr>
   <th style="${thStyle2}">t=4cm 1.4未満</th>
@@ -860,5 +862,4 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 </body>
-</html>
 </html>
