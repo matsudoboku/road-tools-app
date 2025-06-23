@@ -295,6 +295,29 @@
 <script>
 // ▼ グローバル定義
 const LS_KEY = 'paveAppAllSites_v5'; // 新バージョンに合わせて更新
+// 過去バージョンの保存キー一覧（最も古いものから順）
+const OLD_KEYS = ['paveAppAllSites_v4', 'paveAppAllSites_v3', 'paveAppAllSites_v2', 'paveAppAllSites'];
+
+// --- LocalStorage Migration ---
+// 以前のバージョンで使用していたキーが存在する場合、
+// データを新しいキーに移し替え、旧キーを削除する
+function migrateOldData() {
+  for (const k of OLD_KEYS) {
+    const oldStr = localStorage.getItem(k);
+    if (!oldStr) continue;
+    try {
+      const dat = JSON.parse(oldStr);
+      if (dat && typeof dat === 'object') {
+        localStorage.setItem(LS_KEY, JSON.stringify(dat));
+        localStorage.removeItem(k);
+        break; // 1つ見つけたらそれを採用
+      }
+    } catch(e) {
+      // parse error -> ignore
+    }
+    localStorage.removeItem(k);
+  }
+}
 let allSites = {};
 let currentSite = '';
 const paveTypes = ["アスファルト", "コンクリート", "オーバーレイ"];
@@ -709,6 +732,7 @@ window.addEventListener('DOMContentLoaded', () => {
   // 工種設定は初期ON
   document.getElementById('chkWorksEarth').checked = true;
   document.getElementById('chkWorksDemo').checked = true;
+  migrateOldData();
   renderTabs();
   loadData();
   renderAll();
