@@ -2,173 +2,193 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>舗装数量・土工・取壊し 数量/DXFツール</title>
+  <title>舗装補修計算ツール</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
-      font-family: 'Segoe UI', 'Meiryo', sans-serif;
-      background: #f5f8fa;
+      font-family: 'San Francisco', 'SF Pro Display', 'Segoe UI', 'Meiryo', sans-serif;
+      background: linear-gradient(135deg, #f6f6f7 0%, #eaeef3 100%);
       margin: 0;
       color: #222;
     }
     .container {
-      max-width: 1000px;
-      margin: 30px auto;
-      padding: 30px 10px 40px 10px;
+      max-width: 900px;
+      margin: 32px auto;
+      padding: 28px 12px 38px 12px;
       background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 4px 24px #0002;
-    }
-    h4 {
-      font-size: 1.13em;
-      color: #007acc;
-      margin-bottom: 0.6em;
-      margin-top: 0.5em;
+      border-radius: 28px;
+      box-shadow: 0 6px 36px #0001, 0 1.5px 8px #7e7e7e11;
+      border: 1.5px solid #ececec;
     }
     .tabs {
       display: flex;
-      gap: 10px;
+      gap: 6px;
       margin-bottom: 20px;
       overflow-x: auto;
       flex-wrap: nowrap;
       -webkit-overflow-scrolling: touch;
+      background: #f5f6fa;
+      border-radius: 14px 14px 0 0;
+      box-shadow: 0 2.5px 10px #a4b4d922;
+      padding-left: 2px;
     }
     .tab {
-      padding: 8px 28px;
-      background: #e6eef5;
-      border-radius: 12px 12px 0 0;
+      padding: 10px 32px;
+      background: transparent;
+      border-radius: 13px 13px 0 0;
       cursor: pointer;
-      font-weight: bold;
-      font-size: 1.04em;
-      color: #007acc;
-      border-bottom: 2px solid transparent;
-      transition: all 0.15s;
-      white-space: nowrap;
+      font-weight: 600;
+      font-size: 1.05em;
+      color: #2980fe;
+      border: none;
+      border-bottom: 2.5px solid transparent;
+      transition: all 0.14s cubic-bezier(.48,.01,.6,1.01);
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
     }
     .tab.active, .tab:hover {
-      background: #007acc;
-      color: #fff;
-      border-bottom: 2px solid #007acc;
-      box-shadow: 0 2px 10px #007acc22;
+      background: #e3ebfa;
+      color: #007aff;
+      border-bottom: 3px solid #007aff;
+      box-shadow: 0 3px 14px #007aff14;
+      font-weight: 700;
     }
+    input, select {
+      padding: 9px 10px;
+      font-size: 1.01em;
+      border: 1.3px solid #d2d4dc;
+      border-radius: 11px;
+      background: #f8fafd;
+      box-shadow: 0 2.5px 12px #eef2fb13 inset;
+      outline: none;
+      transition: border 0.18s, box-shadow 0.17s;
+      max-width: 120px;
+      box-sizing: border-box;
+      margin-bottom: 3px;
+    }
+    .siteName { max-width: 190px; }
+    input:focus, select:focus {
+      border: 1.7px solid #007aff;
+      background: #f3faff;
+      box-shadow: 0 0 0 2px #007aff15;
+    }
+    input[readonly], .readonly {
+      background: #f4f4f7 !important;
+      color: #bbb;
+      pointer-events: none;
+    }
+    .btn {
+      padding: 8px 22px;
+      background: linear-gradient(180deg,#007aff 0%,#005ed6 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-right: 12px;
+      box-shadow: 0 2px 8px #007aff15, 0 1.5px 3px #4d8fff08;
+      transition: background 0.18s, box-shadow 0.17s;
+      letter-spacing: 0.01em;
+    }
+    .btn:hover { background: #005ed6; }
+    .btn:active { box-shadow: 0 0px 2px #007aff14; background: #297aff; }
     .block {
-      margin: 12px 0 24px 0;
-      padding: 18px 10px 14px 10px;
-      background: #fafdff;
-      border-radius: 12px;
-      box-shadow: 0 1px 4px #007acc15;
+      margin: 14px 0 24px 0;
+      padding: 22px 12px 16px 12px;
+      background: #f9fafb;
+      border-radius: 17px;
+      box-shadow: 0 1.5px 8px #007aff09;
+      border: 1px solid #eef0f5;
       overflow-x: auto;
     }
     .block label {
-      font-weight: bold;
-      margin-right: 8px;
-    }
-    input, select {
-      padding: 3px 4px;
-      font-size: 0.98em;
-      border: 1.2px solid #ccd8e6;
-      border-radius: 5px;
-      outline: none;
-      transition: border 0.15s;
-      background: #fff;
-      max-width: 90px;
-      box-sizing: border-box;
-    }
-    input[type="number"] { width: 60px; }
-    .siteName { max-width: 170px; }
-    input:focus, select:focus {
-      border: 1.2px solid #007acc;
-      background: #f3f9ff;
-    }
-    .btn {
-      padding: 6px 18px;
-      background: #007acc;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
+      font-weight: 500;
       margin-right: 10px;
-      box-shadow: 0 2px 6px #007acc23;
-      transition: background 0.18s;
+      color: #445;
+      letter-spacing: 0.01em;
     }
-    .btn:hover { background: #005e99; }
-    table {
+    h4 {
+      font-size: 1.18em;
+      color: #007aff;
+      margin-bottom: 0.5em;
+      margin-top: 0.3em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    table, .ss-table {
       border-collapse: separate;
       border-spacing: 0;
       width: 100%;
-      margin-top: 12px;
-      background: #fafdff;
-      box-shadow: 0 2px 8px #007acc0a;
-      border-radius: 9px;
+      margin-top: 13px;
+      background: #fff;
+      box-shadow: 0 2px 18px #4c8bfd09;
+      border-radius: 11px;
       overflow: hidden;
-      min-width: 680px;
+      min-width: 700px;
+      font-size: 1em;
+      border: 1px solid #f3f4fa;
     }
-    th, td {
-      border-bottom: 1px solid #e6eef5;
-      padding: 7px 5px;
+    th, td, .ss-table th, .ss-table td {
+      border-bottom: 1.5px solid #e9eefa;
+      padding: 10px 7px;
       text-align: center;
       white-space: nowrap;
+      font-size: 0.99em;
     }
-    th {
-      background: #e6eef5;
-      color: #007acc;
-      font-size: 1.01em;
+    th, .ss-table th {
+      background: #f4f7fd;
+      color: #007aff;
+      font-weight: bold;
+      border-top: none;
+      font-size: 1.04em;
     }
     tr:last-child td { border-bottom: none; }
-    .readonly {
-      background: #f5f7fa !important;
-      color: #888;
-      pointer-events: none;
+    .ss-table {
+      margin-top: 13px;
+      background: #fff;
+      border-radius: 13px;
+      border: 1.5px solid #e6eef5;
+      min-width: 950px;
+      width: auto;
+      display: inline-block;
+      font-size: 1.01em;
     }
+    .ss-table th, .ss-table td {
+      border-right: 1.5px solid #eaeaea;
+    }
+    .ss-table tr td:last-child, .ss-table tr th:last-child { border-right: none; }
+    .ss-table tr:last-child td { border-bottom: none; }
     .sum {
-      margin-top: 12px;
-      font-weight: bold;
-      color: #2471a3;
-      font-size: 1.1em;
+      margin-top: 14px;
+      font-weight: 600;
+      color: #007aff;
+      font-size: 1.17em;
       letter-spacing: 0.5px;
     }
     .hidden { display: none;}
     .alert { color: #e12b43; font-weight: bold;}
+    .works-setting { margin-left: 22px; margin-top: 7px; margin-bottom: 10px; }
+    .scroll-x-guide {
+      text-align: right;
+      color: #aaa;
+      font-size: 0.94em;
+      padding: 0 4px 0 0;
+    }
     @media (max-width: 900px) {
       .container {padding: 5px;}
-      .block {padding: 5px;}
-      table {font-size: 12px;}
-      input, select { font-size: 0.96em; }
+      .block {padding: 8px;}
+      table, .ss-table {font-size: 13px;}
+      input, select { font-size: 0.97em; }
+      .ss-table { min-width: 600px; }
     }
-    .ss-table {
-      margin-top: 10px;
-      background: #fafdff;
-      border-radius: 9px;
-      border: 1.2px solid #e6eef5;
-      box-shadow: 0 2px 8px #007acc0a;
-      min-width: 920px;
-      width: auto;
-      display: inline-block;
-      font-size: 1em;
-    }
-    .ss-table th, .ss-table td {
-      border-bottom: 1px solid #e6eef5;
-      border-right: 1px solid #e6eef5;
-      padding: 7px 14px;
-      text-align: center;
-      white-space: nowrap;
-    }
-    .ss-table th {
-      background: #e6eef5;
-      color: #007acc;
-      font-weight: bold;
-      font-size: 1.02em;
-    }
-    .ss-table tr:last-child td { border-bottom: none; }
-    .ss-table tr td:last-child, .ss-table tr th:last-child { border-right: none; }
     @media (max-width: 600px) {
-      .container { width: 100%; max-width: none; margin: 10px 0; padding: 5px; }
-      .block { margin: 10px 0; padding: 8px 5px; }
-      table, .ss-table { width: 100%; min-width: 0; display: block; }
-      input, select { padding: 2px 3px; }
+      .container { width: 100%; max-width: none; margin: 10px 0; padding: 4px; }
+      .block { margin: 10px 0; padding: 8px 3px; }
+      table, .ss-table { width: 100%; min-width: 0; display: block; font-size: 12px; overflow-x:scroll;}
+      input, select { padding: 5px 4px; }
       .siteName { width: 100%; max-width: none; }
-      input[type="number"] { width: 55px; }
+      input[type="number"] { width: 50px; }
     }
   </style>
 </head>
@@ -182,51 +202,62 @@
     <select id="siteList" onchange="switchSite()" style="margin-left:12px;"></select>
   </div>
 
-  <div class="tabs">
-    <div class="tab active" id="tabPave" onclick="showTab('pave')">舗装工</div>
-    <div class="tab" id="tabEarth" onclick="showTab('earth')">土工</div>
-    <div class="tab" id="tabDemo" onclick="showTab('demo')">取り壊し工</div>
-    <div class="tab" id="tabDisclaimer" onclick="showTab('disclaimer')">免責事項</div>
+  <!-- タブ（動的生成） -->
+  <div class="tabs" id="tabsArea"></div>
+
+  <!-- 工種設定タブ -->
+  <div id="panelWorks" class="block">
+    <h4>工種設定</h4>
+    <div>
+      <label><input type="checkbox" id="chkWorksEarth" onchange="renderTabs()"> 土工</label>
+      <div id="worksEarthSetting" class="works-setting hidden">
+        <label><input type="checkbox" id="earthSamePave" onchange="saveAndUpdate()"> 舗装面積と同じ</label>
+        <select id="earthType" onchange="saveAndUpdate()">
+          <option>標準掘削</option>
+          <option>標準以下掘削</option>
+        </select>
+        <label>掘削厚（cm）：<input type="number" id="earthThick" min="0" style="width:60px;" onchange="saveAndUpdate()"></label>
+      </div>
+    </div>
+    <div>
+      <label><input type="checkbox" id="chkWorksDemo" onchange="renderTabs()"> 取り壊し工</label>
+      <div id="worksDemoSetting" class="works-setting hidden">
+        <label><input type="checkbox" id="demoSamePave" onchange="saveAndUpdate()"> 舗装面積と同じ</label>
+        <select id="demoType" onchange="saveAndUpdate()">
+          <option>As</option>
+          <option>Con</option>
+          <option>As+Con</option>
+        </select>
+        <label>取壊し厚（cm）：<input type="number" id="demoThick" min="0" style="width:60px;" onchange="saveAndUpdate()"></label>
+      </div>
+    </div>
+    <div>
+      <label><input type="checkbox" id="chkWorksAnzen" onchange="renderTabs()"> 安全施設工</label>
+    </div>
+    <div>
+      <label><input type="checkbox" id="chkWorksKari" onchange="renderTabs()"> 仮設工</label>
+    </div>
+    <div>
+      <label><input type="checkbox" id="chkWorksZatsu" onchange="renderTabs()"> 雑工</label>
+    </div>
   </div>
 
+  <!-- 土工タブ -->
+  <div id="panelEarth" class="block hidden">
+    <h4>土工（体積計算）</h4>
+    <div id="earthResult"></div>
+  </div>
   <!-- 舗装工タブ -->
-  <div id="panelPave" class="block">
+  <div id="panelPave" class="block hidden">
     <h4>舗装工</h4>
     <button class="btn" onclick="addRow('pave')">行追加</button>
     <button class="btn" onclick="exportDXF()">DXFエクスポート</button>
     <div style="overflow-x:auto;">
-    <table>
-      <thead>
-        <tr>
-          <th>種別</th>
-          <th>測点</th>
-          <th>単距</th>
-          <th>追距</th>
-          <th>幅員</th>
-          <th>平均幅員</th>
-          <th>面積</th>
-        </tr>
-      </thead>
-      <tbody id="tbodyPave"></tbody>
-    </table>
-    </div>
-    <div class="sum" id="sumPave"></div>
-  </div>
-  <!-- 土工タブ -->
-  <div id="panelEarth" class="block hidden">
-    <h4>土工（体積計算）</h4>
-    <label>土工の有無：<input type="checkbox" id="chkEarth" onchange="toggleEarth()"></label>
-    <select id="earthType">
-      <option>標準掘削</option>
-      <option>標準以下掘削</option>
-    </select>
-    <label style="margin-left:10px;">掘削厚（cm）：<input type="number" id="earthThick" min="0" style="width:60px;" onchange="earthThickChange()"></label>
-    <label style="margin-left:10px;">舗装面積と同じ<input type="checkbox" id="earthSamePave" onchange="earthSameChange()"></label>
-    <div id="earthTableBlock" class="hidden">
-      <button class="btn" onclick="addRow('earth')">行追加</button>
+      <div class="scroll-x-guide">(横スクロール可)</div>
       <table>
         <thead>
           <tr>
+            <th>種別</th>
             <th>測点</th>
             <th>単距</th>
             <th>追距</th>
@@ -235,69 +266,91 @@
             <th>面積</th>
           </tr>
         </thead>
-        <tbody id="tbodyEarth"></tbody>
+        <tbody id="tbodyPave"></tbody>
       </table>
     </div>
-    <div class="sum" id="sumEarth"></div>
-    <div id="earthAlert" class="alert"></div>
+    <div class="sum" id="sumPave"></div>
   </div>
   <!-- 取り壊し工タブ -->
   <div id="panelDemo" class="block hidden">
     <h4>取り壊し工</h4>
-    <label>取り壊し工の有無：<input type="checkbox" id="chkDemo" onchange="toggleDemo()"></label>
-    <select id="demoType">
-      <option>As</option>
-      <option>Con</option>
-      <option>As+Con</option>
-    </select>
-    <label style="margin-left:10px;">取壊し厚（cm）：<input type="number" id="demoThick" min="0" style="width:60px;" onchange="demoThickChange()"></label>
-    <label style="margin-left:10px;">舗装面積と同じ<input type="checkbox" id="demoSamePave" onchange="demoSameChange()"></label>
-    <div id="demoTableBlock" class="hidden">
-      <button class="btn" onclick="addRow('demo')">行追加</button>
-      <table>
-        <thead>
-          <tr>
-            <th>測点</th>
-            <th>単距</th>
-            <th>追距</th>
-            <th>幅員</th>
-            <th>平均幅員</th>
-            <th>面積</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyDemo"></tbody>
-      </table>
-    </div>
-    <div class="sum" id="sumDemo"></div>
-    <div id="demoAlert" class="alert"></div>
+    <div id="demoResult"></div>
   </div>
   <!-- 免責事項タブ -->
   <div id="panelDisclaimer" class="block hidden">
-    <p>本Webアプリは現状のまま無保証で提供しています。利用による一切の損害について、作者は責任を負いません。業務・商用利用の際は必ずご自身で検証してください。</p>
+    <p>
+      本Webアプリは無保証で提供しています。利用による一切の損害について、作者は責任を負いません。<br>
+      業務・商用利用の際は必ずご自身で検証し利用を検討してください。<br>
+      <b>出力データ（DXF等）は参考用です。必ず自己責任でご利用ください。</b>
+    </p>
   </div>
   <div class="block">
-    <button class="btn" onclick="showSummary()">ss形式で合計表示</button>
-    <div id="summary"></div>
+    <button class="btn" onclick="showSummary()">全施工箇所合計表示</button>
+    <div style="overflow-x:auto;">
+      <div id="summary"></div>
+    </div>
   </div>
-</div>
+  <div id="fatalAlert" class="alert hidden"></div>
+
 <script>
+// ▼ グローバル定義
+const LS_KEY = 'paveAppAllSites_v5'; // 新バージョンに合わせて更新
 let allSites = {};
 let currentSite = '';
 const paveTypes = ["アスファルト", "コンクリート", "オーバーレイ"];
+const worksList = [
+  { id: "Works", label: "工種設定", always: true, panel: "panelWorks" },
+  { id: "Earth", label: "土工", chk: "chkWorksEarth", setting: "worksEarthSetting", panel: "panelEarth" },
+  { id: "Pave", label: "舗装工", always: true, panel: "panelPave" },
+  { id: "Demo", label: "取り壊し工", chk: "chkWorksDemo", setting: "worksDemoSetting", panel: "panelDemo" },
+  { id: "Anzen", label: "安全施設工", chk: "chkWorksAnzen", panel: null },
+  { id: "Kari", label: "仮設工", chk: "chkWorksKari", panel: null },
+  { id: "Zatsu", label: "雑工", chk: "chkWorksZatsu", panel: null },
+  { id: "Disclaimer", label: "免責事項", always: true, panel: "panelDisclaimer"}
+];
 
-// ▼ ローカルストレージ保存/復元
-const LS_KEY = 'paveAppAllSites_v2';
+// ▼ タブUI生成＆切り替え
+function renderTabs() {
+  let tabHtml = '';
+  for(const w of worksList) {
+    if(w.always || document.getElementById(w.chk)?.checked) {
+      tabHtml += `<div class="tab" id="tab${w.id}" onclick="showTab('${w.id}')">${w.label}</div>`;
+    }
+    if(w.setting) {
+      const settingDiv = document.getElementById(w.setting);
+      if(settingDiv)
+        document.getElementById(w.chk).checked ? settingDiv.classList.remove('hidden') : settingDiv.classList.add('hidden');
+    }
+    if(w.panel && w.chk) {
+      document.getElementById(w.panel).classList[document.getElementById(w.chk).checked ? "remove" : "add"]('hidden');
+    }
+  }
+  document.getElementById('tabsArea').innerHTML = tabHtml;
+  const firstActive = worksList.find(w => w.always || document.getElementById(w.chk)?.checked);
+  if(firstActive) showTab(firstActive.id);
+  saveAndUpdate();
+}
+function showTab(tabId) {
+  for(const w of worksList) {
+    document.getElementById('tab'+w.id)?.classList.remove('active');
+    if(w.panel) document.getElementById(w.panel).classList.add('hidden');
+  }
+  document.getElementById('tab'+tabId)?.classList.add('active');
+  worksList.forEach(w => {
+    if(w.id === tabId && w.panel) document.getElementById(w.panel).classList.remove('hidden');
+  });
+}
+
+// ▼ データ保存・復元
 function saveData() {
-  try {
-    localStorage.setItem(LS_KEY, JSON.stringify(allSites));
-  } catch(e) {}
+  try { localStorage.setItem(LS_KEY, JSON.stringify(allSites)); } catch(e) {}
 }
 function loadData() {
   try {
     const dat = JSON.parse(localStorage.getItem(LS_KEY));
     if (dat && typeof dat === "object") {
       allSites = dat;
-      // 選択現場復元（なければ最初の現場に）
+      // サイトリスト描画
       const siteList = Object.keys(allSites);
       if (siteList.length) {
         currentSite = siteList[0];
@@ -313,8 +366,6 @@ function renderAllAndSave() {
   renderAll();
   saveData();
 }
-
-// ---- ここから以降は通常の管理関数（ローカルストレージ統合済み）
 function addSite() {
   const name = document.getElementById('siteName').value.trim();
   if (!name || allSites[name]) return;
@@ -322,14 +373,8 @@ function addSite() {
     pave: [],
     earth: [],
     demo: [],
-    earthOn: false,
-    earthType: '標準掘削',
-    earthSame: true,
-    earthThick: 0,
-    demoOn: false,
-    demoType: 'As',
-    demoSame: true,
-    demoThick: 0
+    earthSetting: { same: true, type: '標準掘削', thick: 0 },
+    demoSetting: { same: true, type: 'As', thick: 0 }
   };
   document.getElementById('siteList').innerHTML += `<option>${name}</option>`;
   document.getElementById('siteList').value = name;
@@ -340,29 +385,24 @@ function switchSite() {
   currentSite = document.getElementById('siteList').value;
   renderAllAndSave();
 }
-function showTab(tab) {
-  document.getElementById('tabPave').classList.remove('active');
-  document.getElementById('tabEarth').classList.remove('active');
-  document.getElementById('tabDemo').classList.remove('active');
-  document.getElementById('tabDisclaimer').classList.remove('active');
-  document.getElementById('panelPave').classList.add('hidden');
-  document.getElementById('panelEarth').classList.add('hidden');
-  document.getElementById('panelDemo').classList.add('hidden');
-  document.getElementById('panelDisclaimer').classList.add('hidden');
-  if(tab === 'pave') {
-    document.getElementById('tabPave').classList.add('active');
-    document.getElementById('panelPave').classList.remove('hidden');
-  } else if(tab === 'earth') {
-    document.getElementById('tabEarth').classList.add('active');
-    document.getElementById('panelEarth').classList.remove('hidden');
-  } else if(tab === 'demo') {
-    document.getElementById('tabDemo').classList.add('active');
-    document.getElementById('panelDemo').classList.remove('hidden');
-  } else {
-    document.getElementById('tabDisclaimer').classList.add('active');
-    document.getElementById('panelDisclaimer').classList.remove('hidden');
-  }
+
+// ▼ 各工種設定値を工種設定タブから取得
+function getEarthSetting() {
+  return {
+    same: document.getElementById('earthSamePave').checked,
+    type: document.getElementById('earthType').value,
+    thick: parseFloat(document.getElementById('earthThick').value)||0
+  };
 }
+function getDemoSetting() {
+  return {
+    same: document.getElementById('demoSamePave').checked,
+    type: document.getElementById('demoType').value,
+    thick: parseFloat(document.getElementById('demoThick').value)||0
+  };
+}
+
+// ▼ 舗装工タブ
 function addRow(type) {
   if (!currentSite) return;
   if(type==='pave'){
@@ -374,33 +414,38 @@ function addRow(type) {
   }
   renderAllAndSave();
 }
-function getAveWidthLabel(val){
-  val = parseFloat(val)||0;
-  if(val<1.4) return "1.4未満";
-  if(val<3.0) return "1.4以上";
-  return "3.0以上";
-}
-function getAveWidthValue(val){
-  val = parseFloat(val)||0;
-  if(val<1.4) return 1.2;
-  if(val<3.0) return 1.4;
-  return 3.0;
+function editRow(type, idx, key, val) {
+  if (type === "pave" && key === "種別") {
+    for (let i = idx; i < allSites[currentSite][type].length; i++) {
+      allSites[currentSite][type][i][key] = val;
+    }
+  } else {
+    allSites[currentSite][type][idx][key] = val;
+  }
+  renderAllAndSave();
 }
 function renderTablePave() {
+  if(!currentSite) return;
   const list = allSites[currentSite].pave;
+  let widthSum = 0, cnt = 0;
+  list.forEach(r => {
+    const w = parseFloat(r.幅員);
+    if (!isNaN(w)) {
+      widthSum += w;
+      cnt++;
+    }
+  });
+  let avgW = cnt ? widthSum / cnt : 0;
+  let label = "";
+  if (avgW < 1.4) label = "1.4未満";
+  else if (avgW < 3.0) label = "1.4以上";
+  else label = "3.0以上";
   for(let i=0;i<list.length;i++) {
     let r = list[i];
     r.追距 = (i===0) ? (parseFloat(r.単距)||0)
       : ((parseFloat(list[i-1].追距)||0)+(parseFloat(r.単距)||0));
-    if(r.種別==="アスファルト"||r.種別==="オーバーレイ") {
-      let w = parseFloat(r.幅員)||0;
-      r.平均幅員 = getAveWidthLabel(w);
-      r._平均幅員値 = getAveWidthValue(w);
-    }
-    if(r.種別==="コンクリート") {
-      r.平均幅員="";
-      r._平均幅員値 = '';
-    }
+    r.平均幅員 = label;
+    r._平均幅員値 = avgW;
     if (i === 0) {
       r.面積 = (r.単距 && r.幅員) ? (parseFloat(r.単距)*parseFloat(r.幅員)).toFixed(2) : '';
     } else {
@@ -426,16 +471,11 @@ function renderTablePave() {
       <td><input value="${r.単距||''}" onchange="editRow('pave',${idx},'単距',this.value)"></td>
       <td><input value="${r.追距||''}" class="readonly" readonly></td>
       <td><input value="${r.幅員||''}" onchange="editRow('pave',${idx},'幅員',this.value)"></td>
-      <td>${
-        (r.種別==="コンクリート")
-        ? `<input class="readonly" value="" readonly>`
-        : `<input value="${r.平均幅員||''}" class="readonly" readonly>`
-      }</td>
+      <td><input value="${r.平均幅員||''}" class="readonly" readonly></td>
       <td><input value="${r.面積||''}" class="readonly" readonly></td>
     </tr>`;
   });
   document.getElementById('tbodyPave').innerHTML = tbody;
-  // 合計
   let sum = {アスファルト:0, コンクリート:0, オーバーレイ:0};
   list.forEach(r=>{
     if(!isNaN(parseFloat(r.面積))){
@@ -458,244 +498,44 @@ function renderTablePave() {
       </tr>
     </table>`;
 }
-function renderTable(type, tbodyId, sumId, thick, isDemo) {
-  const list = allSites[currentSite][type];
-  for (let i = 0; i < list.length; i++) {
-    let row = list[i];
-    row.追距 = (i === 0)
-      ? (parseFloat(row.単距)||0)
-      : (parseFloat(list[i-1].追距)||0) + (parseFloat(row.単距)||0);
-    if (i === 0) {
-      row.面積 = (row.単距 && row.幅員) ? (parseFloat(row.単距)*parseFloat(row.幅員)).toFixed(2) : '';
-    } else {
-      let 上幅員 = parseFloat(list[i-1].幅員)||0;
-      let 幅員 = parseFloat(row.幅員)||0;
-      let 単距 = parseFloat(row.単距)||0;
-      if (幅員 > 0 && 上幅員 > 0 && 単距 > 0) {
-        row.面積 = (((幅員 + 上幅員)/2)*単距).toFixed(2);
-      } else {
-        row.面積 = '';
-      }
-    }
-  }
-  let tbody = '';
-  list.forEach((row, idx) => {
-    tbody += `<tr>
-      <td><input value="${row.測点||''}" onchange="editRow('${type}',${idx},'測点',this.value)"></td>
-      <td><input value="${row.単距||''}" onchange="editRow('${type}',${idx},'単距',this.value)"></td>
-      <td><input value="${row.追距||''}" class="readonly" readonly></td>
-      <td><input value="${row.幅員||''}" onchange="editRow('${type}',${idx},'幅員',this.value)"></td>
-      <td><input value="${row.平均幅員||''}" onchange="editRow('${type}',${idx},'平均幅員',this.value)"></td>
-      <td><input value="${row.面積||''}" class="readonly" readonly></td>
-    </tr>`;
-  });
-  document.getElementById(tbodyId).innerHTML = tbody;
-  let sum = 0;
-  list.forEach(row => { if (!isNaN(parseFloat(row.面積))) sum += parseFloat(row.面積); });
-  const vol = (thick && sum) ? (sum * thick / 100).toFixed(2) : '0.00';
-  document.getElementById(sumId).textContent =
-    isDemo
-      ? `合計体積：${vol} m³　（面積：${sum.toFixed(2)}㎡ × 厚さ：${thick}cm）`
-      : `合計体積：${vol} m³　（面積：${sum.toFixed(2)}㎡ × 掘削厚さ：${thick}cm）`;
-}
-function editRow(type, idx, key, val) {
-  allSites[currentSite][type][idx][key] = val;
-  renderAllAndSave();
-}
-function toggleEarth() {
-  allSites[currentSite].earthOn = document.getElementById('chkEarth').checked;
-  renderAllAndSave();
-}
-function earthSameChange() {
-  allSites[currentSite].earthSame = document.getElementById('earthSamePave').checked;
-  renderAllAndSave();
-}
-function earthThickChange() {
-  allSites[currentSite].earthThick = document.getElementById('earthThick').value;
-  renderAllAndSave();
-}
-function toggleDemo() {
-  allSites[currentSite].demoOn = document.getElementById('chkDemo').checked;
-  renderAllAndSave();
-}
-function demoSameChange() {
-  allSites[currentSite].demoSame = document.getElementById('demoSamePave').checked;
-  renderAllAndSave();
-}
-function demoThickChange() {
-  allSites[currentSite].demoThick = document.getElementById('demoThick').value;
-  renderAllAndSave();
-}
-function renderAll() {
+
+// ▼ 土工集計
+function renderEarthResult() {
   if(!currentSite) return;
-  renderTablePave();
-  document.getElementById('chkEarth').checked = allSites[currentSite].earthOn;
-  document.getElementById('earthType').value = allSites[currentSite].earthType;
-  document.getElementById('earthSamePave').checked = allSites[currentSite].earthSame;
-  document.getElementById('earthThick').value = allSites[currentSite].earthThick;
-  if(allSites[currentSite].earthOn) {
-    if(allSites[currentSite].earthSame) {
-      document.getElementById('earthTableBlock').classList.add('hidden');
-      let paveSum = 0;
-      allSites[currentSite].pave.forEach(row=>paveSum+=parseFloat(row.面積)||0);
-      const thick = parseFloat(allSites[currentSite].earthThick)||0;
-      const vol = thick ? (paveSum * thick / 100).toFixed(2) : '0.00';
-      document.getElementById('sumEarth').textContent = `合計体積：${vol} m³　（面積：${paveSum.toFixed(2)}㎡ × 厚さ：${thick}cm）`;
-      document.getElementById('earthAlert').textContent = '';
-    } else {
-      document.getElementById('earthTableBlock').classList.remove('hidden');
-      renderTable('earth','tbodyEarth','sumEarth',parseFloat(allSites[currentSite].earthThick)||0,false);
-    }
+  const setting = getEarthSetting();
+  const paveSum = (allSites[currentSite].pave||[]).reduce((a,r)=>a+(parseFloat(r.面積)||0),0);
+  let html = '';
+  if(setting.same) {
+    const vol = (paveSum * setting.thick / 100).toFixed(2);
+    html = `<div>合計体積：${vol} m³　（面積：${paveSum.toFixed(2)}㎡ × 厚さ：${setting.thick}cm）</div>`;
   } else {
-    document.getElementById('earthTableBlock').classList.add('hidden');
-    document.getElementById('sumEarth').textContent = '';
-    document.getElementById('earthAlert').textContent = '';
+    html = `<div style="color:#888;">（現状「舗装面積と同じ」時のみ自動計算です）</div>`;
   }
-  document.getElementById('chkDemo').checked = allSites[currentSite].demoOn;
-  document.getElementById('demoType').value = allSites[currentSite].demoType;
-  document.getElementById('demoSamePave').checked = allSites[currentSite].demoSame;
-  document.getElementById('demoThick').value = allSites[currentSite].demoThick;
-  if(allSites[currentSite].demoOn) {
-    if(allSites[currentSite].demoSame) {
-      document.getElementById('demoTableBlock').classList.add('hidden');
-      let paveSum = 0;
-      allSites[currentSite].pave.forEach(row=>paveSum+=parseFloat(row.面積)||0);
-      const thick = parseFloat(allSites[currentSite].demoThick)||0;
-      const vol = thick ? (paveSum * thick / 100).toFixed(2) : '0.00';
-      document.getElementById('sumDemo').textContent = `合計体積：${vol} m³　（面積：${paveSum.toFixed(2)}㎡ × 厚さ：${thick}cm）`;
-      document.getElementById('demoAlert').textContent = '';
-    } else {
-      document.getElementById('demoTableBlock').classList.remove('hidden');
-      renderTable('demo','tbodyDemo','sumDemo',parseFloat(allSites[currentSite].demoThick)||0,true);
-    }
+  document.getElementById('earthResult').innerHTML = html;
+}
+// ▼ 取壊し工集計
+function renderDemoResult() {
+  if(!currentSite) return;
+  const setting = getDemoSetting();
+  const paveSum = (allSites[currentSite].pave||[]).reduce((a,r)=>a+(parseFloat(r.面積)||0),0);
+  let html = '';
+  if(setting.same) {
+    const vol = (paveSum * setting.thick / 100).toFixed(2);
+    html = `<div>合計体積：${vol} m³　（面積：${paveSum.toFixed(2)}㎡ × 厚さ：${setting.thick}cm）</div>`;
   } else {
-    document.getElementById('demoTableBlock').classList.add('hidden');
-    document.getElementById('sumDemo').textContent = '';
-    document.getElementById('demoAlert').textContent = '';
+    html = `<div style="color:#888;">（現状「舗装面積と同じ」時のみ自動計算です）</div>`;
   }
+  document.getElementById('demoResult').innerHTML = html;
 }
 
-// ---- ss形式で合計表示（設計請数量集計表風/項目例付き・必要に応じて調整可）
-function showSummary() {
-  const tableStyle = "min-width:600px;border-collapse:collapse;border:2px solid #555;background:#fff;width:100%;";
-  const thStyle1 = "border:2px solid #555;background:#e6eef5;color:#007acc;font-weight:bold;text-align:center;padding:8px 5px;";
-  const thStyle2 = "border:2px solid #555;background:#f7fbff;color:#007acc;font-weight:bold;text-align:center;padding:5px 5px;";
-  const tdStyle = "border:2px solid #555;text-align:center;padding:6px 5px;";
-  // 1段目
-  const headerRow1 = [
-    { label: "箇所名", colspan: 1, rowspan: 3 },
-    { label: "土工", colspan: 2, rowspan: 1 },
-    { label: "取り壊し工", colspan: 7, rowspan: 1 },
-    { label: "舗装工", colspan: 7, rowspan: 1 }
-  ];
-  // 2段目
-  const headerRow2 = [
-    { label: "機械掘削", colspan: 1, rowspan: 2 },
-    { label: "残土処理", colspan: 1, rowspan: 2 },
-    { label: "舗装版切断", colspan: 1, rowspan: 2 },
-    { label: "舗装版破砕As", colspan: 1, rowspan: 2 },
-    { label: "廃材運搬As", colspan: 1, rowspan: 2 },
-    { label: "廃材処理As", colspan: 1, rowspan: 2 },
-    { label: "舗装版破砕Con", colspan: 1, rowspan: 2 },
-    { label: "廃材運搬Con", colspan: 1, rowspan: 2 },
-    { label: "廃材処理Con", colspan: 1, rowspan: 2 },
-    { label: "アスファルト", colspan: 3, rowspan: 1 },
-    { label: "オーバーレイ", colspan: 3, rowspan: 1 },
-    { label: "コンクリート", colspan: 1, rowspan: 2 }
-  ];
-  // 3段目
-  // 1～5列目および最終列は上段セルがrowspan=2のため、ここでは追加しない
-  // アスファルト3区分・オーバーレイ3区分のみ定義
-  const headerRow3 = [
-    { label: "t=4cm 1.4未満" },
-    { label: "t=4cm 1.4以上" },
-    { label: "t=4cm 3.0以上" },
-    { label: "t=4cm 1.4未満" },
-    { label: "t=4cm 1.4以上" },
-    { label: "t=4cm 3.0以上" }
-  ];
-  const dataCols = [
-    "site",
-    "machine_excavation", "residual_soil",
-    "cutting", "break_as", "haizan_unpan_as", "haizan_shori_as",
-    "break_con", "haizan_unpan_con", "haizan_shori_con",    "as_lt1_4", "as_ge1_4", "as_ge3_0",
-    "ovl_lt1_4", "ovl_ge1_4", "ovl_ge3_0",
-    "con_total"
-  ];
-  let html = `<table class="ss-table" style="${tableStyle}">`;
-  html += "<tr>";
-  headerRow1.forEach(cell => {
-    html += `<th style="${thStyle1}" colspan="${cell.colspan}" rowspan="${cell.rowspan}">${cell.label}</th>`;
-  });
-  html += "</tr>";
-  html += "<tr>";
-  for (let i = 0; i < headerRow2.length; i++) {
-    let cell = headerRow2[i];
-    html += `<th style="${thStyle2}" colspan="${cell.colspan}" rowspan="${cell.rowspan || 1}">${cell.label}</th>`;
-  }
-  html += "</tr>";
-  html += "<tr>";
-  headerRow3.forEach(cell=>{
-    html += `<th style="${thStyle2}">${cell.label}</th>`;
-  });
-  html += "</tr>";
-  Object.keys(allSites).forEach(site => {
-    let row = {};
-    row.site = site;
-    // 土工
-    let earthList = allSites[site].earth || [];
-    let machine_excavation = 0, residual_soil = 0;
-    earthList.forEach(r => {
-      let area = parseFloat(r.面積) || 0;
-      machine_excavation += area;
-      residual_soil += area;
-    });
-    row.machine_excavation = machine_excavation > 0 ? machine_excavation.toFixed(1) : "";
-    row.residual_soil = residual_soil > 0 ? residual_soil.toFixed(1) : "";
-    // 取壊し工
-    let demoList = allSites[site].demo || [];
-    let cutting = 0, break_as = 0, break_con = 0;
-    let mode = allSites[site].demoType;
-    demoList.forEach(r => {
-      let area = parseFloat(r.面積) || 0;
-      if (mode === "As") break_as += area;
-      else if (mode === "Con") break_con += area;
-      else if (mode === "As+Con") { break_as += area; break_con += area; }
-    });
-    row.cutting = cutting > 0 ? cutting.toFixed(1) : "";
-    row.break_as = break_as > 0 ? break_as.toFixed(1) : "";
-    row.haizan_unpan_as = break_as > 0 ? break_as.toFixed(1) : "";
-    row.haizan_shori_as = break_as > 0 ? break_as.toFixed(1) : "";
-    row.break_con = break_con > 0 ? break_con.toFixed(1) : "";
-    row.haizan_unpan_con = break_con > 0 ? break_con.toFixed(1) : "";
-    row.haizan_shori_con = break_con > 0 ? break_con.toFixed(1) : "";
-    row.dummy_demo = "";
-    // 舗装工
-    let paveList = allSites[site].pave || [];
-    let as_lt1_4 = 0, as_ge1_4 = 0, as_ge3_0 = 0,
-        con_total = 0, ovl_lt1_4 = 0, ovl_ge1_4 = 0, ovl_ge3_0 = 0;
-    paveList.forEach(r => {
-      let area = parseFloat(r.面積) || 0;
-      if (r.種別 === "アスファルト" && r.平均幅員 === "1.4未満") as_lt1_4 += area;
-      if (r.種別 === "アスファルト" && r.平均幅員 === "1.4以上") as_ge1_4 += area;
-      if (r.種別 === "アスファルト" && r.平均幅員 === "3.0以上") as_ge3_0 += area;
-      if (r.種別 === "コンクリート") con_total += area;
-      if (r.種別 === "オーバーレイ" && r.平均幅員 === "1.4未満") ovl_lt1_4 += area;
-      if (r.種別 === "オーバーレイ" && r.平均幅員 === "1.4以上") ovl_ge1_4 += area;
-      if (r.種別 === "オーバーレイ" && r.平均幅員 === "3.0以上") ovl_ge3_0 += area;
-    });
-    row.as_lt1_4 = as_lt1_4 > 0 ? as_lt1_4.toFixed(1) : "";
-    row.as_ge1_4 = as_ge1_4 > 0 ? as_ge1_4.toFixed(1) : "";
-    row.as_ge3_0 = as_ge3_0 > 0 ? as_ge3_0.toFixed(1) : "";
-    row.ovl_lt1_4 = ovl_lt1_4 > 0 ? ovl_lt1_4.toFixed(1) : "";
-    row.ovl_ge1_4 = ovl_ge1_4 > 0 ? ovl_ge1_4.toFixed(1) : "";
-    row.ovl_ge3_0 = ovl_ge3_0 > 0 ? ovl_ge3_0.toFixed(1) : "";
-    row.con_total = con_total > 0 ? con_total.toFixed(1) : "";
-    html += `<tr>${dataCols.map(k => `<td style="${tdStyle}">${row[k] || ""}</td>`).join("")}</tr>`;
-  });
-  html += '</table>';
-  document.getElementById('summary').innerHTML = html;
+// ▼ まとめて再描画
+function renderAll() {
+  renderTablePave();
+  renderEarthResult();
+  renderDemoResult();
 }
+
+// ▼ DXFエクスポート
 function exportDXF() {
   const list = allSites[currentSite]?.pave || [];
   let lines = [];
@@ -732,18 +572,144 @@ function exportDXF() {
   a.download = "pave.dxf";
   a.click();
 }
-document.getElementById('earthType').onchange = function() {
-  if(!currentSite) return;
-  allSites[currentSite].earthType = this.value;
+
+// ▼ 全集計（従来形式）
+function showSummary() {
+  const tableStyle = "min-width:1200px;border-collapse:collapse;border:2px solid #555;background:#fff;width:auto;";
+  const thStyle1 = "border:2px solid #555;background:#e6eef5;color:#007acc;font-weight:bold;text-align:center;padding:8px 5px;";
+  const thStyle2 = "border:2px solid #555;background:#f7fbff;color:#007acc;font-weight:bold;text-align:center;padding:5px 5px;";
+  const tdStyle = "border:2px solid #555;text-align:center;padding:6px 5px;";
+  const dataCols = [
+    "site",
+    "machine_excavation", "residual_soil",
+    "cutting", "break_as", "haizan_unpan_as", "haizan_shori_as",
+    "break_con", "haizan_unpan_con", "haizan_shori_con",
+    "as_lt1_4", "as_ge1_4", "as_ge3_0",
+    "ovl_lt1_4", "ovl_ge1_4", "ovl_ge3_0",
+    "con_total"
+  ];
+  let html = `<div style="overflow-x:auto;"><table class="ss-table" style="${tableStyle}">`;
+  html += `
+<tr>
+  <th rowspan="2" style="${thStyle1}">箇所名</th>
+  <th rowspan="2" style="${thStyle1}">機械掘削</th>
+  <th rowspan="2" style="${thStyle1}">残土処理</th>
+  <th rowspan="2" style="${thStyle1}">舗装版切断</th>
+  <th rowspan="2" style="${thStyle1}">舗装版破砕As</th>
+  <th rowspan="2" style="${thStyle1}">廃材運搬As</th>
+  <th rowspan="2" style="${thStyle1}">廃材処理As</th>
+  <th rowspan="2" style="${thStyle1}">舗装版破砕Con</th>
+  <th rowspan="2" style="${thStyle1}">廃材運搬Con</th>
+  <th rowspan="2" style="${thStyle1}">廃材処理Con</th>
+  <th colspan="3" style="${thStyle1}">アスファルト</th>
+  <th colspan="3" style="${thStyle1}">オーバーレイ</th>
+  <th rowspan="2" style="${thStyle1}">コンクリート</th>
+</tr>
+<tr>
+  <th style="${thStyle2}">t=4cm 1.4未満</th>
+  <th style="${thStyle2}">t=4cm 1.4以上</th>
+  <th style="${thStyle2}">t=4cm 3.0以上</th>
+  <th style="${thStyle2}">t=4cm 1.4未満</th>
+  <th style="${thStyle2}">t=4cm 1.4以上</th>
+  <th style="${thStyle2}">t=4cm 3.0以上</th>
+</tr>`;
+
+  let totalRow = {};
+  dataCols.forEach(k => totalRow[k] = 0);
+  totalRow.site = "総合計";
+
+  Object.keys(allSites).forEach(site => {
+    let row = {};
+    row.site = site;
+
+    let machine_excavation = 0, residual_soil = 0;
+    let earthSetting = allSites[site].earthSetting || {};
+    let paveSum = 0;
+    (allSites[site].pave||[]).forEach(r=>paveSum+=parseFloat(r.面積)||0);
+    if (earthSetting.same && document.getElementById('chkWorksEarth')?.checked) {
+      let thick = parseFloat(earthSetting.thick)||0;
+      machine_excavation = residual_soil = paveSum * thick / 100;
+    }
+    row.machine_excavation = machine_excavation > 0 ? machine_excavation.toFixed(2) : "";
+    row.residual_soil = residual_soil > 0 ? residual_soil.toFixed(2) : "";
+
+    let cutting = 0, break_as = 0, break_con = 0;
+    let haizan_unpan_as = 0, haizan_shori_as = 0, haizan_unpan_con = 0, haizan_shori_con = 0;
+    let demoSetting = allSites[site].demoSetting || {};
+    let demoType = demoSetting.type;
+    let demoThick = parseFloat(demoSetting.thick)||0;
+    if (demoSetting.same && document.getElementById('chkWorksDemo')?.checked) {
+      if (demoType === "As") break_as = paveSum;
+      else if (demoType === "Con") break_con = paveSum;
+      else if (demoType === "As+Con") { break_as = paveSum; break_con = paveSum; }
+      haizan_unpan_as = break_as * demoThick / 100;
+      haizan_shori_as = haizan_unpan_as * 2.35;
+      haizan_unpan_con = break_con * demoThick / 100;
+      haizan_shori_con = haizan_unpan_con * 2.35;
+    }
+    row.cutting = cutting > 0 ? cutting.toFixed(1) : "";
+    row.break_as = break_as > 0 ? break_as.toFixed(1) : "";
+    row.haizan_unpan_as = haizan_unpan_as > 0 ? haizan_unpan_as.toFixed(2) : "";
+    row.haizan_shori_as = haizan_shori_as > 0 ? haizan_shori_as.toFixed(2) : "";
+    row.break_con = break_con > 0 ? break_con.toFixed(1) : "";
+    row.haizan_unpan_con = haizan_unpan_con > 0 ? haizan_unpan_con.toFixed(2) : "";
+    row.haizan_shori_con = haizan_shori_con > 0 ? haizan_shori_con.toFixed(2) : "";
+
+    let as_lt1_4 = 0, as_ge1_4 = 0, as_ge3_0 = 0,
+        ovl_lt1_4 = 0, ovl_ge1_4 = 0, ovl_ge3_0 = 0, con_total = 0;
+
+    (allSites[site].pave || []).forEach(r => {
+      let area = parseFloat(r.面積) || 0;
+      if (r.種別 === "アスファルト") {
+        if (r.平均幅員 === "1.4未満") as_lt1_4 += area;
+        else if (r.平均幅員 === "1.4以上") as_ge1_4 += area;
+        else if (r.平均幅員 === "3.0以上") as_ge3_0 += area;
+      } else if (r.種別 === "オーバーレイ") {
+        if (r.平均幅員 === "1.4未満") ovl_lt1_4 += area;
+        else if (r.平均幅員 === "1.4以上") ovl_ge1_4 += area;
+        else if (r.平均幅員 === "3.0以上") ovl_ge3_0 += area;
+      } else if (r.種別 === "コンクリート") {
+        con_total += area;
+      }
+    });
+    row.as_lt1_4 = as_lt1_4 > 0 ? as_lt1_4.toFixed(1) : "";
+    row.as_ge1_4 = as_ge1_4 > 0 ? as_ge1_4.toFixed(1) : "";
+    row.as_ge3_0 = as_ge3_0 > 0 ? as_ge3_0.toFixed(1) : "";
+    row.ovl_lt1_4 = ovl_lt1_4 > 0 ? ovl_lt1_4.toFixed(1) : "";
+    row.ovl_ge1_4 = ovl_ge1_4 > 0 ? ovl_ge1_4.toFixed(1) : "";
+    row.ovl_ge3_0 = ovl_ge3_0 > 0 ? ovl_ge3_0.toFixed(1) : "";
+    row.con_total = con_total > 0 ? con_total.toFixed(1) : "";
+
+    dataCols.forEach(k => {
+      if (k !== "site") totalRow[k] += parseFloat(row[k]) || 0;
+    });
+
+    html += `<tr>${dataCols.map(k => `<td style="${tdStyle}">${row[k] || ""}</td>`).join("")}</tr>`;
+  });
+
+  html += `<tr style="background:#f3f9ff;font-weight:bold;">${
+    dataCols.map(k =>
+      `<td style="${tdStyle}">${k==="site" ? "総合計" : (totalRow[k] ? totalRow[k].toFixed(2) : "")}</td>`
+    ).join("")
+  }</tr>`;
+  html += '</table></div>';
+  document.getElementById('summary').innerHTML = html;
+}
+
+// ▼ 設定保存＋再描画
+function saveAndUpdate() {
+  if(currentSite && allSites[currentSite]) {
+    allSites[currentSite].earthSetting = getEarthSetting();
+    allSites[currentSite].demoSetting = getDemoSetting();
+  }
   renderAllAndSave();
-};
-document.getElementById('demoType').onchange = function() {
-  if(!currentSite) return;
-  allSites[currentSite].demoType = this.value;
-  renderAllAndSave();
-};
-// ▼ 初回ロード時：ローカルストレージ復元＋初期表示
-window.addEventListener('DOMContentLoaded', ()=>{
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  // 工種設定は初期ON
+  document.getElementById('chkWorksEarth').checked = true;
+  document.getElementById('chkWorksDemo').checked = true;
+  renderTabs();
   loadData();
   renderAll();
 });
