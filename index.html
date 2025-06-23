@@ -638,7 +638,12 @@ function showSummary() {
   let html = `<div style="overflow-x:auto;"><table class="ss-table" style="${tableStyle}">`;
   html += `
 <tr>
-  <th rowspan="2" style="${thStyle1}">箇所名</th>
+  <th rowspan="3" style="${thStyle1}">箇所名</th>
+  <th colspan="2" style="${thStyle1}">土工</th>
+  <th colspan="7" style="${thStyle1}">取り壊し工</th>
+  <th colspan="7" style="${thStyle1}">舗装工</th>
+</tr>
+<tr>
   <th rowspan="2" style="${thStyle1}">機械掘削</th>
   <th rowspan="2" style="${thStyle1}">残土処理</th>
   <th rowspan="2" style="${thStyle1}">舗装版切断</th>
@@ -755,10 +760,11 @@ function saveAndUpdate() {
 window.addEventListener('DOMContentLoaded', () => {
   loadCheckStates();
   migrateOldData();
-  renderTabs();
   loadData();
+  renderTabs();
   renderAll();
 });
 </script>
 </body>
+</html>
 </html>
