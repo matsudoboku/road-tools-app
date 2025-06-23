@@ -294,6 +294,7 @@
 
 <script>
 // ▼ グローバル定義
+const CHK_KEY = 'paveWorksChecks_v1';
 const LS_KEY = 'paveAppAllSites_v5'; // 新バージョンに合わせて更新
 // 過去バージョンの保存キー一覧（最も古いものから順）
 const OLD_KEYS = ['paveAppAllSites_v4', 'paveAppAllSites_v3', 'paveAppAllSites_v2', 'paveAppAllSites'];
@@ -351,6 +352,7 @@ function renderTabs() {
   document.getElementById('tabsArea').innerHTML = tabHtml;
   const firstActive = worksList.find(w => w.always || document.getElementById(w.chk)?.checked);
   if(firstActive) showTab(firstActive.id);
+  saveCheckStates();
   saveAndUpdate();
 }
 function showTab(tabId) {
@@ -362,6 +364,28 @@ function showTab(tabId) {
   worksList.forEach(w => {
     if(w.id === tabId && w.panel) document.getElementById(w.panel).classList.remove('hidden');
   });
+}
+function saveCheckStates() {
+  try {
+    const states = {};
+    worksList.forEach(w => {
+      if(w.chk) states[w.chk] = document.getElementById(w.chk).checked;
+    });
+    localStorage.setItem(CHK_KEY, JSON.stringify(states));
+  } catch(e) {}
+}
+
+function loadCheckStates() {
+  try {
+    const states = JSON.parse(localStorage.getItem(CHK_KEY));
+    if(states && typeof states === 'object') {
+      worksList.forEach(w => {
+        if(w.chk && states.hasOwnProperty(w.chk)) {
+          document.getElementById(w.chk).checked = states[w.chk];
+        }
+      });
+    }
+  } catch(e) {}
 }
 
 // ▼ データ保存・復元
@@ -729,9 +753,7 @@ function saveAndUpdate() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  // 工種設定は初期ON
-  document.getElementById('chkWorksEarth').checked = true;
-  document.getElementById('chkWorksDemo').checked = true;
+  loadCheckStates();
   migrateOldData();
   renderTabs();
   loadData();
