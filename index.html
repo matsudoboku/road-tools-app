@@ -247,7 +247,23 @@
   <!-- 土工タブ -->
   <div id="panelEarth" class="block hidden">
     <h4>土工（体積計算）</h4>
-    <div id="earthResult"></div>
+    <button class="btn" onclick="addRow('earth')">行追加</button>
+    <div id="earthTable" style="overflow-x:auto;">
+      <div class="scroll-x-guide">(横スクロール可)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>測点</th>
+            <th>単距</th>
+            <th>追距</th>
+            <th>幅員</th>
+            <th>面積</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyEarth"></tbody>
+      </table>
+    </div>
+    <div id="earthResult" class="sum"></div>
   </div>
   <!-- 舗装工タブ -->
   <div id="panelPave" class="block hidden">
@@ -276,8 +292,23 @@
   <!-- 取り壊し工タブ -->
   <div id="panelDemo" class="block hidden">
     <h4>取り壊し工</h4>
-    <div id="demoResult"></div>
-  </div>
+    <button class="btn" onclick="addRow('demo')">行追加</button>
+    <div id="demoTable" style="overflow-x:auto;">
+      <div class="scroll-x-guide">(横スクロール可)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>測点</th>
+            <th>単距</th>
+            <th>追距</th>
+            <th>幅員</th>
+            <th>面積</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyDemo"></tbody>
+      </table>
+    </div>
+    <div id="demoResult" class="sum"></div>  </div>
   <!-- 安全施設工タブ -->
   <div id="panelAnzen" class="block hidden">
     <h4>安全施設工</h4>
@@ -415,12 +446,12 @@ function getDemoSetting() {
 // ▼ 舗装工タブ
 function addRow(type) {
   if (!currentSite) return;
-  if(type==='pave'){
-    allSites[currentSite][type].push({
-      種別: "アスファルト", 測点:'',単距:'',追距:'',幅員:'',平均幅員:'',面積:''
+  if(type === 'pave') {
+    allSites[currentSite].pave.push({
+      種別:"アスファルト", 測点:'', 単距:'', 追距:'', 幅員:'', 平均幅員:'', 面積:''
     });
-  }else{
-    allSites[currentSite][type].push({測点:'',単距:'',追距:'',幅員:'',平均幅員:'',面積:''});
+   } else if (type === 'earth' || type === 'demo') {
+    allSites[currentSite][type].push({測点:'', 単距:'', 追距:'', 幅員:'', 面積:''});
   }
   renderAllAndSave();
 }
@@ -517,6 +548,88 @@ function renderTablePave() {
     </table>`;
 }
 
+function renderTableEarth() {
+  if(!currentSite) return;
+  const setting = getEarthSetting();
+  const table = document.getElementById('earthTable');
+  if(setting.same) {
+    table.classList.add('hidden');
+  } else {
+    table.classList.remove('hidden');
+  }
+  if(setting.same) return;
+  const list = allSites[currentSite].earth;
+  for(let i=0;i<list.length;i++) {
+    let r = list[i];
+    r.追距 = (i===0) ? (parseFloat(r.単距)||0)
+      : ((parseFloat(list[i-1].追距)||0) + (parseFloat(r.単距)||0));
+    if(i===0) {
+      r.面積 = (r.単距 && r.幅員) ? (parseFloat(r.単距)*parseFloat(r.幅員)).toFixed(2) : '';
+    } else {
+      let 上幅員 = parseFloat(list[i-1].幅員)||0;
+      let 幅員 = parseFloat(r.幅員)||0;
+      let 単距 = parseFloat(r.単距)||0;
+      if(幅員>0 && 上幅員>0 && 単距>0) {
+        r.面積 = (((幅員 + 上幅員)/2)*単距).toFixed(2);
+      } else {
+        r.面積 = '';
+      }
+    }
+  }
+  let tbody = '';
+  list.forEach((r,idx)=>{
+    tbody += `<tr>
+      <td><input value="${r.測点||''}" onchange="editRow('earth',${idx},'測点',this.value)"></td>
+      <td><input value="${r.単距||''}" onchange="editRow('earth',${idx},'単距',this.value)"></td>
+      <td><input value="${r.追距||''}" class="readonly" readonly></td>
+      <td><input value="${r.幅員||''}" onchange="editRow('earth',${idx},'幅員',this.value)"></td>
+      <td><input value="${r.面積||''}" class="readonly" readonly></td>
+    </tr>`;
+  });
+  document.getElementById('tbodyEarth').innerHTML = tbody;
+}
+
+function renderTableDemo() {
+  if(!currentSite) return;
+  const setting = getDemoSetting();
+  const table = document.getElementById('demoTable');
+  if(setting.same) {
+    table.classList.add('hidden');
+  } else {
+    table.classList.remove('hidden');
+  }
+  if(setting.same) return;
+  const list = allSites[currentSite].demo;
+  for(let i=0;i<list.length;i++) {
+    let r = list[i];
+    r.追距 = (i===0) ? (parseFloat(r.単距)||0)
+      : ((parseFloat(list[i-1].追距)||0) + (parseFloat(r.単距)||0));
+    if(i===0) {
+      r.面積 = (r.単距 && r.幅員) ? (parseFloat(r.単距)*parseFloat(r.幅員)).toFixed(2) : '';
+    } else {
+      let 上幅員 = parseFloat(list[i-1].幅員)||0;
+      let 幅員 = parseFloat(r.幅員)||0;
+      let 単距 = parseFloat(r.単距)||0;
+      if(幅員>0 && 上幅員>0 && 単距>0) {
+        r.面積 = (((幅員 + 上幅員)/2)*単距).toFixed(2);
+      } else {
+        r.面積 = '';
+      }
+    }
+  }
+  let tbody = '';
+  list.forEach((r,idx)=>{
+    tbody += `<tr>
+      <td><input value="${r.測点||''}" onchange="editRow('demo',${idx},'測点',this.value)"></td>
+      <td><input value="${r.単距||''}" onchange="editRow('demo',${idx},'単距',this.value)"></td>
+      <td><input value="${r.追距||''}" class="readonly" readonly></td>
+      <td><input value="${r.幅員||''}" onchange="editRow('demo',${idx},'幅員',this.value)"></td>
+      <td><input value="${r.面積||''}" class="readonly" readonly></td>
+    </tr>`;
+  });
+  document.getElementById('tbodyDemo').innerHTML = tbody;
+}
+
 // ▼ 土工集計
 function renderEarthResult() {
   if(!currentSite) return;
@@ -527,8 +640,10 @@ function renderEarthResult() {
     const vol = (paveSum * setting.thick / 100).toFixed(2);
     html = `<div>合計体積：${vol} m³　（面積：${paveSum.toFixed(2)}㎡ × 厚さ：${setting.thick}cm）</div>`;
   } else {
-    html = `<div style="color:#888;">（現状「舗装面積と同じ」時のみ自動計算です）</div>`;
-  }
+    const list = allSites[currentSite].earth || [];
+    const area = list.reduce((a,r)=>a+(parseFloat(r.面積)||0),0);
+    const vol = (area * setting.thick / 100).toFixed(2);
+    html = `<div>合計体積：${vol} m³　（面積：${area.toFixed(2)}㎡ × 厚さ：${setting.thick}cm）</div>`;  }
   document.getElementById('earthResult').innerHTML = html;
 }
 // ▼ 取壊し工集計
@@ -541,8 +656,10 @@ function renderDemoResult() {
     const vol = (paveSum * setting.thick / 100).toFixed(2);
     html = `<div>合計体積：${vol} m³　（面積：${paveSum.toFixed(2)}㎡ × 厚さ：${setting.thick}cm）</div>`;
   } else {
-    html = `<div style="color:#888;">（現状「舗装面積と同じ」時のみ自動計算です）</div>`;
-  }
+    const list = allSites[currentSite].demo || [];
+    const area = list.reduce((a,r)=>a+(parseFloat(r.面積)||0),0);
+    const vol = (area * setting.thick / 100).toFixed(2);
+    html = `<div>合計体積：${vol} m³　（面積：${area.toFixed(2)}㎡ × 厚さ：${setting.thick}cm）</div>`;  }
   document.getElementById('demoResult').innerHTML = html;
 }
 
@@ -557,7 +674,9 @@ function renderAnzenInputs() {
 // ▼ まとめて再描画
 function renderAll() {
   renderTablePave();
+  renderTableEarth();
   renderEarthResult();
+  renderTableDemo();
   renderDemoResult();
   renderAnzenInputs();
 }
@@ -711,7 +830,7 @@ function showSummary() {
     let earthSetting = allSites[site].earthSetting || {};
     let paveSum = 0;
     (allSites[site].pave||[]).forEach(r=>paveSum+=parseFloat(r.面積)||0);
-    if (earthSetting.same && document.getElementById('chkWorksEarth')?.checked) {
+    if (document.getElementById('chkWorksEarth')?.checked) {
       let thick = parseFloat(earthSetting.thick)||0;
       machine_excavation = residual_soil = paveSum * thick / 100;
     }
@@ -723,10 +842,11 @@ function showSummary() {
     let demoSetting = allSites[site].demoSetting || {};
     let demoType = demoSetting.type;
     let demoThick = parseFloat(demoSetting.thick)||0;
-    if (demoSetting.same && document.getElementById('chkWorksDemo')?.checked) {
-      if (demoType === "As") break_as = paveSum;
-      else if (demoType === "Con") break_con = paveSum;
-      else if (demoType === "As+Con") { break_as = paveSum; break_con = paveSum; }
+    if (document.getElementById('chkWorksDemo')?.checked) {
+      let areaDemo = demoSetting.same ? paveSum : (allSites[site].demo||[]).reduce((a,r)=>a+(parseFloat(r.面積)||0),0);
+      if (demoType === "As") break_as = areaDemo;
+      else if (demoType === "Con") break_con = areaDemo;
+      else if (demoType === "As+Con") { break_as = areaDemo; break_con = areaDemo; }
       haizan_unpan_as = break_as * demoThick / 100;
       haizan_shori_as = haizan_unpan_as * 2.35;
       haizan_unpan_con = break_con * demoThick / 100;
