@@ -202,6 +202,9 @@
     <input id="siteName" class="siteName" placeholder="例：〇〇号線" style="width:170px;">
     <button class="btn" onclick="addSite()">追加</button>
     <select id="siteList" onchange="switchSite()" style="margin-left:12px;"></select>
+      <button class="btn" onclick="backupData()" style="margin-left:12px;">バックアップ</button>
+    <button class="btn" onclick="document.getElementById('importFile').click()">インポート</button>
+    <input id="importFile" type="file" accept="application/json" onchange="importData(event)" style="display:none;">
   </div>
 
   <!-- タブ（動的生成） -->
@@ -423,6 +426,43 @@ function loadData() {
       }
     }
   } catch(e){}
+}
+
+// ▼ バックアップ・インポート
+function backupData() {
+  const blob = new Blob([JSON.stringify(allSites)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'pave_backup.json';
+  a.click();
+}
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const dat = JSON.parse(ev.target.result);
+      if (dat && typeof dat === 'object') {
+        allSites = dat;
+        const siteList = Object.keys(allSites);
+        if (siteList.length) {
+          currentSite = siteList[0];
+          let opt = '';
+          for (const s of siteList) opt += `<option>${s}</option>`;
+          document.getElementById('siteList').innerHTML = opt;
+          document.getElementById('siteList').value = currentSite;
+        }
+        renderAllAndSave();
+      } else {
+        alert('読み込み失敗');
+      }
+    } catch (err) {
+      alert('読み込み失敗');
+    }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
 }
 function renderAllAndSave() {
   renderAll();
@@ -1012,4 +1052,5 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 </body>
+</html>
 </html>
