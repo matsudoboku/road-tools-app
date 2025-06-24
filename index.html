@@ -233,7 +233,9 @@
     </div>
     <div>
       <label><input type="checkbox" id="chkWorksAnzen" onchange="renderTabs()"> 安全施設工</label>
-      <div id="worksAnzenSetting" class="works-setting hidden"></div>
+    </div>
+    <div>
+      <label><input type="checkbox" id="chkWorksKari" onchange="renderTabs()"> 仮設工</label>
     </div>
     <div>
       <label><input type="checkbox" id="chkWorksZatsu" onchange="renderTabs()"> 雑工</label>
@@ -274,37 +276,6 @@
     <h4>取り壊し工</h4>
     <div id="demoResult"></div>
   </div>
-  <!-- 安全施設工タブ -->
-  <div id="panelAnzen" class="block hidden">
-    <h4>安全施設工</h4>
-    <div>
-      <label>区画線設置 外側線：<input type="number" id="anzenOutside" min="0" onchange="editAnzen('outside', this.value)"></label>
-    </div>
-    <div>
-      <label>区画線設置 停止線：<input type="number" id="anzenStop" min="0" onchange="editAnzen('stop', this.value)"></label>
-    </div>
-    <div>
-      <label>区画線設置 文字記号：<input type="number" id="anzenMark" min="0" onchange="editAnzen('mark', this.value)"></label>
-    </div>
-    <div>
-      <label>アスカーブ 標準：<input type="number" id="anzenStdCurb" min="0" onchange="editAnzen('std_as_curb', this.value)"></label>
-    </div>
-    <div>
-      <label>アスカーブ 小型：<input type="number" id="anzenSmallCurb" min="0" onchange="editAnzen('small_as_curb', this.value)"></label>
-    </div>
-    <div>
-      <label>アスカーブ 手盛：<input type="number" id="anzenHandCurb" min="0" onchange="editAnzen('hand_as_curb', this.value)"></label>
-    </div>
-  </div>
-  <div>
-    <label>交通誘導員B：<input type="number" id="kariGuideB" min="0" onchange="editKari('guideB', this.value)"></label>
-  </div>
-  <div>
-    <label>仮設信号機：<input type="number" id="kariSignal" min="0" onchange="editKari('signal', this.value)"></label>
-  </div>
-  <div>
-    <label>重機運搬費：<input type="number" id="kariTransport" min="0" onchange="editKari('transport', this.value)"></label>
-  </div>
   <!-- 免責事項タブ -->
   <div id="panelDisclaimer" class="block hidden">
     <p>
@@ -323,31 +294,7 @@
 
 <script>
 // ▼ グローバル定義
-const CHK_KEY = 'paveWorksChecks_v1';
-const LS_KEY = 'paveAppAllSites_v6'; // 新バージョンに合わせて更新
-// 過去バージョンの保存キー一覧（最も古いものから順）
-const OLD_KEYS = ['paveAppAllSites_v5', 'paveAppAllSites_v4', 'paveAppAllSites_v3', 'paveAppAllSites_v2', 'paveAppAllSites'];
-
-// --- LocalStorage Migration ---
-// 以前のバージョンで使用していたキーが存在する場合、
-// データを新しいキーに移し替え、旧キーを削除する
-function migrateOldData() {
-  for (const k of OLD_KEYS) {
-    const oldStr = localStorage.getItem(k);
-    if (!oldStr) continue;
-    try {
-      const dat = JSON.parse(oldStr);
-      if (dat && typeof dat === 'object') {
-        localStorage.setItem(LS_KEY, JSON.stringify(dat));
-        localStorage.removeItem(k);
-        break; // 1つ見つけたらそれを採用
-      }
-    } catch(e) {
-      // parse error -> ignore
-    }
-    localStorage.removeItem(k);
-  }
-}
+const LS_KEY = 'paveAppAllSites_v5'; // 新バージョンに合わせて更新
 let allSites = {};
 let currentSite = '';
 const paveTypes = ["アスファルト", "コンクリート", "オーバーレイ"];
@@ -356,7 +303,8 @@ const worksList = [
   { id: "Earth", label: "土工", chk: "chkWorksEarth", setting: "worksEarthSetting", panel: "panelEarth" },
   { id: "Pave", label: "舗装工", always: true, panel: "panelPave" },
   { id: "Demo", label: "取り壊し工", chk: "chkWorksDemo", setting: "worksDemoSetting", panel: "panelDemo" },
-  { id: "Anzen", label: "安全施設工", chk: "chkWorksAnzen", setting: "worksAnzenSetting", panel: "panelAnzen" },
+  { id: "Anzen", label: "安全施設工", chk: "chkWorksAnzen", panel: null },
+  { id: "Kari", label: "仮設工", chk: "chkWorksKari", panel: null },
   { id: "Zatsu", label: "雑工", chk: "chkWorksZatsu", panel: null },
   { id: "Disclaimer", label: "免責事項", always: true, panel: "panelDisclaimer"}
 ];
@@ -380,7 +328,6 @@ function renderTabs() {
   document.getElementById('tabsArea').innerHTML = tabHtml;
   const firstActive = worksList.find(w => w.always || document.getElementById(w.chk)?.checked);
   if(firstActive) showTab(firstActive.id);
-  saveCheckStates();
   saveAndUpdate();
 }
 function showTab(tabId) {
@@ -393,28 +340,6 @@ function showTab(tabId) {
     if(w.id === tabId && w.panel) document.getElementById(w.panel).classList.remove('hidden');
   });
 }
-function saveCheckStates() {
-  try {
-    const states = {};
-    worksList.forEach(w => {
-      if(w.chk) states[w.chk] = document.getElementById(w.chk).checked;
-    });
-    localStorage.setItem(CHK_KEY, JSON.stringify(states));
-  } catch(e) {}
-}
-
-function loadCheckStates() {
-  try {
-    const states = JSON.parse(localStorage.getItem(CHK_KEY));
-    if(states && typeof states === 'object') {
-      worksList.forEach(w => {
-        if(w.chk && states.hasOwnProperty(w.chk)) {
-          document.getElementById(w.chk).checked = states[w.chk];
-        }
-      });
-    }
-  } catch(e) {}
-}
 
 // ▼ データ保存・復元
 function saveData() {
@@ -425,17 +350,6 @@ function loadData() {
     const dat = JSON.parse(localStorage.getItem(LS_KEY));
     if (dat && typeof dat === "object") {
       allSites = dat;
-      Object.keys(allSites).forEach(s => {
-        const a = allSites[s].anzen || {};
-        allSites[s].anzen = {
-          outside: a.outside || '',
-          stop: a.stop || '',
-          mark: a.mark || '',
-          std_as_curb: a.std_as_curb || '',
-          small_as_curb: a.small_as_curb || '',
-          hand_as_curb: a.hand_as_curb || ''
-        };        allSites[s].kari = allSites[s].kari || { guideB:'', signal:'', transport:'' };
-      });
       // サイトリスト描画
       const siteList = Object.keys(allSites);
       if (siteList.length) {
@@ -459,8 +373,6 @@ function addSite() {
     pave: [],
     earth: [],
     demo: [],
-    anzen: { outside:'', stop:'', mark:'', std_as_curb:'', small_as_curb:'', hand_as_curb:'' },
-    kari: { guideB:'', signal:'', transport:'' },
     earthSetting: { same: true, type: '標準掘削', thick: 0 },
     demoSetting: { same: true, type: 'As', thick: 0 }
   };
@@ -510,16 +422,6 @@ function editRow(type, idx, key, val) {
   } else {
     allSites[currentSite][type][idx][key] = val;
   }
-function editAnzen(key, val) {
-  if (!currentSite) return;
-  allSites[currentSite].anzen[key] = val;
-  renderAllAndSave();
-}
-function editKari(key, val) {
-  if (!currentSite) return;
-  allSites[currentSite].kari[key] = val;
-  renderAllAndSave();
-}
   renderAllAndSave();
 }
 function renderTablePave() {
@@ -626,71 +528,85 @@ function renderDemoResult() {
   document.getElementById('demoResult').innerHTML = html;
 }
 
-function renderAnzen() {
-  if(!currentSite) return;
-  const a = allSites[currentSite].anzen || {};
-  document.getElementById('anzenOutside').value = a.outside || '';
-  document.getElementById('anzenStop').value = a.stop || '';
-  document.getElementById('anzenMark').value = a.mark || '';
-  document.getElementById('anzenStdCurb').value = a.std_as_curb || '';
-  document.getElementById('anzenSmallCurb').value = a.small_as_curb || '';
-  document.getElementById('anzenHandCurb').value = a.hand_as_curb || '';
-}
-
-function renderKari() {
-  if(!currentSite) return;
-  const k = allSites[currentSite].kari || {};
-  document.getElementById('kariGuideB').value = k.guideB || '';
-  document.getElementById('kariSignal').value = k.signal || '';
-  document.getElementById('kariTransport').value = k.transport || '';
-}
-
 // ▼ まとめて再描画
 function renderAll() {
   renderTablePave();
   renderEarthResult();
   renderDemoResult();
-  renderAnzen();
-  renderKari();
 }
 
 // ▼ DXFエクスポート
 function exportDXF() {
   const list = allSites[currentSite]?.pave || [];
-  let lines = [];
-  let x = 0, y = 0;
-  let scale = 100;
-  let sumA = 0, sumC = 0, sumO = 0;
-  for(let i=0;i<list.length;i++) {
-    let r = list[i];
-    let len = parseFloat(r.単距)||0;
-    let width = parseFloat(r.幅員)||0;
-    if(len<=0 || width<=0) continue;
-    let x0 = x, y0 = y, x1 = x+len*scale, y1 = y+width*scale;
-    lines.push(`0\nLINE\n8\n0\n10\n${x0}\n20\n${y0}\n11\n${x1}\n21\n${y0}\n`);
-    lines.push(`0\nLINE\n8\n0\n10\n${x1}\n20\n${y0}\n11\n${x1}\n21\n${y1}\n`);
-    lines.push(`0\nLINE\n8\n0\n10\n${x1}\n20\n${y1}\n11\n${x0}\n21\n${y1}\n`);
-    lines.push(`0\nLINE\n8\n0\n10\n${x0}\n20\n${y1}\n11\n${x0}\n21\n${y0}\n`);
-    lines.push(`0\nTEXT\n8\n0\n10\n${x+len*scale/2}\n20\n${y-18}\n40\n6\n1\n${len}\n`);
-    if(r.種別==="アスファルト") sumA += parseFloat(r.面積)||0;
-    if(r.種別==="コンクリート") sumC += parseFloat(r.面積)||0;
-    if(r.種別==="オーバーレイ") sumO += parseFloat(r.面積)||0;
-    x += len*scale;
+  if (list.length < 2) {
+    alert('最低2行以上必要です');
+    return;
   }
-  let sumTextY = -38;
-  if(sumA>0) { lines.push(`0\nTEXT\n8\n0\n10\n50\n20\n${sumTextY}\n40\n7\n1\nアスファルト舗装 合計A=${sumA.toFixed(1)}㎡\n`); sumTextY-=26; }
-  if(sumC>0) { lines.push(`0\nTEXT\n8\n0\n10\n50\n20\n${sumTextY}\n40\n7\n1\nコンクリート舗装 合計A=${sumC.toFixed(1)}㎡\n`); sumTextY-=26; }
-  if(sumO>0) { lines.push(`0\nTEXT\n8\n0\n10\n50\n20\n${sumTextY}\n40\n7\n1\nオーバーレイ舗装 合計A=${sumO.toFixed(1)}㎡\n`);}
+  let scale = 100;
+  let points = [];
+  let x = 0;
+  for (let i = 0; i < list.length; i++) {
+    // 全角数字や不可視文字・空白を排除
+    let len = (list[i].単距 + '').replace(/[Ａ-Ｚａ-ｚ０-９＋]/g, s =>
+      String.fromCharCode(s.charCodeAt(0) - 0xFEE0)).replace(/[^\d.-]/g, '');
+    let width = (list[i].幅員 + '').replace(/[Ａ-Ｚａ-ｚ０-９＋]/g, s =>
+      String.fromCharCode(s.charCodeAt(0) - 0xFEE0)).replace(/[^\d.-]/g, '');
+    len = parseFloat(len) || 0;
+    width = parseFloat(width) || 0;
+    // デバッグ
+    console.log(`i=${i} len=${len} width=${width} x=${x}`);
+    points.push({
+      x: x,
+      up: width / 2,
+      down: -width / 2,
+      width: width,
+      st: list[i].測点
+    });
+    x += len;
+  }
+  console.log(points);
+
+  // ---（以下は従来通り）---
+  let lines = [];
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i], p1 = points[i + 1];
+    // 台形外周
+    lines.push(`0\nLINE\n8\n0\n10\n${p0.x * scale}\n20\n${p0.up * scale}\n11\n${p1.x * scale}\n21\n${p1.up * scale}\n`);
+    lines.push(`0\nLINE\n8\n0\n10\n${p1.x * scale}\n20\n${p1.up * scale}\n11\n${p1.x * scale}\n21\n${p1.down * scale}\n`);
+    lines.push(`0\nLINE\n8\n0\n10\n${p1.x * scale}\n20\n${p1.down * scale}\n11\n${p0.x * scale}\n21\n${p0.down * scale}\n`);
+    lines.push(`0\nLINE\n8\n0\n10\n${p0.x * scale}\n20\n${p0.down * scale}\n11\n${p0.x * scale}\n21\n${p0.up * scale}\n`);
+    // センターライン
+    lines.push(`0\nLINE\n8\n1\n10\n${p0.x * scale}\n20\n0\n11\n${p1.x * scale}\n21\n0\n`);
+    // 区間長ラベル
+    const len = (p1.x - p0.x).toFixed(2);
+    lines.push(
+      `0\nTEXT\n8\n3\n10\n${((p0.x + p1.x) / 2) * scale}\n20\n-35\n40\n7\n1\n${len}m\n`
+    );
+  }
+  for (let i = 0; i < points.length; i++) {
+    const p = points[i];
+    lines.push(
+      `0\nLINE\n8\n2\n10\n${p.x * scale}\n20\n${p.down * scale}\n11\n${p.x * scale}\n21\n${p.up * scale}\n`
+    );
+    lines.push(
+      `0\nTEXT\n8\n2\n10\n${p.x * scale}\n20\n${((p.up + p.down) / 2) * scale}\n40\n7\n1\n${p.width.toFixed(2)}m\n`
+    );
+    let name = p.st ? p.st : `No${i}`;
+    lines.push(
+      `0\nTEXT\n8\n2\n10\n${p.x * scale}\n20\n${(p.up * scale + 30)}\n40\n7\n1\n${name}\n`
+    );
+  }
   let dxf =
     '0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nSECTION\n2\nTABLES\n0\nENDSEC\n0\nSECTION\n2\nBLOCKS\n0\nENDSEC\n0\nSECTION\n2\nENTITIES\n'
     + lines.join('')
     + '0\nENDSEC\n0\nEOF\n';
-  let blob = new Blob([dxf], {type:'text/plain'});
+  let blob = new Blob([dxf], { type: 'text/plain' });
   let a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = "pave.dxf";
+  a.download = "belt.dxf";
   a.click();
 }
+
 
 // ▼ 全集計（従来形式）
 function showSummary() {
@@ -701,62 +617,57 @@ function showSummary() {
   const dataCols = [
     "site",
     "machine_excavation", "residual_soil",
-    "break_as", "haizan_unpan_as", "haizan_shori_as",
+    "cutting", "break_as", "haizan_unpan_as", "haizan_shori_as",
     "break_con", "haizan_unpan_con", "haizan_shori_con",
     "as_lt1_4", "as_ge1_4", "as_ge3_0",
     "ovl_lt1_4", "ovl_ge1_4", "ovl_ge3_0",
-    "con_total",
-    "kakusen_out", "kakusen_stop", "kakusen_char",
-    "std_as_curb", "small_as_curb", "hand_as_curb",
-    "kari_guard_b", "kari_signal", "kari_heavy",
-    "zatsu_total"
-    ];
+    "con_total"
+  ];
   let html = `<div style="overflow-x:auto;"><table class="ss-table" style="${tableStyle}">`;
   html += `
 <tr>
-  <th rowspan="3" style="${thStyle1}">箇所名</th>
-  <th colspan="2" style="${thStyle1}">土工</th>
-  <th colspan="6" style="${thStyle1}">取り壊し工</th>
-  <th colspan="10" style="${thStyle1}">舗装工</th>
-  <th colspan="6" style="${thStyle1}">安全施設工</th>
-  <th colspan="3" style="${thStyle1}">仮設工</th>
-  <th rowspan="3" style="${thStyle1}">雑工</th>
-</tr>
-<tr>
-  <th rowspan="2" style="${thStyle1}">機械掘削</th>
-  <th rowspan="2" style="${thStyle1}">残土処理</th>
-  <th rowspan="2" style="${thStyle1}">舗装版破砕As</th>
-  <th rowspan="2" style="${thStyle1}">廃材運搬As</th>
-  <th rowspan="2" style="${thStyle1}">廃材処理As</th>
-  <th rowspan="2" style="${thStyle1}">舗装版破砕Con</th>
-  <th rowspan="2" style="${thStyle1}">廃材運搬Con</th>
-  <th rowspan="2" style="${thStyle1}">廃材処理Con</th>
-  <th colspan="3" style="${thStyle1}">アスファルト</th>
-  <th colspan="3" style="${thStyle1}">オーバーレイ</th>
-  <th rowspan="2" style="${thStyle1}">コンクリート</th>
-  <th colspan="3" style="${thStyle1}">区画線設置</th>
-  <th colspan="3" style="${thStyle1}">アスカーブ</th>
-  <th colspan="3" style="${thStyle1}">仮設工</th>
-
-
-</tr>
-<tr>
-  <th style="${thStyle2}">t=4cm 1.4未満</th>
-  <th style="${thStyle2}">t=4cm 1.4以上</th>
-  <th style="${thStyle2}">t=4cm 3.0以上</th>
-  <th style="${thStyle2}">t=4cm 1.4未満</th>
-  <th style="${thStyle2}">t=4cm 1.4以上</th>
-  <th style="${thStyle2}">t=4cm 3.0以上</th>
-  <th style="${thStyle2}">外側線</th>
-  <th style="${thStyle2}">停止線</th>
-  <th style="${thStyle2}">文字・記号</th>
-  <th style="${thStyle2}">標準</th>
-  <th style="${thStyle2}">小型</th>
-  <th style="${thStyle2}">手盛</th>
-  <th style="${thStyle2}">交通誘導員B</th>
-  <th style="${thStyle2}">仮設信号機</th>
-  <th style="${thStyle2}">重機運搬費</th>
-</tr>`;
+    <th rowspan="3" class="th-main">箇所名</th>
+    <th colspan="2" class="th-main">土工</th>
+    <th colspan="6" class="th-main">取壊工</th>
+    <th colspan="12" class="th-main">舗装工</th>
+    <th colspan="3" class="th-main">安全施設工</th>
+    <th colspan="3" class="th-main">仮設工</th>
+    <th colspan="3" class="th-main">雑工</th>
+  </tr>
+  <tr>
+    <th rowspan="2">機械掘削</th>
+    <th rowspan="2">残土処理</th>
+    <th rowspan="2">舗装版切断</th>
+    <th rowspan="2">舗装版破砕As</th>
+    <th rowspan="2">廃材運搬As</th>
+    <th rowspan="2">廃材処理As</th>
+    <th rowspan="2">舗装版破砕Con</th>
+    <th rowspan="2">廃材運搬Con</th>
+    <th rowspan="2">廃材処理Con</th>
+    <th colspan="3">アスファルト</th>
+    <th rowspan="2">上層路盤工</th>
+    <th colspan="3">オーバーレイ</th>
+    <th rowspan="2">コンクリート</th>
+    <th colspan="3">アスカーブ</th>
+    <th colspan="3">区画線設置</th>
+    <th rowspan="2">交通誘導員B</th>
+    <th rowspan="2">仮設信号機</th>
+    <th rowspan="2">重機運搬費</th>
+  </tr>
+  <tr>
+    <th>t=4cm<br>1.4未満</th>
+    <th>t=4cm<br>1.4以上</th>
+    <th>t=4cm<br>3.0以上</th>
+    <th>t=4cm<br>1.4未満</th>
+    <th>t=4cm<br>1.4以上</th>
+    <th>t=4cm<br>3.0以上</th>
+    <th>標準</th>
+    <th>小型</th>
+    <th>手盛</th>
+    <th>外側線</th>
+    <th>停止線</th>
+    <th>文字記号</th>
+  </tr>`;
 
   let totalRow = {};
   dataCols.forEach(k => totalRow[k] = 0);
@@ -777,7 +688,7 @@ function showSummary() {
     row.machine_excavation = machine_excavation > 0 ? machine_excavation.toFixed(2) : "";
     row.residual_soil = residual_soil > 0 ? residual_soil.toFixed(2) : "";
 
-    let break_as = 0, break_con = 0;
+    let cutting = 0, break_as = 0, break_con = 0;
     let haizan_unpan_as = 0, haizan_shori_as = 0, haizan_unpan_con = 0, haizan_shori_con = 0;
     let demoSetting = allSites[site].demoSetting || {};
     let demoType = demoSetting.type;
@@ -791,6 +702,7 @@ function showSummary() {
       haizan_unpan_con = break_con * demoThick / 100;
       haizan_shori_con = haizan_unpan_con * 2.35;
     }
+    row.cutting = cutting > 0 ? cutting.toFixed(1) : "";
     row.break_as = break_as > 0 ? break_as.toFixed(1) : "";
     row.haizan_unpan_as = haizan_unpan_as > 0 ? haizan_unpan_as.toFixed(2) : "";
     row.haizan_shori_as = haizan_shori_as > 0 ? haizan_shori_as.toFixed(2) : "";
@@ -823,23 +735,6 @@ function showSummary() {
     row.ovl_ge3_0 = ovl_ge3_0 > 0 ? ovl_ge3_0.toFixed(1) : "";
     row.con_total = con_total > 0 ? con_total.toFixed(1) : "";
 
-    const anzen = allSites[site].anzen || {};
-    const kari = allSites[site].kari || {};
-    row.kakusen_out = anzen.outside || '';
-    row.kakusen_stop = anzen.stop || '';
-    row.kakusen_char = anzen.mark || '';
-    row.std_as_curb = anzen.std_as_curb || '';
-    row.small_as_curb = anzen.small_as_curb || '';
-    row.hand_as_curb = anzen.hand_as_curb || '';
-    row.kari_guard_b = kari.guideB || '';
-    row.kari_signal = kari.signal || '';
-    row.kari_heavy = kari.transport || '';
-    let anzen_total = (parseFloat(anzen.outside)||0) + (parseFloat(anzen.stop)||0) + (parseFloat(anzen.mark)||0);
-    let kari_total = (parseFloat(kari.guideB)||0) + (parseFloat(kari.signal)||0) + (parseFloat(kari.transport)||0);
-    row.anzen_total = anzen_total > 0 ? anzen_total.toFixed(1) : "";
-    row.kari_total = kari_total > 0 ? kari_total.toFixed(1) : "";
-    row.zatsu_total = "";
-
     dataCols.forEach(k => {
       if (k !== "site") totalRow[k] += parseFloat(row[k]) || 0;
     });
@@ -866,10 +761,11 @@ function saveAndUpdate() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  loadCheckStates();
-  migrateOldData();
-  loadData();
+  // 工種設定は初期ON
+  document.getElementById('chkWorksEarth').checked = true;
+  document.getElementById('chkWorksDemo').checked = true;
   renderTabs();
+  loadData();
   renderAll();
 });
 </script>
