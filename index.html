@@ -287,6 +287,14 @@
         <tbody id="tbodyPave"></tbody>
       </table>
     </div>
+    <div style="margin-top:10px;">
+      <label><input type="checkbox" id="chkCurbUse" onchange="toggleCurbInputs()"> アスカーブ</label>
+      <span id="curbInputs" class="hidden">
+        <label>標準：<input id="curbStd" type="number" style="width:80px;" onchange="editCurb('std', this.value)"></label>
+        <label>小型：<input id="curbSmall" type="number" style="width:80px;" onchange="editCurb('small', this.value)"></label>
+        <label>手盛：<input id="curbHand" type="number" style="width:80px;" onchange="editCurb('hand', this.value)"></label>
+      </span>
+    </div>
     <div class="sum" id="sumPave"></div>
   </div>
   <!-- 取り壊し工タブ -->
@@ -396,9 +404,10 @@ function loadData() {
   try {
     const dat = JSON.parse(localStorage.getItem(LS_KEY));
     if (dat && typeof dat === "object") {
-      Object.values(allSites).forEach(s => {
+      Object.values(dat).forEach(s => {
         if(!s.kari) s.kari = { traffic_b: 0, temp_signal: 0, machine_transport: 0 };
       });
+        if(!s.curb) s.curb = { use: false, std: 0, small: 0, hand: 0 };
       allSites = dat;
       // サイトリスト描画
       const siteList = Object.keys(allSites);
@@ -425,6 +434,7 @@ function addSite() {
     demo: [],
     anzen: { line_outer: 0, line_stop: 0, line_symbol: 0 },
     kari: { traffic_b: 0, temp_signal: 0, machine_transport: 0 },
+    curb: { use: false, std: 0, small: 0, hand: 0 },
     earthSetting: { same: true, type: '標準掘削', thick: 0 },
     demoSetting: { same: true, type: 'As', thick: 0 }
   };
@@ -490,6 +500,26 @@ function editKari(key, val) {
     allSites[currentSite].kari = { traffic_b: 0, temp_signal: 0, machine_transport: 0 };
   }
   allSites[currentSite].kari[key] = parseFloat(val) || 0;
+  renderAllAndSave();
+}
+function toggleCurbInputs() {
+  if(!currentSite) return;
+  const use = document.getElementById('chkCurbUse').checked;
+  const area = document.getElementById('curbInputs');
+  if(use) area.classList.remove('hidden');
+  else area.classList.add('hidden');
+  if(!allSites[currentSite].curb) {
+    allSites[currentSite].curb = { use: false, std: 0, small: 0, hand: 0 };
+  }
+  allSites[currentSite].curb.use = use;
+  renderAllAndSave();
+}
+function editCurb(key, val) {
+  if(!currentSite) return;
+  if(!allSites[currentSite].curb) {
+    allSites[currentSite].curb = { use: false, std: 0, small: 0, hand: 0 };
+  }
+  allSites[currentSite].curb[key] = parseFloat(val) || 0;
   renderAllAndSave();
 }
 function renderTablePave() {
@@ -696,6 +726,20 @@ function renderKariInputs() {
   document.getElementById('kariTempSignal').value = dat.temp_signal || 0;
   document.getElementById('kariMachineTrans').value = dat.machine_transport || 0;
 }
+function renderCurbInputs() {
+  if(!currentSite) return;
+  const dat = allSites[currentSite].curb || { use: false, std: 0, small: 0, hand: 0 };
+  const chk = document.getElementById('chkCurbUse');
+  const area = document.getElementById('curbInputs');
+  if(chk) chk.checked = dat.use || false;
+  if(area) {
+    if(chk.checked) area.classList.remove('hidden');
+    else area.classList.add('hidden');
+  }
+  document.getElementById('curbStd').value = dat.std || 0;
+  document.getElementById('curbSmall').value = dat.small || 0;
+  document.getElementById('curbHand').value = dat.hand || 0;
+}
 
 // ▼ まとめて再描画
 function renderAll() {
@@ -704,6 +748,7 @@ function renderAll() {
   renderEarthResult();
   renderTableDemo();
   renderDemoResult();
+  renderCurbInputs();
   renderAnzenInputs();
   renderKariInputs();
 }
@@ -912,9 +957,10 @@ function showSummary() {
     row.ovl_ge1_4 = ovl_ge1_4 > 0 ? ovl_ge1_4.toFixed(1) : "";
     row.ovl_ge3_0 = ovl_ge3_0 > 0 ? ovl_ge3_0.toFixed(1) : "";
     row.con_total = con_total > 0 ? con_total.toFixed(1) : "";
-    row.curb_std = "";
-    row.curb_small = "";
-    row.curb_hand = "";
+    const curb = allSites[site].curb || {};
+    row.curb_std = (curb.use && curb.std > 0) ? curb.std : "";
+    row.curb_small = (curb.use && curb.small > 0) ? curb.small : "";
+    row.curb_hand = (curb.use && curb.hand > 0) ? curb.hand : "";
     const anzen = allSites[site].anzen || {};
     row.line_outer = anzen.line_outer || "";
     row.line_stop = anzen.line_stop || "";
