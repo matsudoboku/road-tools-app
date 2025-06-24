@@ -278,6 +278,13 @@
     <h4>取り壊し工</h4>
     <div id="demoResult"></div>
   </div>
+  <!-- 安全施設工タブ -->
+  <div id="panelAnzen" class="block hidden">
+    <h4>安全施設工</h4>
+    <label>外側線：<input id="anzenLineOuter" type="number" onchange="editAnzen('line_outer', this.value)"></label>
+    <label>停止線：<input id="anzenLineStop" type="number" onchange="editAnzen('line_stop', this.value)"></label>
+    <label>文字記号：<input id="anzenLineSymbol" type="number" onchange="editAnzen('line_symbol', this.value)"></label>
+  </div>
   <!-- 免責事項タブ -->
   <div id="panelDisclaimer" class="block hidden">
     <p>
@@ -305,7 +312,7 @@ const worksList = [
   { id: "Earth", label: "土工", chk: "chkWorksEarth", setting: "worksEarthSetting", panel: "panelEarth" },
   { id: "Pave", label: "舗装工", always: true, panel: "panelPave" },
   { id: "Demo", label: "取り壊し工", chk: "chkWorksDemo", setting: "worksDemoSetting", panel: "panelDemo" },
-  { id: "Anzen", label: "安全施設工", chk: "chkWorksAnzen", panel: null },
+  { id: "Anzen", label: "安全施設工", chk: "chkWorksAnzen", panel: "panelAnzen" },
   { id: "Kari", label: "仮設工", chk: "chkWorksKari", panel: null },
   { id: "Zatsu", label: "雑工", chk: "chkWorksZatsu", panel: null },
   { id: "Disclaimer", label: "免責事項", always: true, panel: "panelDisclaimer"}
@@ -375,6 +382,7 @@ function addSite() {
     pave: [],
     earth: [],
     demo: [],
+    anzen: { line_outer: 0, line_stop: 0, line_symbol: 0 },
     earthSetting: { same: true, type: '標準掘削', thick: 0 },
     demoSetting: { same: true, type: 'As', thick: 0 }
   };
@@ -424,6 +432,14 @@ function editRow(type, idx, key, val) {
   } else {
     allSites[currentSite][type][idx][key] = val;
   }
+  renderAllAndSave();
+}
+function editAnzen(key, val) {
+  if (!currentSite) return;
+  if (!allSites[currentSite].anzen) {
+    allSites[currentSite].anzen = { line_outer: 0, line_stop: 0, line_symbol: 0 };
+  }
+  allSites[currentSite].anzen[key] = parseFloat(val) || 0;
   renderAllAndSave();
 }
 function renderTablePave() {
@@ -530,11 +546,20 @@ function renderDemoResult() {
   document.getElementById('demoResult').innerHTML = html;
 }
 
+function renderAnzenInputs() {
+  if(!currentSite) return;
+  const dat = allSites[currentSite].anzen || {};
+  document.getElementById('anzenLineOuter').value = dat.line_outer || 0;
+  document.getElementById('anzenLineStop').value = dat.line_stop || 0;
+  document.getElementById('anzenLineSymbol').value = dat.line_symbol || 0;
+}
+
 // ▼ まとめて再描画
 function renderAll() {
   renderTablePave();
   renderEarthResult();
   renderDemoResult();
+  renderAnzenInputs();
 }
 
 // ▼ DXFエクスポート
@@ -743,9 +768,10 @@ function showSummary() {
     row.curb_std = "";
     row.curb_small = "";
     row.curb_hand = "";
-    row.line_outer = "";
-    row.line_stop = "";
-    row.line_symbol = "";
+    const anzen = allSites[site].anzen || {};
+    row.line_outer = anzen.line_outer || "";
+    row.line_stop = anzen.line_stop || "";
+    row.line_symbol = anzen.line_symbol || "";
     row.traffic_b = "";
     row.temp_signal = "";
     row.machine_transport = "";
@@ -779,6 +805,7 @@ window.addEventListener('DOMContentLoaded', () => {
   // 工種設定は初期OFF
   document.getElementById('chkWorksEarth').checked = false;
   document.getElementById('chkWorksDemo').checked = false;
+  document.getElementById('chkWorksAnzen').checked = false;
   renderTabs();
   loadData();
   renderAll();
