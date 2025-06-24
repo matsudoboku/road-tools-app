@@ -484,10 +484,14 @@ function addSite() {
   document.getElementById('siteList').innerHTML += `<option>${name}</option>`;
   document.getElementById('siteList').value = name;
   currentSite = name;
+  renderEarthSetting();
+  renderDemoSetting();
   renderAllAndSave();
 }
 function switchSite() {
   currentSite = document.getElementById('siteList').value;
+  renderEarthSetting();
+  renderDemoSetting();
   renderAllAndSave();
 }
 
@@ -761,6 +765,23 @@ function renderAnzenInputs() {
   document.getElementById('anzenLineStop').value = dat.line_stop || 0;
   document.getElementById('anzenLineSymbol').value = dat.line_symbol || 0;
 }
+
+function renderEarthSetting() {
+  if(!currentSite) return;
+  const set = allSites[currentSite].earthSetting || { same: true, type: '標準掘削', thick: 0 };
+  document.getElementById('earthSamePave').checked = set.same || false;
+  document.getElementById('earthType').value = set.type || '標準掘削';
+  document.getElementById('earthThick').value = set.thick || 0;
+}
+
+function renderDemoSetting() {
+  if(!currentSite) return;
+  const set = allSites[currentSite].demoSetting || { same: true, type: 'As', thick: 0, cutting: 0 };
+  document.getElementById('demoSamePave').checked = set.same || false;
+  document.getElementById('demoType').value = set.type || 'As';
+  document.getElementById('demoThick').value = set.thick || 0;
+  document.getElementById('demoCutting').value = set.cutting || 0;
+}
 function renderKariInputs() {
   if(!currentSite) return;
   const dat = allSites[currentSite].kari || {};
@@ -785,6 +806,8 @@ function renderCurbInputs() {
 
 // ▼ まとめて再描画
 function renderAll() {
+  renderEarthSetting();
+  renderDemoSetting();
   renderTablePave();
   renderTableEarth();
   renderEarthResult();
