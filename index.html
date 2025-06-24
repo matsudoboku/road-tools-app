@@ -231,6 +231,7 @@
           <option>As+Con</option>
         </select>
         <label>取壊し厚（cm）：<input type="number" id="demoThick" min="0" style="width:60px;" onchange="saveAndUpdate()"></label>
+        <label>舗装版切断（m）：<input type="number" id="demoCutting" min="0" style="width:60px;" onchange="saveAndUpdate()"></label>
       </div>
     </div>
     <div>
@@ -406,9 +407,11 @@ function loadData() {
     if (dat && typeof dat === "object") {
       Object.values(dat).forEach(s => {
         if(!s.kari) s.kari = { traffic_b: 0, temp_signal: 0, machine_transport: 0 };
-      });
         if(!s.curb) s.curb = { use: false, std: 0, small: 0, hand: 0 };
-      allSites = dat;
+        if(!s.demoSetting) s.demoSetting = { same: true, type: 'As', thick: 0, cutting: 0 };
+        else if(s.demoSetting.cutting === undefined) s.demoSetting.cutting = 0;
+      });
+        allSites = dat;
       // サイトリスト描画
       const siteList = Object.keys(allSites);
       if (siteList.length) {
@@ -436,7 +439,7 @@ function addSite() {
     kari: { traffic_b: 0, temp_signal: 0, machine_transport: 0 },
     curb: { use: false, std: 0, small: 0, hand: 0 },
     earthSetting: { same: true, type: '標準掘削', thick: 0 },
-    demoSetting: { same: true, type: 'As', thick: 0 }
+    demoSetting: { same: true, type: 'As', thick: 0, cutting: 0 }
   };
   document.getElementById('siteList').innerHTML += `<option>${name}</option>`;
   document.getElementById('siteList').value = name;
@@ -460,8 +463,8 @@ function getDemoSetting() {
   return {
     same: document.getElementById('demoSamePave').checked,
     type: document.getElementById('demoType').value,
-    thick: parseFloat(document.getElementById('demoThick').value)||0
-  };
+    thick: parseFloat(document.getElementById('demoThick').value)||0,
+    cutting: parseFloat(document.getElementById('demoCutting').value)||0  };
 }
 
 // ▼ 舗装工タブ
@@ -915,6 +918,7 @@ function showSummary() {
     let demoType = demoSetting.type;
     let demoThick = parseFloat(demoSetting.thick)||0;
     if (document.getElementById('chkWorksDemo')?.checked) {
+      cutting = parseFloat(demoSetting.cutting) || 0;
       let areaDemo = demoSetting.same ? paveSum : (allSites[site].demo||[]).reduce((a,r)=>a+(parseFloat(r.面積)||0),0);
       if (demoType === "As") break_as = areaDemo;
       else if (demoType === "Con") break_con = areaDemo;
