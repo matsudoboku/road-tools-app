@@ -46,6 +46,8 @@
       letter-spacing: 0.04em;
       display: flex;
       align-items: center;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
     .tab.active, .tab:hover {
       background: #e3ebfa;
@@ -620,9 +622,12 @@ function showSummary() {
     "cutting", "break_as", "haizan_unpan_as", "haizan_shori_as",
     "break_con", "haizan_unpan_con", "haizan_shori_con",
     "as_lt1_4", "as_ge1_4", "as_ge3_0",
+    "base_course",
     "ovl_lt1_4", "ovl_ge1_4", "ovl_ge3_0",
-    "con_total"
-  ];
+    "con_total",
+    "curb_std", "curb_small", "curb_hand",
+    "line_outer", "line_stop", "line_symbol",
+    "traffic_b", "temp_signal", "machine_transport"  ];
   let html = `<div style="overflow-x:auto;"><table class="ss-table" style="${tableStyle}">`;
   html += `
 <tr>
@@ -730,10 +735,20 @@ function showSummary() {
     row.as_lt1_4 = as_lt1_4 > 0 ? as_lt1_4.toFixed(1) : "";
     row.as_ge1_4 = as_ge1_4 > 0 ? as_ge1_4.toFixed(1) : "";
     row.as_ge3_0 = as_ge3_0 > 0 ? as_ge3_0.toFixed(1) : "";
+    row.base_course = "";
     row.ovl_lt1_4 = ovl_lt1_4 > 0 ? ovl_lt1_4.toFixed(1) : "";
     row.ovl_ge1_4 = ovl_ge1_4 > 0 ? ovl_ge1_4.toFixed(1) : "";
     row.ovl_ge3_0 = ovl_ge3_0 > 0 ? ovl_ge3_0.toFixed(1) : "";
     row.con_total = con_total > 0 ? con_total.toFixed(1) : "";
+    row.curb_std = "";
+    row.curb_small = "";
+    row.curb_hand = "";
+    row.line_outer = "";
+    row.line_stop = "";
+    row.line_symbol = "";
+    row.traffic_b = "";
+    row.temp_signal = "";
+    row.machine_transport = "";
 
     dataCols.forEach(k => {
       if (k !== "site") totalRow[k] += parseFloat(row[k]) || 0;
