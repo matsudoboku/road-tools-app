@@ -776,9 +776,9 @@ function saveAndUpdate() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  // 工種設定は初期ON
-  document.getElementById('chkWorksEarth').checked = true;
-  document.getElementById('chkWorksDemo').checked = true;
+  // 工種設定は初期OFF
+  document.getElementById('chkWorksEarth').checked = false;
+  document.getElementById('chkWorksDemo').checked = false;
   renderTabs();
   loadData();
   renderAll();
