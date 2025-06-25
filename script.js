@@ -19,8 +19,8 @@ function renderTabs() {
   if(currentSite && allSites[currentSite]) saveWorksChk();
   let tabHtml = '';
   for(const w of worksList) {
-    if(w.always || document.getElementById(w.chk)?.checked) {
-      tabHtml += `<div class="tab" id="tab${w.id}" onclick="showTab('${w.id}')">${w.label}</div>`;
+    const chkEl = document.getElementById(w.chk);
+    if(w.always || (chkEl && chkEl.checked)) {      tabHtml += `<div class="tab" id="tab${w.id}" onclick="showTab('${w.id}')">${w.label}</div>`;
     }
     if(w.setting) {
       const settingDiv = document.getElementById(w.setting);
@@ -32,19 +32,27 @@ function renderTabs() {
     }
   }
   document.getElementById('tabsArea').innerHTML = tabHtml;
-  const firstActive = worksList.find(w => w.always || document.getElementById(w.chk)?.checked);
-  if(firstActive) showTab(firstActive.id);
+  const firstActive = worksList.find(w => {
+    const el = document.getElementById(w.chk);
+    return w.always || (el && el.checked);
+  });  if(firstActive) showTab(firstActive.id);
   saveAndUpdate();
 }
 function showTab(tabId) {
   for(const w of worksList) {
-    document.getElementById('tab'+w.id)?.classList.remove('active');
-    if(w.panel) document.getElementById(w.panel).classList.add('hidden');
+    const tabEl = document.getElementById('tab'+w.id);
+    if(tabEl) tabEl.classList.remove('active');
+    if(w.panel) {
+      const panelEl = document.getElementById(w.panel);
+      if(panelEl) panelEl.classList.add('hidden');
+    }
   }
-  document.getElementById('tab'+tabId)?.classList.add('active');
-  worksList.forEach(w => {
-    if(w.id === tabId && w.panel) document.getElementById(w.panel).classList.remove('hidden');
-  });
+  const activeTabEl = document.getElementById('tab'+tabId);
+  if(activeTabEl) activeTabEl.classList.add('active');  worksList.forEach(w => {
+    if(w.id === tabId && w.panel) {
+      const panelEl = document.getElementById(w.panel);
+      if(panelEl) panelEl.classList.remove('hidden');
+    }  });
 }
 
 // ▼ データ保存・復元
@@ -496,7 +504,7 @@ function renderAll() {
 
 // ▼ DXFエクスポート
 function exportDXF() {
-  const list = allSites[currentSite]?.pave || [];
+  const list = (allSites[currentSite] && allSites[currentSite].pave) || [];
   if (list.length < 2) {
     alert('最低2行以上必要です');
     return;
@@ -658,8 +666,9 @@ function showSummary() {
     let earthSetting = allSites[site].earthSetting || {};
     let paveSum = 0;
     (allSites[site].pave||[]).forEach(r=>paveSum+=parseFloat(r.面積)||0);
-    if (allSites[site].works?.earth) {
-      if (document.getElementById('chkWorksEarth')?.checked) {
+    if (allSites[site].works && allSites[site].works.earth) {
+      var chkEarth = document.getElementById('chkWorksEarth');
+      if (chkEarth && chkEarth.checked) {
         let thick = parseFloat(earthSetting.thick)||0;
         machine_excavation = residual_soil = paveSum * thick / 100;
       }
@@ -672,18 +681,24 @@ function showSummary() {
     let demoSetting = allSites[site].demoSetting || {};
     let demoType = demoSetting.type;
     let demoThick = parseFloat(demoSetting.thick)||0;
-    if (document.getElementById('chkWorksDemo')?.checked) {
-      if (allSites[site].works?.demo) {
-      cutting = parseFloat(demoSetting.cutting) || 0;
-      let areaDemo = demoSetting.same ? paveSum : (allSites[site].demo||[]).reduce((a,r)=>a+(parseFloat(r.面積)||0),0);
-      if (demoType === "As") break_as = areaDemo;
-      else if (demoType === "Con") break_con = areaDemo;
-      else if (demoType === "As+Con") { break_as = areaDemo; break_con = areaDemo; }
-      haizan_unpan_as = break_as * demoThick / 100;
-      haizan_shori_as = haizan_unpan_as * 2.35;
-      haizan_unpan_con = break_con * demoThick / 100;
-      haizan_shori_con = haizan_unpan_con * 2.35;
-    }
+    var chkDemoMain = document.getElementById('chkWorksDemo');
+    if (chkDemoMain && chkDemoMain.checked) {
+      if (allSites[site].works && allSites[site].works.demo) {
+        cutting = parseFloat(demoSetting.cutting) || 0;
+        let areaDemo = demoSetting.same ? paveSum : (allSites[site].demo||[]).reduce((a,r)=>a+(parseFloat(r.面積)||0),0);
+        if (demoType === "As") {
+          break_as = areaDemo;
+        } else if (demoType === "Con") {
+          break_con = areaDemo;
+        } else if (demoType === "As+Con") {
+          break_as = areaDemo;
+          break_con = areaDemo;
+        }
+        haizan_unpan_as = break_as * demoThick / 100;
+        haizan_shori_as = haizan_unpan_as * 2.35;
+        haizan_unpan_con = break_con * demoThick / 100;
+        haizan_shori_con = haizan_unpan_con * 2.35;
+      }
     }
     row.cutting = cutting > 0 ? cutting.toFixed(1) : "";
     row.break_as = break_as > 0 ? break_as.toFixed(1) : "";
