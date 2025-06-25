@@ -596,6 +596,8 @@ function showSummary() {
   const thStyle1 = "border:2px solid #555;background:#e6eef5;color:#007acc;font-weight:bold;text-align:center;padding:8px 5px;";
   const thStyle2 = "border:2px solid #555;background:#f7fbff;color:#007acc;font-weight:bold;text-align:center;padding:5px 5px;";
   const tdStyle = "border:2px solid #555;text-align:center;padding:6px 5px;";
+  const tdStyleFirst = tdStyle + "border-bottom:none;";
+  const tdStyleSecond = tdStyle + "border-top:none;";
   const dataCols = [
     "site",
     "machine_excavation", "residual_soil",
@@ -754,6 +756,8 @@ function showSummary() {
     });
 
     html += `<tr>${dataCols.map(k => `<td style="${tdStyle}">${row[k] || ""}</td>`).join("")}</tr>`;
+    html += `<tr>${dataCols.map(k => `<td style="${tdStyleFirst}">${row[k] || ""}</td>`).join("")}</tr>`;
+    html += `<tr>${dataCols.map(k => `<td style="${tdStyleSecond}"></td>`).join("")}</tr>`;
   });
 
   html += `<tr style="background:#f3f9ff;font-weight:bold;">${
