@@ -591,7 +591,7 @@ function exportDXF() {
 }
 
 // ▼ 全集計（従来形式）
-function showSummary() {
+function getSummaryHtml(forExcel = false) {
   const tableStyle = "min-width:1200px;border-collapse:collapse;border:2px solid #555;background:#fff;width:auto;";
   const thStyle1 = "border:2px solid #555;background:#e6eef5;color:#007acc;font-weight:bold;text-align:center;padding:8px 5px;";
   const thStyle2 = "border:2px solid #555;background:#f7fbff;color:#007acc;font-weight:bold;text-align:center;padding:5px 5px;";
@@ -755,9 +755,12 @@ function showSummary() {
       if (k !== "site") totalRow[k] += parseFloat(row[k]) || 0;
     });
 
-    html += `<tr>${dataCols.map(k => `<td style="${tdStyle}">${row[k] || ""}</td>`).join("")}</tr>`;
-    html += `<tr>${dataCols.map(k => `<td style="${tdStyleFirst}">${row[k] || ""}</td>`).join("")}</tr>`;
-    html += `<tr>${dataCols.map(k => `<td style="${tdStyleSecond}"></td>`).join("")}</tr>`;
+    if (forExcel) {
+      html += `<tr>${dataCols.map(k => `<td style="${tdStyleFirst}"></td>`).join("")}</tr>`;
+      html += `<tr>${dataCols.map(k => `<td style="${tdStyleSecond}">${row[k] || ""}</td>`).join("")}</tr>`;
+    } else {
+      html += `<tr>${dataCols.map(k => `<td style="${tdStyle}">${row[k] || ""}</td>`).join("")}</tr>`;
+    }
   });
 
   html += `<tr style="background:#f3f9ff;font-weight:bold;">${
@@ -766,14 +769,17 @@ function showSummary() {
     ).join("")
   }</tr>`;
   html += '</table></div>';
-  document.getElementById('summary').innerHTML = html;
+  return html;
 }
+
+function showSummary() {
+  document.getElementById('summary').innerHTML = getSummaryHtml(false);}
 
 // ▼ 集計表をExcel形式でダウンロード
 function exportSummaryExcel() {
   showSummary();
   const html = '<html><head><meta charset="UTF-8"></head><body>' +
-               document.getElementById('summary').innerHTML +
+               getSummaryHtml(true) +
                '</body></html>';
   const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
   const a = document.createElement('a');
