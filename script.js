@@ -592,7 +592,7 @@ function exportDXF() {
 
 // ▼ 全集計（従来形式）
 function getSummaryHtml(forExcel = false) {
-  const border = forExcel ? "1px" : "2px";
+  const border = forExcel ? "0.5px" : "2px";
   const tableStyle = `min-width:1200px;border-collapse:collapse;border:${border} solid #555;background:#fff;width:auto;`;
   const thStyle1 = `border:${border} solid #555;background:#e6eef5;color:#007acc;font-weight:bold;text-align:center;padding:8px 5px;`;
   const thStyle2 = `border:${border} solid #555;background:#f7fbff;color:#007acc;font-weight:bold;text-align:center;padding:5px 5px;`;
