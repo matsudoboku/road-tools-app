@@ -659,9 +659,10 @@ function showSummary() {
     let paveSum = 0;
     (allSites[site].pave||[]).forEach(r=>paveSum+=parseFloat(r.面積)||0);
     if (allSites[site].works?.earth) {
-    if (document.getElementById('chkWorksEarth')?.checked) {
-      let thick = parseFloat(earthSetting.thick)||0;
-      machine_excavation = residual_soil = paveSum * thick / 100;
+      if (document.getElementById('chkWorksEarth')?.checked) {
+        let thick = parseFloat(earthSetting.thick)||0;
+        machine_excavation = residual_soil = paveSum * thick / 100;
+      }
     }
     row.machine_excavation = machine_excavation > 0 ? machine_excavation.toFixed(2) : "";
     row.residual_soil = residual_soil > 0 ? residual_soil.toFixed(2) : "";
@@ -672,7 +673,7 @@ function showSummary() {
     let demoType = demoSetting.type;
     let demoThick = parseFloat(demoSetting.thick)||0;
     if (document.getElementById('chkWorksDemo')?.checked) {
-    if (allSites[site].works?.demo) {
+      if (allSites[site].works?.demo) {
       cutting = parseFloat(demoSetting.cutting) || 0;
       let areaDemo = demoSetting.same ? paveSum : (allSites[site].demo||[]).reduce((a,r)=>a+(parseFloat(r.面積)||0),0);
       if (demoType === "As") break_as = areaDemo;
@@ -682,6 +683,7 @@ function showSummary() {
       haizan_shori_as = haizan_unpan_as * 2.35;
       haizan_unpan_con = break_con * demoThick / 100;
       haizan_shori_con = haizan_unpan_con * 2.35;
+    }
     }
     row.cutting = cutting > 0 ? cutting.toFixed(1) : "";
     row.break_as = break_as > 0 ? break_as.toFixed(1) : "";
