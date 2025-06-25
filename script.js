@@ -592,10 +592,11 @@ function exportDXF() {
 
 // ▼ 全集計（従来形式）
 function getSummaryHtml(forExcel = false) {
-  const tableStyle = "min-width:1200px;border-collapse:collapse;border:2px solid #555;background:#fff;width:auto;";
-  const thStyle1 = "border:2px solid #555;background:#e6eef5;color:#007acc;font-weight:bold;text-align:center;padding:8px 5px;";
-  const thStyle2 = "border:2px solid #555;background:#f7fbff;color:#007acc;font-weight:bold;text-align:center;padding:5px 5px;";
-  const tdStyle = "border:2px solid #555;text-align:center;padding:6px 5px;";
+  const border = forExcel ? "1px" : "2px";
+  const tableStyle = `min-width:1200px;border-collapse:collapse;border:${border} solid #555;background:#fff;width:auto;`;
+  const thStyle1 = `border:${border} solid #555;background:#e6eef5;color:#007acc;font-weight:bold;text-align:center;padding:8px 5px;`;
+  const thStyle2 = `border:${border} solid #555;background:#f7fbff;color:#007acc;font-weight:bold;text-align:center;padding:5px 5px;`;
+  const tdStyle = `border:${border} solid #555;text-align:center;padding:6px 5px;`;
   const tdStyleFirst = tdStyle + "border-bottom:none;";
   const tdStyleSecond = tdStyle + "border-top:none;";
   const dataCols = [
