@@ -5,12 +5,12 @@
   <title>舗装補修計算ツール</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body {
-      font-family: 'San Francisco', 'SF Pro Display', 'Segoe UI', 'Meiryo', sans-serif;
-      background: linear-gradient(135deg, #f6f6f7 0%, #eaeef3 100%);
-      margin: 0;
-      color: #222;
-    }
+   body {
+     font-family: 'San Francisco', 'SF Pro Display', 'Segoe UI', 'Meiryo', sans-serif;
+     background: linear-gradient(135deg, #f6f6f7 0%, #eaeef3 100%);
+     margin: 0;
+     color: #222;
+   }
     .container {
       max-width: 900px;
       margin: 32px auto;
@@ -233,8 +233,8 @@
           <option>Con</option>
           <option>As+Con</option>
         </select>
-        <label>取壊し厚（cm）：<input type="number" id="demoThick" min="0" style="width:60px;" oninput="saveAndUpdate()"></label>
-        <label>舗装版切断（m）：<input type="number" id="demoCutting" min="0" style="width:60px;" oninput="saveAndUpdate()"></label>
+        <label>取壊し厚（cm）：<input type="number" id="demoThick" min="0" style="width:60px;" oninput="saveAndUpdate(false)" onblur="saveAndUpdate(true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>舗装版切断（m）：<input type="number" id="demoCutting" min="0" style="width:60px;" oninput="saveAndUpdate(false)" onblur="saveAndUpdate(true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
       </div>
     </div>
     <div>
@@ -294,9 +294,9 @@
     <div style="margin-top:10px;">
       <label><input type="checkbox" id="chkCurbUse" onchange="toggleCurbInputs()"> アスカーブ</label>
       <span id="curbInputs" class="hidden">
-        <label>標準：<input id="curbStd" type="number" style="width:80px;" oninput="editCurb('std', this.value)"></label>
-        <label>小型：<input id="curbSmall" type="number" style="width:80px;" oninput="editCurb('small', this.value)"></label>
-        <label>手盛：<input id="curbHand" type="number" style="width:80px;" oninput="editCurb('hand', this.value)"></label>
+        <label>標準：<input id="curbStd" type="number" style="width:80px;" oninput="editCurb('std', this.value)" onblur="editCurb('std', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>小型：<input id="curbSmall" type="number" style="width:80px;" oninput="editCurb('small', this.value)" onblur="editCurb('small', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>手盛：<input id="curbHand" type="number" style="width:80px;" oninput="editCurb('hand', this.value)" onblur="editCurb('hand', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
       </span>
     </div>
     <div class="sum" id="sumPave"></div>
@@ -324,16 +324,16 @@
   <!-- 安全施設工タブ -->
   <div id="panelAnzen" class="block hidden">
     <h4>安全施設工</h4>
-  <label>外側線：<input id="anzenLineOuter" type="number" oninput="editAnzen('line_outer', this.value)"></label>
-  <label>停止線：<input id="anzenLineStop" type="number" oninput="editAnzen('line_stop', this.value)"></label>
-  <label>文字記号：<input id="anzenLineSymbol" type="number" oninput="editAnzen('line_symbol', this.value)"></label>
+  <label>外側線：<input id="anzenLineOuter" type="number" oninput="editAnzen('line_outer', this.value)" onblur="editAnzen('line_outer', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+  <label>停止線：<input id="anzenLineStop" type="number" oninput="editAnzen('line_stop', this.value)" onblur="editAnzen('line_stop', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+  <label>文字記号：<input id="anzenLineSymbol" type="number" oninput="editAnzen('line_symbol', this.value)" onblur="editAnzen('line_symbol', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
   </div>
   <!-- 仮設工タブ -->
   <div id="panelKari" class="block hidden">
     <h4>仮設工</h4>
-  <label>交通誘導員B：<input id="kariTrafficB" type="number" oninput="editKari('traffic_b', this.value)"></label>
-  <label>仮設信号機：<input id="kariTempSignal" type="number" oninput="editKari('temp_signal', this.value)"></label>
-  <label>重機運搬費：<input id="kariMachineTrans" type="number" oninput="editKari('machine_transport', this.value)"></label>
+  <label>交通誘導員B：<input id="kariTrafficB" type="number" oninput="editKari('traffic_b', this.value)" onblur="editKari('traffic_b', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+  <label>仮設信号機：<input id="kariTempSignal" type="number" oninput="editKari('temp_signal', this.value)" onblur="editKari('temp_signal', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+  <label>重機運搬費：<input id="kariMachineTrans" type="number" oninput="editKari('machine_transport', this.value)" onblur="editKari('machine_transport', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
   </div>
   <!-- 免責事項タブ -->
   <div id="panelDisclaimer" class="block hidden">
@@ -523,7 +523,7 @@ function addRow(type) {
   }
   renderAllAndSave();
 }
-function editRow(type, idx, key, val) {
+function editRow(type, idx, key, val, update = false) {
   if (type === "pave" && key === "種別") {
     for (let i = idx; i < allSites[currentSite][type].length; i++) {
       allSites[currentSite][type][i][key] = val;
@@ -531,23 +531,23 @@ function editRow(type, idx, key, val) {
   } else {
     allSites[currentSite][type][idx][key] = val;
   }
-  renderAllAndSave();
+  // 入力中は再描画しない！
+  if (update) renderAllAndSave();
 }
-function editAnzen(key, val) {
-  if (!currentSite) return;
+function editAnzen(key, val, update = false) {  if (!currentSite) return;
   if (!allSites[currentSite].anzen) {
     allSites[currentSite].anzen = { line_outer: 0, line_stop: 0, line_symbol: 0 };
   }
   allSites[currentSite].anzen[key] = parseFloat(val) || 0;
-  renderAllAndSave();
+  if(update) renderAllAndSave();
 }
-function editKari(key, val) {
+function editKari(key, val, update = false) {
   if (!currentSite) return;
   if (!allSites[currentSite].kari) {
     allSites[currentSite].kari = { traffic_b: 0, temp_signal: 0, machine_transport: 0 };
   }
   allSites[currentSite].kari[key] = parseFloat(val) || 0;
-  renderAllAndSave();
+  if(update) renderAllAndSave();
 }
 function toggleCurbInputs() {
   if(!currentSite) return;
@@ -561,13 +561,13 @@ function toggleCurbInputs() {
   allSites[currentSite].curb.use = use;
   renderAllAndSave();
 }
-function editCurb(key, val) {
+function editCurb(key, val, update = false) {
   if(!currentSite) return;
   if(!allSites[currentSite].curb) {
     allSites[currentSite].curb = { use: false, std: 0, small: 0, hand: 0 };
   }
   allSites[currentSite].curb[key] = parseFloat(val) || 0;
-  renderAllAndSave();
+  if(update) renderAllAndSave();
 }
 function renderTablePave() {
   if(!currentSite) return;
@@ -608,14 +608,14 @@ function renderTablePave() {
   list.forEach((r,idx)=>{
     tbody += `<tr>
       <td>
-        <select onchange="editRow('pave',${idx},'種別',this.value)">
+        <select onchange="editRow('pave',${idx},'種別',this.value,true)">
           ${paveTypes.map(tp=>`<option value="${tp}"${r.種別===tp?' selected':''}>${tp}</option>`).join('')}
         </select>
       </td>
-      <td><input value="${r.測点||''}" oninput="editRow('pave',${idx},'測点',this.value)"></td>
-      <td><input value="${r.単距||''}" oninput="editRow('pave',${idx},'単距',this.value)"></td>
+      <td><input value="${r.測点||''}" oninput="editRow('pave',${idx},'測点',this.value)" onblur="editRow('pave',${idx},'測点',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
+      <td><input value="${r.単距||''}" oninput="editRow('pave',${idx},'単距',this.value)" onblur="editRow('pave',${idx},'単距',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
       <td><input value="${r.追距||''}" class="readonly" readonly></td>
-      <td><input value="${r.幅員||''}" oninput="editRow('pave',${idx},'幅員',this.value)"></td>      <td><input value="${r.平均幅員||''}" class="readonly" readonly></td>
+      <td><input value="${r.幅員||''}" oninput="editRow('pave',${idx},'幅員',this.value)" onblur="editRow('pave',${idx},'幅員',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>      <td><input value="${r.平均幅員||''}" class="readonly" readonly></td>
       <td><input value="${r.面積||''}" class="readonly" readonly></td>
     </tr>`;
   });
@@ -674,10 +674,10 @@ function renderTableEarth() {
   let tbody = '';
   list.forEach((r,idx)=>{
     tbody += `<tr>
-      <td><input value="${r.測点||''}" oninput="editRow('earth',${idx},'測点',this.value)"></td>
-      <td><input value="${r.単距||''}" oninput="editRow('earth',${idx},'単距',this.value)"></td>
+      <td><input value="${r.測点||''}" oninput="editRow('earth',${idx},'測点',this.value)" onblur="editRow('earth',${idx},'測点',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
+      <td><input value="${r.単距||''}" oninput="editRow('earth',${idx},'単距',this.value)" onblur="editRow('earth',${idx},'単距',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
       <td><input value="${r.追距||''}" class="readonly" readonly></td>
-      <td><input value="${r.幅員||''}" oninput="editRow('earth',${idx},'幅員',this.value)"></td>
+      <td><input value="${r.幅員||''}" oninput="editRow('earth',${idx},'幅員',this.value)" onblur="editRow('earth',${idx},'幅員',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
       <td><input value="${r.面積||''}" class="readonly" readonly></td>
     </tr>`;
   });
@@ -715,10 +715,10 @@ function renderTableDemo() {
   let tbody = '';
   list.forEach((r,idx)=>{
     tbody += `<tr>
-      <td><input value="${r.測点||''}" oninput="editRow('demo',${idx},'測点',this.value)"></td>
-      <td><input value="${r.単距||''}" oninput="editRow('demo',${idx},'単距',this.value)"></td>
+      <td><input value="${r.測点||''}" oninput="editRow('demo',${idx},'測点',this.value)" onblur="editRow('demo',${idx},'測点',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
+      <td><input value="${r.単距||''}" oninput="editRow('demo',${idx},'単距',this.value)" onblur="editRow('demo',${idx},'単距',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
       <td><input value="${r.追距||''}" class="readonly" readonly></td>
-      <td><input value="${r.幅員||''}" oninput="editRow('demo',${idx},'幅員',this.value)"></td>
+      <td><input value="${r.幅員||''}" oninput="editRow('demo',${idx},'幅員',this.value)" onblur="editRow('demo',${idx},'幅員',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
       <td><input value="${r.面積||''}" class="readonly" readonly></td>
     </tr>`;
   });
@@ -828,16 +828,31 @@ function exportDXF() {
   let scale = 100;
   let points = [];
   let x = 0;
-  for (let i = 0; i < list.length; i++) {
-    // 全角数字や不可視文字・空白を排除
-    let len = (list[i].単距 + '').replace(/[Ａ-Ｚａ-ｚ０-９＋]/g, s =>
-      String.fromCharCode(s.charCodeAt(0) - 0xFEE0)).replace(/[^\d.-]/g, '');
-    let width = (list[i].幅員 + '').replace(/[Ａ-Ｚａ-ｚ０-９＋]/g, s =>
-      String.fromCharCode(s.charCodeAt(0) - 0xFEE0)).replace(/[^\d.-]/g, '');
+
+  // レイヤー名を日本語で
+  const LAYER_FRAME   = 'FRAME';
+  const LAYER_BASE    = '---';
+  const LAYER_WIDTH   = 'W';
+  const LAYER_LEN     = 'L';
+  const LAYER_STATION = 'No';
+
+  // 1点目
+  let width0 = parseFloat((list[0].幅員 + '').replace(/[Ａ-Ｚａ-ｚ０-９＋]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0)).replace(/[^\d.-]/g, '')) || 0;
+  points.push({
+    x: 0,
+    up: width0 / 2,
+    down: -width0 / 2,
+    width: width0,
+    st: list[0].測点
+  });
+
+  // 2点目以降
+  for (let i = 1; i < list.length; i++) {
+    let len = (list[i].単距 + '').replace(/[Ａ-Ｚａ-ｚ０-９＋]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0)).replace(/[^\d.-]/g, '');
+    let width = (list[i].幅員 + '').replace(/[Ａ-Ｚａ-ｚ０-９＋]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0)).replace(/[^\d.-]/g, '');
     len = parseFloat(len) || 0;
     width = parseFloat(width) || 0;
-    // デバッグ
-    console.log(`i=${i} len=${len} width=${width} x=${x}`);
+    x += len;
     points.push({
       x: x,
       up: width / 2,
@@ -845,51 +860,51 @@ function exportDXF() {
       width: width,
       st: list[i].測点
     });
-    x += len;
   }
-  console.log(points);
 
-  // ---（以下は従来通り）---
   let lines = [];
+  // 枠線（LAYER_FRAME）
   for (let i = 0; i < points.length - 1; i++) {
     const p0 = points[i], p1 = points[i + 1];
-    // 台形外周
-    lines.push(`0\nLINE\n8\n0\n10\n${p0.x * scale}\n20\n${p0.up * scale}\n11\n${p1.x * scale}\n21\n${p1.up * scale}\n`);
-    lines.push(`0\nLINE\n8\n0\n10\n${p1.x * scale}\n20\n${p1.up * scale}\n11\n${p1.x * scale}\n21\n${p1.down * scale}\n`);
-    lines.push(`0\nLINE\n8\n0\n10\n${p1.x * scale}\n20\n${p1.down * scale}\n11\n${p0.x * scale}\n21\n${p0.down * scale}\n`);
-    lines.push(`0\nLINE\n8\n0\n10\n${p0.x * scale}\n20\n${p0.down * scale}\n11\n${p0.x * scale}\n21\n${p0.up * scale}\n`);
-    // センターライン
-    lines.push(`0\nLINE\n8\n1\n10\n${p0.x * scale}\n20\n0\n11\n${p1.x * scale}\n21\n0\n`);
-    // 区間長ラベル
-    const len = (p1.x - p0.x).toFixed(2);
-    lines.push(
-      `0\nTEXT\n8\n3\n10\n${((p0.x + p1.x) / 2) * scale}\n20\n-35\n40\n7\n1\n${len}m\n`
-    );
+    lines.push(`0\nLINE\n8\n${LAYER_FRAME}\n10\n${p0.x * scale}\n20\n${p0.up * scale}\n11\n${p1.x * scale}\n21\n${p1.up * scale}\n`);
+    lines.push(`0\nLINE\n8\n${LAYER_FRAME}\n10\n${p1.x * scale}\n20\n${p1.up * scale}\n11\n${p1.x * scale}\n21\n${p1.down * scale}\n`);
+    lines.push(`0\nLINE\n8\n${LAYER_FRAME}\n10\n${p1.x * scale}\n20\n${p1.down * scale}\n11\n${p0.x * scale}\n21\n${p0.down * scale}\n`);
+    lines.push(`0\nLINE\n8\n${LAYER_FRAME}\n10\n${p0.x * scale}\n20\n${p0.down * scale}\n11\n${p0.x * scale}\n21\n${p0.up * scale}\n`);
   }
+
+  // 基準線（LAYER_BASE）＆点間距離（LAYER_LEN）
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i], p1 = points[i + 1];
+    // 基準線
+    lines.push(`0\nLINE\n8\n${LAYER_BASE}\n10\n${p0.x * scale}\n20\n0\n11\n${p1.x * scale}\n21\n0\n`);
+    // 点間距離（ラベル：LAYER_LEN、横書き）
+    const len = (p1.x - p0.x).toFixed(2);
+    lines.push(`0\nTEXT\n8\n${LAYER_LEN}\n10\n${((p0.x + p1.x) / 2) * scale}\n20\n-35\n40\n7\n1\n${len}m\n50\n0\n`);
+  }
+
+  // 幅員線・幅員値（LAYER_WIDTH）、測点（LAYER_STATION, 90°時計回り＝-90°）
   for (let i = 0; i < points.length; i++) {
     const p = points[i];
-    lines.push(
-      `0\nLINE\n8\n2\n10\n${p.x * scale}\n20\n${p.down * scale}\n11\n${p.x * scale}\n21\n${p.up * scale}\n`
-    );
-    lines.push(
-      `0\nTEXT\n8\n2\n10\n${p.x * scale}\n20\n${((p.up + p.down) / 2) * scale}\n40\n7\n1\n${p.width.toFixed(2)}m\n`
-    );
-    let name = p.st ? p.st : `No${i}`;
-    lines.push(
-      `0\nTEXT\n8\n2\n10\n${p.x * scale}\n20\n${(p.up * scale + 30)}\n40\n7\n1\n${name}\n`
-    );
+    // 幅員線（LAYER_WIDTH）
+    lines.push(`0\nLINE\n8\n${LAYER_WIDTH}\n10\n${p.x * scale}\n20\n${p.down * scale}\n11\n${p.x * scale}\n21\n${p.up * scale}\n`);
+    // 幅員値（LAYER_WIDTH、-90°：時計回り90度回転）
+    lines.push(`0\nTEXT\n8\n${LAYER_WIDTH}\n10\n${p.x * scale}\n20\n${((p.up + p.down) / 2) * scale}\n40\n7\n1\n${p.width.toFixed(2)}m\n50\n-90\n`);
+    // 測点名（LAYER_STATION、-90°：時計回り90度回転）
+    if (p.st && p.st.trim()) {
+      lines.push(`0\nTEXT\n8\n${LAYER_STATION}\n10\n${p.x * scale}\n20\n${(p.up * scale + 30)}\n40\n7\n1\n${p.st}\n50\n-90\n`);
+    }
   }
-  let dxf =
-    '0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nSECTION\n2\nTABLES\n0\nENDSEC\n0\nSECTION\n2\nBLOCKS\n0\nENDSEC\n0\nSECTION\n2\nENTITIES\n'
+
+  let dxf = '0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nSECTION\n2\nTABLES\n0\nENDSEC\n0\nSECTION\n2\nBLOCKS\n0\nENDSEC\n0\nSECTION\n2\nENTITIES\n'
     + lines.join('')
     + '0\nENDSEC\n0\nEOF\n';
-  let blob = new Blob([dxf], { type: 'text/plain' });
+
+  let safeSiteName = currentSite.replace(/[\\/:*?"<>|]/g, "_");
   let a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = "belt.dxf";
+  a.href = URL.createObjectURL(new Blob([dxf], { type: 'text/plain' }));
+  a.download = safeSiteName + ".dxf";
   a.click();
 }
-
 
 // ▼ 全集計（従来形式）
 function showSummary() {
@@ -1056,12 +1071,12 @@ function showSummary() {
 }
 
 // ▼ 設定保存＋再描画
-function saveAndUpdate() {
+function saveAndUpdate(update = true) {
   if(currentSite && allSites[currentSite]) {
     allSites[currentSite].earthSetting = getEarthSetting();
     allSites[currentSite].demoSetting = getDemoSetting();
   }
-  renderAllAndSave();
+  if(update) renderAllAndSave();
 }
 
 window.addEventListener('DOMContentLoaded', () => { 
