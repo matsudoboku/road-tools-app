@@ -345,6 +345,7 @@
   </div>
   <div class="block">
     <button class="btn" onclick="showSummary()">全施工箇所合計表示</button>
+    <button class="btn" onclick="exportSummaryExcel()">Excelエクスポート</button>
     <div style="overflow-x:auto;">
       <div id="summary"></div>
     </div>
@@ -957,47 +958,47 @@ function showSummary() {
   let html = `<div style="overflow-x:auto;"><table class="ss-table" style="${tableStyle}">`;
   html += `
 <tr>
-    <th rowspan="3" class="th-main">箇所名</th>
-    <th colspan="2" class="th-main">土工</th>
-    <th colspan="6" class="th-main">取壊工</th>
-    <th colspan="12" class="th-main">舗装工</th>
-    <th colspan="3" class="th-main">安全施設工</th>
-    <th colspan="3" class="th-main">仮設工</th>
-    <th colspan="3" class="th-main">雑工</th>
+    <th rowspan="3" style="${thStyle1}">箇所名</th>
+    <th colspan="2" style="${thStyle1}">土工</th>
+    <th colspan="6" style="${thStyle1}">取壊工</th>
+    <th colspan="12" style="${thStyle1}">舗装工</th>
+    <th colspan="3" style="${thStyle1}">安全施設工</th>
+    <th colspan="3" style="${thStyle1}">仮設工</th>
+    <th colspan="3" style="${thStyle1}">雑工</th>
   </tr>
   <tr>
-    <th rowspan="2">機械掘削</th>
-    <th rowspan="2">残土処理</th>
-    <th rowspan="2">舗装版切断</th>
-    <th rowspan="2">舗装版破砕As</th>
-    <th rowspan="2">廃材運搬As</th>
-    <th rowspan="2">廃材処理As</th>
-    <th rowspan="2">舗装版破砕Con</th>
-    <th rowspan="2">廃材運搬Con</th>
-    <th rowspan="2">廃材処理Con</th>
-    <th colspan="3">アスファルト</th>
-    <th rowspan="2">上層路盤工</th>
-    <th colspan="3">オーバーレイ</th>
-    <th rowspan="2">コンクリート</th>
-    <th colspan="3">アスカーブ</th>
-    <th colspan="3">区画線設置</th>
-    <th rowspan="2">交通誘導員B</th>
-    <th rowspan="2">仮設信号機</th>
-    <th rowspan="2">重機運搬費</th>
+    <th rowspan="2" style="${thStyle2}">機械掘削</th>
+    <th rowspan="2" style="${thStyle2}">残土処理</th>
+    <th rowspan="2" style="${thStyle2}">舗装版切断</th>
+    <th rowspan="2" style="${thStyle2}">舗装版破砕As</th>
+    <th rowspan="2" style="${thStyle2}">廃材運搬As</th>
+    <th rowspan="2" style="${thStyle2}">廃材処理As</th>
+    <th rowspan="2" style="${thStyle2}">舗装版破砕Con</th>
+    <th rowspan="2" style="${thStyle2}">廃材運搬Con</th>
+    <th rowspan="2" style="${thStyle2}">廃材処理Con</th>
+    <th colspan="3" style="${thStyle2}">アスファルト</th>
+    <th rowspan="2" style="${thStyle2}">上層路盤工</th>
+    <th colspan="3" style="${thStyle2}">オーバーレイ</th>
+    <th rowspan="2" style="${thStyle2}">コンクリート</th>
+    <th colspan="3" style="${thStyle2}">アスカーブ</th>
+    <th colspan="3" style="${thStyle2}">区画線設置</th>
+    <th rowspan="2" style="${thStyle2}">交通誘導員B</th>
+    <th rowspan="2" style="${thStyle2}">仮設信号機</th>
+    <th rowspan="2" style="${thStyle2}">重機運搬費</th>
   </tr>
   <tr>
-    <th>t=4cm<br>1.4未満</th>
-    <th>t=4cm<br>1.4以上</th>
-    <th>t=4cm<br>3.0以上</th>
-    <th>t=4cm<br>1.4未満</th>
-    <th>t=4cm<br>1.4以上</th>
-    <th>t=4cm<br>3.0以上</th>
-    <th>標準</th>
-    <th>小型</th>
-    <th>手盛</th>
-    <th>外側線</th>
-    <th>停止線</th>
-    <th>文字記号</th>
+    <th style="${thStyle2}">t=4cm<br>1.4未満</th>
+    <th style="${thStyle2}">t=4cm<br>1.4以上</th>
+    <th style="${thStyle2}">t=4cm<br>3.0以上</th>
+    <th style="${thStyle2}">t=4cm<br>1.4未満</th>
+    <th style="${thStyle2}">t=4cm<br>1.4以上</th>
+    <th style="${thStyle2}">t=4cm<br>3.0以上</th>
+    <th style="${thStyle2}">標準</th>
+    <th style="${thStyle2}">小型</th>
+    <th style="${thStyle2}">手盛</th>
+    <th style="${thStyle2}">外側線</th>
+    <th style="${thStyle2}">停止線</th>
+    <th style="${thStyle2}">文字記号</th>
   </tr>`;
 
   let totalRow = {};
@@ -1100,6 +1101,19 @@ function showSummary() {
   }</tr>`;
   html += '</table></div>';
   document.getElementById('summary').innerHTML = html;
+}
+
+// ▼ 集計表をExcel形式でダウンロード
+function exportSummaryExcel() {
+  showSummary();
+  const html = '<html><head><meta charset="UTF-8"></head><body>' +
+               document.getElementById('summary').innerHTML +
+               '</body></html>';
+  const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'summary.xls';
+  a.click();
 }
 
 // ▼ 設定保存＋再描画
