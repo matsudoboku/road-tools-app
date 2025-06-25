@@ -370,6 +370,7 @@ const worksList = [
 
 // ▼ タブUI生成＆切り替え
 function renderTabs() {
+  if(currentSite && allSites[currentSite]) saveWorksChk();
   let tabHtml = '';
   for(const w of worksList) {
     if(w.always || document.getElementById(w.chk)?.checked) {
@@ -411,6 +412,7 @@ function loadData() {
       Object.values(dat).forEach(s => {
         if(!s.kari) s.kari = { traffic_b: 0, temp_signal: 0, machine_transport: 0 };
         if(!s.curb) s.curb = { use: false, std: 0, small: 0, hand: 0 };
+        if(!s.works) s.works = { earth: false, demo: false, anzen: false, kari: false, zatsu: false };
         if(!s.demoSetting) s.demoSetting = { same: true, type: 'As', thick: 0, cutting: 0 };
         else if(s.demoSetting.cutting === undefined) s.demoSetting.cutting = 0;
       });
@@ -478,6 +480,7 @@ function addSite() {
     anzen: { line_outer: 0, line_stop: 0, line_symbol: 0 },
     kari: { traffic_b: 0, temp_signal: 0, machine_transport: 0 },
     curb: { use: false, std: 0, small: 0, hand: 0 },
+    works: { earth: false, demo: false, anzen: false, kari: false, zatsu: false },
     earthSetting: { same: true, type: '標準掘削', thick: 0 },
     demoSetting: { same: true, type: 'As', thick: 0, cutting: 0 }
   };
@@ -485,11 +488,15 @@ function addSite() {
   document.getElementById('siteList').value = name;
   currentSite = name;
   renderEarthSetting();
+  renderWorksChk();
+  renderTabs();
   renderDemoSetting();
   renderAllAndSave();
 }
 function switchSite() {
   currentSite = document.getElementById('siteList').value;
+  renderWorksChk();
+  renderTabs();
   renderEarthSetting();
   renderDemoSetting();
   renderAllAndSave();
@@ -804,8 +811,31 @@ function renderCurbInputs() {
   document.getElementById('curbHand').value = dat.hand || 0;
 }
 
+function renderWorksChk() {
+  if(!currentSite) return;
+  const w = allSites[currentSite].works || { earth:false, demo:false, anzen:false, kari:false, zatsu:false };
+  document.getElementById('chkWorksEarth').checked = w.earth || false;
+  document.getElementById('chkWorksDemo').checked = w.demo || false;
+  document.getElementById('chkWorksAnzen').checked = w.anzen || false;
+  document.getElementById('chkWorksKari').checked = w.kari || false;
+  document.getElementById('chkWorksZatsu').checked = w.zatsu || false;
+}
+
+function saveWorksChk() {
+  if(!currentSite) return;
+  allSites[currentSite].works = {
+    earth: document.getElementById('chkWorksEarth').checked,
+    demo: document.getElementById('chkWorksDemo').checked,
+    anzen: document.getElementById('chkWorksAnzen').checked,
+    kari: document.getElementById('chkWorksKari').checked,
+    zatsu: document.getElementById('chkWorksZatsu').checked
+  };
+}
+
+
 // ▼ まとめて再描画
 function renderAll() {
+  renderWorksChk();
   renderEarthSetting();
   renderDemoSetting();
   renderTablePave();
@@ -982,6 +1012,7 @@ function showSummary() {
     let earthSetting = allSites[site].earthSetting || {};
     let paveSum = 0;
     (allSites[site].pave||[]).forEach(r=>paveSum+=parseFloat(r.面積)||0);
+    if (allSites[site].works?.earth) {
     if (document.getElementById('chkWorksEarth')?.checked) {
       let thick = parseFloat(earthSetting.thick)||0;
       machine_excavation = residual_soil = paveSum * thick / 100;
@@ -995,6 +1026,7 @@ function showSummary() {
     let demoType = demoSetting.type;
     let demoThick = parseFloat(demoSetting.thick)||0;
     if (document.getElementById('chkWorksDemo')?.checked) {
+    if (allSites[site].works?.demo) {
       cutting = parseFloat(demoSetting.cutting) || 0;
       let areaDemo = demoSetting.same ? paveSum : (allSites[site].demo||[]).reduce((a,r)=>a+(parseFloat(r.面積)||0),0);
       if (demoType === "As") break_as = areaDemo;
@@ -1079,12 +1111,9 @@ function saveAndUpdate(update = true) {
   if(update) renderAllAndSave();
 }
 
-window.addEventListener('DOMContentLoaded', () => { 
+window.addEventListener('DOMContentLoaded', () => {
   loadData();
-  // 工種設定は初期OFF
-  document.getElementById('chkWorksEarth').checked = false;
-  document.getElementById('chkWorksDemo').checked = false;
-  document.getElementById('chkWorksAnzen').checked = false;
+  renderWorksChk();
   renderTabs();
   renderAll();
 });
