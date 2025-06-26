@@ -798,44 +798,97 @@ function getQuantityHtml() {
   let html = `<table class="ss-table" style="${tableStyle}">`;
   html += `<tr><th style="${thStyle}">箇所名</th><th style="${thStyle}">工種</th><th style="${thStyle}">規格</th><th style="${thStyle}">計算式</th><th style="${thStyle}">単位</th><th style="${thStyle}">数量</th></tr>`;
 
+    const addRow = (site, work, spec, formula, unit, qty) => {
+    html += `<tr><td style="${tdStyle}">${site}</td><td style="${tdStyle}">${work}</td><td style="${tdStyle}">${spec}</td><td style="${tdStyle}">${formula}</td><td style="${tdStyle}">${unit}</td><td style="${tdStyle}">${qty}</td></tr>`;
+  };
+
   Object.keys(allSites).forEach(site => {
     const dat = allSites[site] || {};
+
+    let paveSum = 0;
+    (dat.pave || []).forEach(r => paveSum += parseFloat(r.面積) || 0);
+
     if(dat.works && dat.works.earth) {
       const set = dat.earthSetting || {};
       const thick = parseFloat(set.thick) || 0;
-      const list = set.same ? (dat.pave || []) : (dat.earth || []);
-      for(let i=0;i<list.length;i++) {
-        const prevW = i===0 ? parseFloat(list[i].幅員)||0 : parseFloat(list[i-1].幅員)||0;
-        const width = parseFloat(list[i].幅員)||0;
-        const len = parseFloat(list[i].単距)||0;
-        if(width>0 && len>0 && thick>0) {
-          const vol = (i===0 ? width : (prevW + width) / 2) * len * thick / 100;
-          const formula = i===0
-            ? `${width}×${len}×(${thick}/100)`
-            : `(${prevW}+${width})/2×${len}×(${thick}/100)`;
-          html += `<tr><td style="${tdStyle}">${site}</td><td style="${tdStyle}">土工</td><td style="${tdStyle}">${set.type||''}</td><td style="${tdStyle}">${formula}</td><td style="${tdStyle}">m³</td><td style="${tdStyle}">${vol.toFixed(2)}</td></tr>`;
+      const vol = paveSum * thick / 100;
+      if(vol > 0) {
+        const formula = `${paveSum.toFixed(1)}×(${thick}/100)`;
+        addRow(site, '機械掘削', set.type || '', formula, 'm³', vol.toFixed(2));
+        addRow(site, '残土処理', set.type || '', formula, 'm³', vol.toFixed(2));
         }
       }
-    }
+    
     if(dat.works && dat.works.demo) {
       const set = dat.demoSetting || {};
+      const demoType = set.type;
       const thick = parseFloat(set.thick) || 0;
-      const list = set.same ? (dat.pave || []) : (dat.demo || []);
-      for(let i=0;i<list.length;i++) {
-        const prevW = i===0 ? parseFloat(list[i].幅員)||0 : parseFloat(list[i-1].幅員)||0;
-        const width = parseFloat(list[i].幅員)||0;
-        const len = parseFloat(list[i].単距)||0;
-        if(width>0 && len>0 && thick>0) {
-          const vol = (i===0 ? width : (prevW + width) / 2) * len * thick / 100;
-          const formula = i===0
-            ? `${width}×${len}×(${thick}/100)`
-            : `(${prevW}+${width})/2×${len}×(${thick}/100)`;
-          html += `<tr><td style="${tdStyle}">${site}</td><td style="${tdStyle}">取壊し工</td><td style="${tdStyle}">${set.type||''}</td><td style="${tdStyle}">${formula}</td><td style="${tdStyle}">m³</td><td style="${tdStyle}">${vol.toFixed(2)}</td></tr>`;
-        }
+      const areaDemo = set.same ? paveSum : (dat.demo || []).reduce((a,r)=>a+(parseFloat(r.面積)||0),0);
+      const cutting = parseFloat(set.cutting)||0;
+      if(cutting>0) addRow(site,'舗装版切断','',`${cutting}`, 'm', cutting.toFixed(1));
+
+      let break_as=0, break_con=0;
+      if(demoType==='As') break_as = areaDemo;
+      else if(demoType==='Con') break_con = areaDemo;
+      else if(demoType==='As+Con') { break_as = areaDemo; break_con = areaDemo; }
+
+      if(break_as>0) {
+        addRow(site,'舗装版破砕','As',`${areaDemo.toFixed(1)}`,'m²',break_as.toFixed(1));
+        const unpan = break_as * thick / 100;
+        addRow(site,'廃材運搬','As',`${break_as.toFixed(1)}×(${thick}/100)`,'m³',unpan.toFixed(2));
+        addRow(site,'廃材処理','As',`${unpan.toFixed(2)}×2.35`,'t',(unpan*2.35).toFixed(2));
+      }
+      if(break_con>0) {
+        addRow(site,'舗装版破砕','Con',`${areaDemo.toFixed(1)}`,'m²',break_con.toFixed(1));
+        const unpan = break_con * thick / 100;
+        addRow(site,'廃材運搬','Con',`${break_con.toFixed(1)}×(${thick}/100)`,'m³',unpan.toFixed(2));
+        addRow(site,'廃材処理','Con',`${unpan.toFixed(2)}×2.35`,'t',(unpan*2.35).toFixed(2));
       }
     }
-  });
 
+    let as_lt1_4 = 0, as_ge1_4 = 0, as_ge3_0 = 0,
+        ovl_lt1_4 = 0, ovl_ge1_4 = 0, ovl_ge3_0 = 0, con_total = 0;
+
+    (dat.pave || []).forEach(r => {
+      const area = parseFloat(r.面積) || 0;
+      if (r.種別 === 'アスファルト') {
+        if (r.平均幅員 === '1.4未満') as_lt1_4 += area;
+        else if (r.平均幅員 === '1.4以上') as_ge1_4 += area;
+        else if (r.平均幅員 === '3.0以上') as_ge3_0 += area;
+      } else if (r.種別 === 'オーバーレイ') {
+        if (r.平均幅員 === '1.4未満') ovl_lt1_4 += area;
+        else if (r.平均幅員 === '1.4以上') ovl_ge1_4 += area;
+        else if (r.平均幅員 === '3.0以上') ovl_ge3_0 += area;
+      } else if (r.種別 === 'コンクリート') {
+        con_total += area;
+    }
+   });
+
+    if(as_lt1_4>0) addRow(site,'アスファルト','t=4cm 1.4未満','', 'm²', as_lt1_4.toFixed(1));
+    if(as_ge1_4>0) addRow(site,'アスファルト','t=4cm 1.4以上','', 'm²', as_ge1_4.toFixed(1));
+    if(as_ge3_0>0) addRow(site,'アスファルト','t=4cm 3.0以上','', 'm²', as_ge3_0.toFixed(1));
+    if(ovl_lt1_4>0) addRow(site,'オーバーレイ','t=4cm 1.4未満','', 'm²', ovl_lt1_4.toFixed(1));
+    if(ovl_ge1_4>0) addRow(site,'オーバーレイ','t=4cm 1.4以上','', 'm²', ovl_ge1_4.toFixed(1));
+    if(ovl_ge3_0>0) addRow(site,'オーバーレイ','t=4cm 3.0以上','', 'm²', ovl_ge3_0.toFixed(1));
+    if(con_total>0) addRow(site,'コンクリート','', '', 'm²', con_total.toFixed(1));
+
+    const curb = dat.curb || {};
+    if(curb.use) {
+      if(curb.std>0) addRow(site,'アスカーブ','標準','', 'm', curb.std);
+      if(curb.small>0) addRow(site,'アスカーブ','小型','', 'm', curb.small);
+      if(curb.hand>0) addRow(site,'アスカーブ','手盛','', 'm', curb.hand);
+    }
+
+    const anzen = dat.anzen || {};
+    if(anzen.line_outer>0) addRow(site,'区画線設置','外側線','', 'm', anzen.line_outer);
+    if(anzen.line_stop>0) addRow(site,'区画線設置','停止線','', 'm', anzen.line_stop);
+    if(anzen.line_symbol>0) addRow(site,'区画線設置','文字記号','', 'm²', anzen.line_symbol);
+
+    const kari = dat.kari || {};
+    if(kari.traffic_b>0) addRow(site,'仮設工','交通誘導員B','', '人日', kari.traffic_b);
+    if(kari.temp_signal>0) addRow(site,'仮設工','仮設信号機','', '基', kari.temp_signal);
+    if(kari.machine_transport>0) addRow(site,'仮設工','重機運搬費','', '式', kari.machine_transport);
+  });
   html += '</table>';
   return html;
 }
