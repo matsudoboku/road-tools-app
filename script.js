@@ -851,7 +851,7 @@ function exportQuantityExcel() {
               ('0'+(now.getMonth()+1)).slice(-2) +
               ('0'+now.getDate()).slice(-2);
   a.href = URL.createObjectURL(blob);
-  a.download = `数量計算書_${ymd}.xlsx`;
+  a.download = `数量計算書_${ymd}.xls`;
   a.click();
 }
 
