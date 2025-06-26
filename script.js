@@ -670,11 +670,8 @@ function getSummaryHtml(forExcel = false) {
     let paveSum = 0;
     (allSites[site].pave||[]).forEach(r=>paveSum+=parseFloat(r.面積)||0);
     if (allSites[site].works && allSites[site].works.earth) {
-      var chkEarth = document.getElementById('chkWorksEarth');
-      if (chkEarth && chkEarth.checked) {
-        let thick = parseFloat(earthSetting.thick)||0;
-        machine_excavation = residual_soil = paveSum * thick / 100;
-      }
+      let thick = parseFloat(earthSetting.thick) || 0;
+      machine_excavation = residual_soil = paveSum * thick / 100;
     }
     row.machine_excavation = machine_excavation > 0 ? machine_excavation.toFixed(2) : "";
     row.residual_soil = residual_soil > 0 ? residual_soil.toFixed(2) : "";
@@ -684,24 +681,21 @@ function getSummaryHtml(forExcel = false) {
     let demoSetting = allSites[site].demoSetting || {};
     let demoType = demoSetting.type;
     let demoThick = parseFloat(demoSetting.thick)||0;
-    var chkDemoMain = document.getElementById('chkWorksDemo');
-    if (chkDemoMain && chkDemoMain.checked) {
-      if (allSites[site].works && allSites[site].works.demo) {
-        cutting = parseFloat(demoSetting.cutting) || 0;
-        let areaDemo = demoSetting.same ? paveSum : (allSites[site].demo||[]).reduce((a,r)=>a+(parseFloat(r.面積)||0),0);
-        if (demoType === "As") {
-          break_as = areaDemo;
-        } else if (demoType === "Con") {
-          break_con = areaDemo;
-        } else if (demoType === "As+Con") {
-          break_as = areaDemo;
-          break_con = areaDemo;
-        }
-        haizan_unpan_as = break_as * demoThick / 100;
-        haizan_shori_as = haizan_unpan_as * 2.35;
-        haizan_unpan_con = break_con * demoThick / 100;
-        haizan_shori_con = haizan_unpan_con * 2.35;
+    if (allSites[site].works && allSites[site].works.demo) {
+      cutting = parseFloat(demoSetting.cutting) || 0;
+      let areaDemo = demoSetting.same ? paveSum : (allSites[site].demo || []).reduce((a, r) => a + (parseFloat(r.面積) || 0), 0);
+      if (demoType === "As") {
+        break_as = areaDemo;
+      } else if (demoType === "Con") {
+        break_con = areaDemo;
+      } else if (demoType === "As+Con") {
+        break_as = areaDemo;
+        break_con = areaDemo;
       }
+      haizan_unpan_as = break_as * demoThick / 100;
+      haizan_shori_as = haizan_unpan_as * 2.35;
+      haizan_unpan_con = break_con * demoThick / 100;
+      haizan_shori_con = haizan_unpan_con * 2.35;
     }
     row.cutting = cutting > 0 ? cutting.toFixed(1) : "";
     row.break_as = break_as > 0 ? break_as.toFixed(1) : "";
