@@ -789,6 +789,72 @@ function exportSummaryExcel() {
   a.click();
 }
 
+function getQuantityHtml() {
+  const border = '1px';
+  const tableStyle = `min-width:1200px;border-collapse:collapse;border:${border} solid #555;background:#fff;width:auto;`;
+  const thStyle = `border:${border} solid #555;background:#e6eef5;color:#007acc;font-weight:bold;text-align:center;padding:8px 5px;`;
+  const tdStyle = `border:${border} solid #555;text-align:center;padding:6px 5px;`;
+
+  let html = `<table class="ss-table" style="${tableStyle}">`;
+  html += `<tr><th style="${thStyle}">箇所名</th><th style="${thStyle}">工種</th><th style="${thStyle}">規格</th><th style="${thStyle}">計算式</th><th style="${thStyle}">単位</th><th style="${thStyle}">数量</th></tr>`;
+
+  Object.keys(allSites).forEach(site => {
+    const dat = allSites[site] || {};
+    if(dat.works && dat.works.earth) {
+      const set = dat.earthSetting || {};
+      const thick = parseFloat(set.thick) || 0;
+      const list = set.same ? (dat.pave || []) : (dat.earth || []);
+      for(let i=0;i<list.length;i++) {
+        const prevW = i===0 ? parseFloat(list[i].幅員)||0 : parseFloat(list[i-1].幅員)||0;
+        const width = parseFloat(list[i].幅員)||0;
+        const len = parseFloat(list[i].単距)||0;
+        if(width>0 && len>0 && thick>0) {
+          const vol = (i===0 ? width : (prevW + width) / 2) * len * thick / 100;
+          const formula = i===0
+            ? `${width}×${len}×(${thick}/100)`
+            : `(${prevW}+${width})/2×${len}×(${thick}/100)`;
+          html += `<tr><td style="${tdStyle}">${site}</td><td style="${tdStyle}">土工</td><td style="${tdStyle}">${set.type||''}</td><td style="${tdStyle}">${formula}</td><td style="${tdStyle}">m³</td><td style="${tdStyle}">${vol.toFixed(2)}</td></tr>`;
+        }
+      }
+    }
+    if(dat.works && dat.works.demo) {
+      const set = dat.demoSetting || {};
+      const thick = parseFloat(set.thick) || 0;
+      const list = set.same ? (dat.pave || []) : (dat.demo || []);
+      for(let i=0;i<list.length;i++) {
+        const prevW = i===0 ? parseFloat(list[i].幅員)||0 : parseFloat(list[i-1].幅員)||0;
+        const width = parseFloat(list[i].幅員)||0;
+        const len = parseFloat(list[i].単距)||0;
+        if(width>0 && len>0 && thick>0) {
+          const vol = (i===0 ? width : (prevW + width) / 2) * len * thick / 100;
+          const formula = i===0
+            ? `${width}×${len}×(${thick}/100)`
+            : `(${prevW}+${width})/2×${len}×(${thick}/100)`;
+          html += `<tr><td style="${tdStyle}">${site}</td><td style="${tdStyle}">取壊し工</td><td style="${tdStyle}">${set.type||''}</td><td style="${tdStyle}">${formula}</td><td style="${tdStyle}">m³</td><td style="${tdStyle}">${vol.toFixed(2)}</td></tr>`;
+        }
+      }
+    }
+  });
+
+  html += '</table>';
+  return html;
+}
+
+function exportQuantityExcel() {
+  const html = '<html><head><meta charset="UTF-8"></head><body>' +
+               getQuantityHtml() +
+               '</body></html>';
+  const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+  const a = document.createElement('a');
+  const now = new Date();
+  const ymd = now.getFullYear() +
+              ('0'+(now.getMonth()+1)).slice(-2) +
+              ('0'+now.getDate()).slice(-2);
+  a.href = URL.createObjectURL(blob);
+  a.download = `数量計算書_${ymd}.xlsx`;
+  a.click();
+}
+
 // ▼ 設定保存＋再描画
 function saveAndUpdate(update = true) {
   if(currentSite && allSites[currentSite]) {
