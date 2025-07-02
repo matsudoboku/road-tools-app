@@ -177,6 +177,7 @@
       input, select { font-size: 0.97em; }
       .ss-table { min-width: 600px; }
     }
+    @media (max-width: 600px) {
       body { font-size: 14px; }
       .container { width: 100%; max-width: none; margin: 10px 0; padding: 4px; }
       .tabs { flex-wrap: wrap; }
