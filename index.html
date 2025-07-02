@@ -33,7 +33,7 @@
           <option>標準掘削</option>
           <option>標準以下掘削</option>
         </select>
-        <label>掘削厚（cm）：<input type="number" id="earthThick" min="0" style="width:60px;" onchange="saveAndUpdate()"></label>
+        <label>掘削厚（cm）：<input type="text" inputmode="decimal" class="numeric" id="earthThick" min="0" style="width:60px;" onchange="saveAndUpdate()"></label>
       </div>
     </div>
     <div>
@@ -45,8 +45,8 @@
           <option>Con</option>
           <option>As+Con</option>
         </select>
-        <label>取壊し厚（cm）：<input type="number" id="demoThick" min="0" style="width:60px;" oninput="saveAndUpdate(false)" onblur="saveAndUpdate(true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-        <label>舗装版切断（m）：<input type="number" id="demoCutting" min="0" style="width:60px;" oninput="saveAndUpdate(false)" onblur="saveAndUpdate(true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>取壊し厚（cm）：<input type="text" inputmode="decimal" class="numeric" id="demoThick" min="0" style="width:60px;" oninput="saveAndUpdate(false)" onblur="saveAndUpdate(true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>舗装版切断（m）：<input type="text" inputmode="decimal" class="numeric" id="demoCutting" min="0" style="width:60px;" oninput="saveAndUpdate(false)" onblur="saveAndUpdate(true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
       </div>
     </div>
     <div>
@@ -106,9 +106,9 @@
     <div style="margin-top:10px;">
       <label><input type="checkbox" id="chkCurbUse" onchange="toggleCurbInputs()"> アスカーブ</label>
       <span id="curbInputs" class="hidden">
-        <label>標準：<input id="curbStd" type="number" style="width:80px;" oninput="editCurb('std', this.value)" onblur="editCurb('std', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-        <label>小型：<input id="curbSmall" type="number" style="width:80px;" oninput="editCurb('small', this.value)" onblur="editCurb('small', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-        <label>手盛：<input id="curbHand" type="number" style="width:80px;" oninput="editCurb('hand', this.value)" onblur="editCurb('hand', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>標準：<input id="curbStd" type="text" inputmode="decimal" class="numeric" style="width:80px;" oninput="editCurb('std', this.value)" onblur="editCurb('std', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>小型：<input id="curbSmall" type="text" inputmode="decimal" class="numeric" style="width:80px;" oninput="editCurb('small', this.value)" onblur="editCurb('small', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>手盛：<input id="curbHand" type="text" inputmode="decimal" class="numeric" style="width:80px;" oninput="editCurb('hand', this.value)" onblur="editCurb('hand', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
       </span>
     </div>
     <div class="sum" id="sumPave"></div>
@@ -136,16 +136,16 @@
   <!-- 安全施設工タブ -->
   <div id="panelAnzen" class="block hidden">
     <h4>安全施設工</h4>
-  <label>外側線：<input id="anzenLineOuter" type="number" oninput="editAnzen('line_outer', this.value)" onblur="editAnzen('line_outer', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-  <label>停止線：<input id="anzenLineStop" type="number" oninput="editAnzen('line_stop', this.value)" onblur="editAnzen('line_stop', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-  <label>文字記号：<input id="anzenLineSymbol" type="number" oninput="editAnzen('line_symbol', this.value)" onblur="editAnzen('line_symbol', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+  <label>外側線：<input id="anzenLineOuter" type="text" inputmode="decimal" class="numeric" oninput="editAnzen('line_outer', this.value)" onblur="editAnzen('line_outer', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+  <label>停止線：<input id="anzenLineStop" type="text" inputmode="decimal" class="numeric" oninput="editAnzen('line_stop', this.value)" onblur="editAnzen('line_stop', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+  <label>文字記号：<input id="anzenLineSymbol" type="text" inputmode="decimal" class="numeric" oninput="editAnzen('line_symbol', this.value)" onblur="editAnzen('line_symbol', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
   </div>
   <!-- 仮設工タブ -->
   <div id="panelKari" class="block hidden">
     <h4>仮設工</h4>
-  <label>交通誘導員B：<input id="kariTrafficB" type="number" oninput="editKari('traffic_b', this.value)" onblur="editKari('traffic_b', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-  <label>仮設信号機：<input id="kariTempSignal" type="number" oninput="editKari('temp_signal', this.value)" onblur="editKari('temp_signal', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-  <label>重機運搬費：<input id="kariMachineTrans" type="number" oninput="editKari('machine_transport', this.value)" onblur="editKari('machine_transport', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+  <label>交通誘導員B：<input id="kariTrafficB" type="text" inputmode="decimal" class="numeric" oninput="editKari('traffic_b', this.value)" onblur="editKari('traffic_b', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+  <label>仮設信号機：<input id="kariTempSignal" type="text" inputmode="decimal" class="numeric" oninput="editKari('temp_signal', this.value)" onblur="editKari('temp_signal', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+  <label>重機運搬費：<input id="kariMachineTrans" type="text" inputmode="decimal" class="numeric" oninput="editKari('machine_transport', this.value)" onblur="editKari('machine_transport', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
   </div>
   <!-- 免責事項タブ -->
   <div id="panelDisclaimer" class="block hidden">
