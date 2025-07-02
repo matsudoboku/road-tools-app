@@ -11,10 +11,10 @@
 
   <div class="block" style="margin-bottom:26px">
     <label>現場名:</label>
-    <input id="siteName" class="siteName" placeholder="例：〇〇号線">
+    <input id="siteName" class="siteName" placeholder="例：〇〇号線" style="width:170px;">
     <button class="btn" onclick="addSite()">追加</button>
-    <select id="siteList" onchange="switchSite()"></select>
-    <button class="btn" onclick="backupData()">バックアップ</button>
+    <select id="siteList" onchange="switchSite()" style="margin-left:12px;"></select>
+      <button class="btn" onclick="backupData()" style="margin-left:12px;">バックアップ</button>
     <button class="btn" onclick="document.getElementById('importFile').click()">インポート</button>
     <input id="importFile" type="file" accept="application/json" onchange="importData(event)" style="display:none;">
   </div>
@@ -33,8 +33,7 @@
           <option>標準掘削</option>
           <option>標準以下掘削</option>
         </select>
-        <label>掘削厚（cm）：<input type="text" inputmode="decimal" class="numeric" id="earthThick" min="0" onchange="saveAndUpdate()"></label>
-      </div>
+        <label>掘削厚（cm）：<input type="text" inputmode="decimal" class="numeric" id="earthThick" min="0" style="width:60px;" onchange="saveAndUpdate()"></label>      </div>
     </div>
     <div>
       <label><input type="checkbox" id="chkWorksDemo" onchange="renderTabs()"> 取り壊し工</label>
@@ -45,8 +44,8 @@
           <option>Con</option>
           <option>As+Con</option>
         </select>
-        <label>取壊し厚（cm）：<input type="text" inputmode="decimal" class="numeric" id="demoThick" min="0" oninput="saveAndUpdate(false)" onblur="saveAndUpdate(true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-        <label>舗装版切断（m）：<input type="text" inputmode="decimal" class="numeric" id="demoCutting" min="0" oninput="saveAndUpdate(false)" onblur="saveAndUpdate(true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>取壊し厚（cm）：<input type="text" inputmode="decimal" class="numeric" id="demoThick" min="0" style="width:60px;" oninput="saveAndUpdate(false)" onblur="saveAndUpdate(true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>舗装版切断（m）：<input type="text" inputmode="decimal" class="numeric" id="demoCutting" min="0" style="width:60px;" oninput="saveAndUpdate(false)" onblur="saveAndUpdate(true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
       </div>
     </div>
     <div>
@@ -106,9 +105,9 @@
     <div style="margin-top:10px;">
       <label><input type="checkbox" id="chkCurbUse" onchange="toggleCurbInputs()"> アスカーブ</label>
       <span id="curbInputs" class="hidden">
-        <label>標準：<input id="curbStd" type="text" inputmode="decimal" class="numeric" oninput="editCurb('std', this.value)" onblur="editCurb('std', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-        <label>小型：<input id="curbSmall" type="text" inputmode="decimal" class="numeric" oninput="editCurb('small', this.value)" onblur="editCurb('small', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-        <label>手盛：<input id="curbHand" type="text" inputmode="decimal" class="numeric" oninput="editCurb('hand', this.value)" onblur="editCurb('hand', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>標準：<input id="curbStd" type="text" inputmode="decimal" class="numeric" style="width:80px;" oninput="editCurb('std', this.value)" onblur="editCurb('std', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>小型：<input id="curbSmall" type="text" inputmode="decimal" class="numeric" style="width:80px;" oninput="editCurb('small', this.value)" onblur="editCurb('small', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>手盛：<input id="curbHand" type="text" inputmode="decimal" class="numeric" style="width:80px;" oninput="editCurb('hand', this.value)" onblur="editCurb('hand', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
       </span>
     </div>
     <div class="sum" id="sumPave"></div>
