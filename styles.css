@@ -177,11 +177,14 @@
       input, select { font-size: 0.97em; }
       .ss-table { min-width: 600px; }
     }
-    @media (max-width: 600px) {
+      body { font-size: 14px; }
       .container { width: 100%; max-width: none; margin: 10px 0; padding: 4px; }
-      .block { margin: 10px 0; padding: 8px 3px; }
-      table, .ss-table { width: 100%; min-width: 0; display: block; font-size: 12px; overflow-x:scroll;}
-      input, select { padding: 5px 4px; }
+      .tabs { flex-wrap: wrap; }
+      .block { margin: 10px 0; padding: 8px 3px; display:flex; flex-direction: column; }
+      .block label { display:block; margin-right:0; margin-bottom:6px; }
+      table, .ss-table { width: 100%; min-width: 0; display: block; font-size: 14px; overflow-x:auto; }
+      input, select { padding: 10px 8px; width: 100%; max-width: none; margin-bottom:10px; font-size: 14px; }
+      .btn { width:100%; margin:8px 0; padding:12px; font-size:16px; }
       .siteName { width: 100%; max-width: none; }
-      .numeric { width: 50px; }
+      .numeric { width: 100%; }
     }
