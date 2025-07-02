@@ -127,6 +127,7 @@ function renderAllAndSave() {
 function addSite() {
   const name = document.getElementById('siteName').value.trim();
   if (!name || allSites[name]) return;
+  saveAndUpdate();
   allSites[name] = {
     pave: [],
     earth: [],
@@ -142,17 +143,18 @@ function addSite() {
   document.getElementById('siteList').value = name;
   currentSite = name;
   renderEarthSetting();
+  renderDemoSetting();
   renderWorksChk();
   renderTabs();
-  renderDemoSetting();
   renderAllAndSave();
 }
 function switchSite() {
+  saveAndUpdate();
   currentSite = document.getElementById('siteList').value;
-  renderWorksChk();
-  renderTabs();
   renderEarthSetting();
   renderDemoSetting();
+  renderWorksChk();
+  renderTabs();
   renderAllAndSave();
 }
 
@@ -942,7 +944,6 @@ function saveAndUpdate(update = true) {
 
 window.addEventListener('DOMContentLoaded', () => {
   loadData();
-  renderWorksChk();
-  renderTabs();
   renderAll();
+  renderTabs();
 });
