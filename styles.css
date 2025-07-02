@@ -183,5 +183,5 @@
       table, .ss-table { width: 100%; min-width: 0; display: block; font-size: 12px; overflow-x:scroll;}
       input, select { padding: 5px 4px; }
       .siteName { width: 100%; max-width: none; }
-      input[type="number"] { width: 50px; }
+      .numeric { width: 50px; }
     }
