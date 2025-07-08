@@ -63,6 +63,7 @@
       margin-bottom: 3px;
     }
     .siteName { max-width: 190px; }
+    .numeric { min-width: 100px; }
     input:focus, select:focus {
       border: 1.7px solid #007aff;
       background: #f3faff;
@@ -88,6 +89,8 @@
     }
     .btn:hover { background: #005ed6; }
     .btn:active { box-shadow: 0 0px 2px #007aff14; background: #297aff; }
+    .controls select, .controls button { margin-left: 12px; }
+    .controls > *:first-child, .controls > label:first-child { margin-left: 0; }
     .block {
       margin: 14px 0 24px 0;
       padding: 22px 12px 16px 12px;
@@ -102,6 +105,10 @@
       margin-right: 10px;
       color: #445;
       letter-spacing: 0.01em;
+    }
+    .block label input[type="checkbox"] {
+      margin-right: 6px;
+      vertical-align: middle;
     }
     h4 {
       font-size: 1.18em;
@@ -154,6 +161,7 @@
     }
     .ss-table tr td:last-child, .ss-table tr th:last-child { border-right: none; }
     .ss-table tr:last-child td { border-bottom: none; }
+    table input { min-width: 100px; }
     .sum {
       margin-top: 14px;
       font-weight: 600;
@@ -183,9 +191,9 @@
       .tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 8px; }
       .block { margin: 10px 0; padding: 8px 6px; display:flex; flex-direction: column; }
       .block label { display:block; margin-right:0; margin-bottom:6px; }
-      table, .ss-table { width: 100%; min-width: 0; display: block; font-size: 14px; overflow-x:auto; }
+      table, .ss-table { width: auto; min-width: 650px; display: block; font-size: 14px; overflow-x:auto; }
       input, select { padding: 10px 8px; width: 100% !important; max-width: none; margin-bottom:10px; font-size: 14px; }
       .btn { width:100%; margin:8px 0; padding:12px; font-size:16px; }
       .siteName { width: 100% !important; max-width: none; }
-      .numeric { width: 100% !important; }
-    }
+      .numeric { width: 100% !important; min-width: 100px; }
+      .controls select, .controls button { margin-left:0; }    }
