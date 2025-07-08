@@ -271,7 +271,7 @@ function renderTablePave() {
   list.forEach((r,idx)=>{
     tbody += `<tr>
       <td>
-        <select onchange="editRow('pave',${idx},'種別',this.value,true)">
+        <select class="pave-type" onchange="editRow('pave',${idx},'種別',this.value,true)">
           ${paveTypes.map(tp=>`<option value="${tp}"${r.種別===tp?' selected':''}>${tp}</option>`).join('')}
         </select>
       </td>
