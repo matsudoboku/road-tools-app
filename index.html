@@ -9,12 +9,12 @@
 <body>
 <div class="container">
 
-  <div class="block" style="margin-bottom:26px">
+  <div class="block controls" style="margin-bottom:26px">
     <label>現場名:</label>
-    <input id="siteName" class="siteName" placeholder="例：〇〇号線" style="width:170px;">
+    <input id="siteName" class="siteName" placeholder="例：〇〇号線">
     <button class="btn" onclick="addSite()">追加</button>
-    <select id="siteList" onchange="switchSite()" style="margin-left:12px;"></select>
-      <button class="btn" onclick="backupData()" style="margin-left:12px;">バックアップ</button>
+    <select id="siteList" onchange="switchSite()"></select>
+    <button class="btn" onclick="backupData()">バックアップ</button>
     <button class="btn" onclick="document.getElementById('importFile').click()">インポート</button>
     <input id="importFile" type="file" accept="application/json" onchange="importData(event)" style="display:none;">
   </div>
