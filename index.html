@@ -14,9 +14,6 @@
     <input id="siteName" class="siteName" placeholder="例：〇〇号線">
     <button class="btn" onclick="addSite()">追加</button>
     <select id="siteList" onchange="switchSite()"></select>
-    <button class="btn" onclick="backupData()">バックアップ</button>
-    <button class="btn" onclick="document.getElementById('importFile').click()">インポート</button>
-    <input id="importFile" type="file" accept="application/json" onchange="importData(event)" style="display:none;">
   </div>
 
   <!-- タブ（動的生成） -->
@@ -26,7 +23,7 @@
   <div id="panelWorks" class="block">
     <h4>工種設定</h4>
     <div>
-      <label><input type="checkbox" id="chkWorksEarth" onchange="renderTabs()"> 土工</label>
+      <label>土工 <input type="checkbox" id="chkWorksEarth" onchange="renderTabs()"></label>
       <div id="worksEarthSetting" class="works-setting hidden">
         <label><input type="checkbox" id="earthSamePave" onchange="saveAndUpdate()"> 舗装面積と同じ</label>
         <select id="earthType" onchange="saveAndUpdate()">
@@ -36,7 +33,7 @@
         <label>掘削厚（cm）：<input type="text" inputmode="decimal" class="numeric" id="earthThick" min="0" style="width:60px;" onchange="saveAndUpdate()"></label>      </div>
     </div>
     <div>
-      <label><input type="checkbox" id="chkWorksDemo" onchange="renderTabs()"> 取り壊し工</label>
+      <label>取り壊し工 <input type="checkbox" id="chkWorksDemo" onchange="renderTabs()"></label>
       <div id="worksDemoSetting" class="works-setting hidden">
         <label><input type="checkbox" id="demoSamePave" onchange="saveAndUpdate()"> 舗装面積と同じ</label>
         <select id="demoType" onchange="saveAndUpdate()">
@@ -49,13 +46,13 @@
       </div>
     </div>
     <div>
-      <label><input type="checkbox" id="chkWorksAnzen" onchange="renderTabs()"> 安全施設工</label>
+      <label>安全施設工 <input type="checkbox" id="chkWorksAnzen" onchange="renderTabs()"></label>
     </div>
     <div>
-      <label><input type="checkbox" id="chkWorksKari" onchange="renderTabs()"> 仮設工</label>
+      <label>仮設工 <input type="checkbox" id="chkWorksKari" onchange="renderTabs()"></label>
     </div>
     <div>
-      <label><input type="checkbox" id="chkWorksZatsu" onchange="renderTabs()"> 雑工</label>
+      <label>雑工 <input type="checkbox" id="chkWorksZatsu" onchange="renderTabs()"></label>
     </div>
   </div>
 
@@ -158,6 +155,11 @@
     <button class="btn" onclick="showSummary()">全施工箇所合計表示</button>
     <button class="btn" onclick="exportSummaryExcel()">Excelエクスポート</button>
     <button class="btn" onclick="exportQuantityExcel()">数量計算書出力</button>
+    <div style="margin-top:10px;">
+      <button class="btn" onclick="backupData()">バックアップ</button>
+      <button class="btn" onclick="document.getElementById('importFile').click()">インポート</button>
+      <input id="importFile" type="file" accept="application/json" onchange="importData(event)" style="display:none;">
+    </div>
     <div style="overflow-x:auto;">
       <div id="summary"></div>
     </div>
