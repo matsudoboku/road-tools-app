@@ -161,7 +161,7 @@
       font-size: 1.17em;
       letter-spacing: 0.5px;
     }
-    .hidden { display: none;}
+    .hidden { display: none !important; }
     .alert { color: #e12b43; font-weight: bold;}
     .works-setting { margin-left: 22px; margin-top: 7px; margin-bottom: 10px; }
     .scroll-x-guide {
