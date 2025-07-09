@@ -201,6 +201,10 @@
       font-size: 0.94em;
       padding: 0 4px 0 0;
     }
+    .scroll-x-container {
+      overflow-x: auto;
+      white-space: nowrap;
+    }
     @media (max-width: 900px) {
       .container {padding: 5px;}
       .block {padding: 8px;}
