@@ -27,7 +27,7 @@
     <div>
       <label>土工 <input type="checkbox" id="chkWorksEarth" onchange="renderTabs()"></label>
       <div id="worksEarthSetting" class="works-setting hidden">
-        <label><input type="checkbox" id="earthSamePave" onchange="saveAndUpdate()"> 舗装面積と同じ</label>
+        <label>舗装面積と同じ <input type="checkbox" id="earthSamePave" onchange="saveAndUpdate()"></label>
         <select id="earthType" onchange="saveAndUpdate()">
           <option>標準掘削</option>
           <option>標準以下掘削</option>
@@ -37,7 +37,7 @@
     <div>
       <label>取り壊し工 <input type="checkbox" id="chkWorksDemo" onchange="renderTabs()"></label>
       <div id="worksDemoSetting" class="works-setting hidden">
-        <label><input type="checkbox" id="demoSamePave" onchange="saveAndUpdate()"> 舗装面積と同じ</label>
+        <label>舗装面積と同じ <input type="checkbox" id="demoSamePave" onchange="saveAndUpdate()"></label>
         <select id="demoType" onchange="saveAndUpdate()">
           <option>As</option>
           <option>Con</option>
@@ -101,7 +101,7 @@
       </table>
     </div>
     <div style="margin-top:10px;">
-      <label><input type="checkbox" id="chkCurbUse" onchange="toggleCurbInputs()"> アスカーブ</label>
+      <label>アスカーブ <input type="checkbox" id="chkCurbUse" onchange="toggleCurbInputs()"></label>
       <span id="curbInputs" class="hidden">
         <label>標準：<input id="curbStd" type="text" inputmode="decimal" class="numeric" style="width:80px;" oninput="editCurb('std', this.value)" onblur="editCurb('std', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
         <label>小型：<input id="curbSmall" type="text" inputmode="decimal" class="numeric" style="width:80px;" oninput="editCurb('small', this.value)" onblur="editCurb('small', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
