@@ -108,8 +108,10 @@
         <label>手盛：<input id="curbHand" type="text" inputmode="decimal" class="numeric" style="width:80px;" oninput="editCurb('hand', this.value)" onblur="editCurb('hand', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
       </span>
     </div>
-    <div class="sum" id="sumPave"></div>
-  </div>
+    <div class="sum">
+      <div class="scroll-x-guide">(横スクロール可)</div>
+      <div id="sumPave" class="scroll-x-container"></div>
+    </div>  </div>
   <!-- 取り壊し工タブ -->
   <div id="panelDemo" class="block hidden">
     <h4>取り壊し工</h4>
