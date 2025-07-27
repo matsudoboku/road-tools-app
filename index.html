@@ -145,15 +145,8 @@
   <label>仮設信号機：<input id="kariTempSignal" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editKari('temp_signal', this.value)" onblur="editKari('temp_signal', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
   <label>重機運搬費：<input id="kariMachineTrans" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editKari('machine_transport', this.value)" onblur="editKari('machine_transport', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
   </div>
-  <!-- 免責事項タブ -->
-  <div id="panelDisclaimer" class="block hidden">
-    <p>
-      本Webアプリは無保証で提供しています。利用による一切の損害について、作者は責任を負いません。<br>
-      業務・商用利用の際は必ずご自身で検証し利用を検討してください。<br>
-      <b>出力データ（DXF等）は参考用です。必ず自己責任でご利用ください。</b>
-    </p>
-  </div>
-  <div class="block">
+  <!-- データ管理・出力タブ -->
+  <div id="panelData" class="block hidden">
     <button class="btn" onclick="showSummary()">全施工箇所合計表示</button>
     <button class="btn" onclick="exportSummaryExcel()">Excelエクスポート</button>
     <button class="btn" onclick="exportQuantityExcel()">数量計算書出力</button>
@@ -168,6 +161,14 @@
     <div style="overflow-x:auto;">
       <div id="summary"></div>
     </div>
+  </div>
+  <!-- 免責事項タブ -->
+  <div id="panelDisclaimer" class="block hidden">
+    <p>
+      本Webアプリは無保証で提供しています。利用による一切の損害について、作者は責任を負いません。<br>
+      業務・商用利用の際は必ずご自身で検証し利用を検討してください。<br>
+      <b>出力データ（DXF等）は参考用です。必ず自己責任でご利用ください。</b>
+    </p>
   </div>
   <div id="fatalAlert" class="alert hidden"></div>
 <script src="script.js"></script>
