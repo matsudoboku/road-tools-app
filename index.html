@@ -57,6 +57,9 @@
     <div>
       <label>雑工 <input type="checkbox" id="chkWorksZatsu" onchange="renderTabs()"></label>
     </div>
+    <div style="overflow-x:auto;">
+      <div class="summary-table"></div>
+    </div>
   </div>
 
   <!-- 土工タブ -->
@@ -79,6 +82,9 @@
       </table>
     </div>
     <div id="earthResult" class="sum"></div>
+    <div style="overflow-x:auto;">
+      <div class="summary-table"></div>
+    </div>
   </div>
   <!-- 舗装工タブ -->
     <div id="panelPave" class="block hidden">
@@ -111,7 +117,11 @@
     <div class="sum">
       <div class="scroll-x-guide">(横スクロール可)</div>
       <div id="sumPave" class="scroll-x-container"></div>
-    </div>  </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <div class="summary-table"></div>
+    </div>
+  </div> 
   <!-- 取り壊し工タブ -->
   <div id="panelDemo" class="block hidden">
     <h4>取り壊し工</h4>
@@ -131,13 +141,19 @@
         <tbody id="tbodyDemo"></tbody>
       </table>
     </div>
-    <div id="demoResult" class="sum"></div>  </div>
-  <!-- 安全施設工タブ -->
+    <div id="demoResult" class="sum"></div>
+    <div style="overflow-x:auto;">
+      <div class="summary-table"></div>
+    </div>
+  </div>  <!-- 安全施設工タブ -->
   <div id="panelAnzen" class="block hidden">
     <h4>安全施設工</h4>
   <label>外側線：<input id="anzenLineOuter" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editAnzen('line_outer', this.value)" onblur="editAnzen('line_outer', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
   <label>停止線：<input id="anzenLineStop" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editAnzen('line_stop', this.value)" onblur="editAnzen('line_stop', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
   <label>文字記号：<input id="anzenLineSymbol" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editAnzen('line_symbol', this.value)" onblur="editAnzen('line_symbol', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+    <div style="overflow-x:auto;">
+      <div class="summary-table"></div>
+    </div>
   <!-- 仮設工タブ -->
   <div id="panelKari" class="block hidden">
     <h4>仮設工</h4>
@@ -147,7 +163,6 @@
   </div>
   <!-- データ管理・出力タブ -->
   <div id="panelData" class="block hidden">
-    <button class="btn" onclick="showSummary()">全施工箇所合計表示</button>
     <button class="btn" onclick="exportSummaryExcel()">Excelエクスポート</button>
     <button class="btn" onclick="exportQuantityExcel()">数量計算書出力</button>
     <div style="margin-top:10px;">
@@ -159,7 +174,7 @@
       <input id="importFile" type="file" accept="application/json" onchange="importData(event)" style="display:none;">
     </div>
     <div style="overflow-x:auto;">
-      <div id="summary"></div>
+      <div class="summary-table"></div>
     </div>
   </div>
   <!-- 免責事項タブ -->
@@ -168,6 +183,9 @@
       本Webアプリは無保証で提供しています。利用による一切の損害について、作者は責任を負いません。<br>
       業務・商用利用の際は必ずご自身で検証し利用を検討してください。<br>
       <b>出力データ（DXF等）は参考用です。必ず自己責任でご利用ください。</b>
+    <div style="overflow-x:auto;">
+      <div class="summary-table"></div>
+    </div>
     </p>
   </div>
   <div id="fatalAlert" class="alert hidden"></div>
