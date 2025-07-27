@@ -2,7 +2,6 @@
 const LS_KEY = 'paveAppAllSites_v5'; // 新バージョンに合わせて更新
 let allSites = {};
 let currentSite = '';
-let currentSite = '';
 const paveTypes = ["アスファルト", "コンクリート", "オーバーレイ"];
 const worksList = [
   { id: "Works", label: "工種設定", always: true, panel: "panelWorks" },
