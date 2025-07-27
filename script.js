@@ -514,6 +514,7 @@ function renderAll() {
   renderCurbInputs();
   renderAnzenInputs();
   renderKariInputs();
+  showSummary();
 }
 
 // ▼ DXFエクスポート
@@ -782,7 +783,11 @@ function getSummaryHtml(forExcel = false) {
 }
 
 function showSummary() {
-  document.getElementById('summary').innerHTML = getSummaryHtml(false);}
+  const html = getSummaryHtml(false);
+  document.querySelectorAll('.summary-table').forEach(el => {
+    el.innerHTML = html;
+  });
+}
 
 // ▼ 集計表をExcel形式でダウンロード
 function exportSummaryExcel() {
