@@ -1,9 +1,15 @@
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
 body {
   font-family: 'San Francisco', 'SF Pro Display', 'Segoe UI', 'Meiryo', sans-serif;
   background: linear-gradient(135deg, #f6f6f7 0%, #eaeef3 100%);
-  margin: 0;
   color: #222;
-  overscroll-behavior-y: none;
+  overscroll-behavior: none;
 }
     .container {
       max-width: 900px;
@@ -13,6 +19,8 @@ body {
       border-radius: 28px;
       box-shadow: 0 6px 36px #0001, 0 1.5px 8px #7e7e7e11;
       border: 1.5px solid #ececec;
+      min-height: 100vh;
+      box-sizing: border-box;
     }
     .tabs {
       display: flex;
