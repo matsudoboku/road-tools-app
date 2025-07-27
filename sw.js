@@ -1,4 +1,4 @@
-const CACHE_NAME = 'road-tools-cache-v1';
+const CACHE_NAME = 'road-tools-cache-v2';
 const urlsToCache = [
   '/',
   '/index.html',
