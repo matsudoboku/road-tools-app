@@ -2,6 +2,7 @@
 const LS_KEY = 'paveAppAllSites_v5'; // 新バージョンに合わせて更新
 let allSites = {};
 let currentSite = '';
+let currentSite = '';
 const paveTypes = ["アスファルト", "コンクリート", "オーバーレイ"];
 const worksList = [
   { id: "Works", label: "工種設定", always: true, panel: "panelWorks" },
@@ -121,8 +122,20 @@ function importData(e) {
   reader.readAsText(file);
 }
 function renderAllAndSave() {
+  const focus = nextFocus;
   renderAll();
   saveData();
+  if(focus) {
+    const selector = `[data-type="${focus.type}"][data-idx="${focus.idx}"][data-key="${focus.key}"]`;
+    const el = document.querySelector(selector);
+    if(el) {
+      el.focus();
+      if(el.setSelectionRange) {
+        const len = el.value.length;
+        el.setSelectionRange(len, len);
+      }
+    }
+  }
 }
 function addSite() {
   const name = document.getElementById('siteName').value.trim();
@@ -271,15 +284,15 @@ function renderTablePave() {
   list.forEach((r,idx)=>{
     tbody += `<tr>
       <td>
-        <select class="pave-type" onchange="editRow('pave',${idx},'種別',this.value,true)">
+        <select class="pave-type" data-type="pave" data-idx="${idx}" data-key="種別" onchange="editRow('pave',${idx},'種別',this.value,true)" onkeydown="handleKey(event)">
           ${paveTypes.map(tp=>`<option value="${tp}"${r.種別===tp?' selected':''}>${tp}</option>`).join('')}
         </select>
       </td>
-      <td><input value="${r.測点||''}" inputmode="text" pattern="[0-9A-Za-z]*" oninput="editRow('pave',${idx},'測点',this.value)" onblur="editRow('pave',${idx},'測点',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
-      <td><input value="${r.単距||''}" type="number" inputmode="decimal" step="any" oninput="editRow('pave',${idx},'単距',this.value)" onblur="editRow('pave',${idx},'単距',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
+      <td><input data-type="pave" data-idx="${idx}" data-key="測点" value="${r.測点||''}" inputmode="text" pattern="[0-9A-Za-z]*" oninput="editRow('pave',${idx},'測点',this.value)" onblur="editRow('pave',${idx},'測点',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="pave" data-idx="${idx}" data-key="単距" value="${r.単距||''}" type="number" inputmode="decimal" step="any" oninput="editRow('pave',${idx},'単距',this.value)" onblur="editRow('pave',${idx},'単距',this.value,true)" onkeydown="handleKey(event)"></td>
       <td><input value="${r.追距||''}" class="readonly" readonly></td>
-      <td><input value="${r.幅員||''}" type="number" inputmode="decimal" step="any" oninput="editRow('pave',${idx},'幅員',this.value)" onblur="editRow('pave',${idx},'幅員',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>      <td><input value="${r.平均幅員||''}" class="readonly" readonly></td>
-      <td><input value="${r.面積||''}" class="readonly" readonly></td>
+      <td><input data-type="pave" data-idx="${idx}" data-key="幅員" value="${r.幅員||''}" type="number" inputmode="decimal" step="any" oninput="editRow('pave',${idx},'幅員',this.value)" onblur="editRow('pave',${idx},'幅員',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input value="${r.平均幅員||''}" class="readonly" readonly></td>      <td><input value="${r.面積||''}" class="readonly" readonly></td>
     </tr>`;
   });
   document.getElementById('tbodyPave').innerHTML = tbody;
@@ -337,10 +350,10 @@ function renderTableEarth() {
   let tbody = '';
   list.forEach((r,idx)=>{
     tbody += `<tr>
-      <td><input value="${r.測点||''}" inputmode="text" pattern="[0-9A-Za-z]*" oninput="editRow('earth',${idx},'測点',this.value)" onblur="editRow('earth',${idx},'測点',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
-      <td><input value="${r.単距||''}" type="number" inputmode="decimal" step="any" oninput="editRow('earth',${idx},'単距',this.value)" onblur="editRow('earth',${idx},'単距',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
+      <td><input data-type="earth" data-idx="${idx}" data-key="測点" value="${r.測点||''}" inputmode="text" pattern="[0-9A-Za-z]*" oninput="editRow('earth',${idx},'測点',this.value)" onblur="editRow('earth',${idx},'測点',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="earth" data-idx="${idx}" data-key="単距" value="${r.単距||''}" type="number" inputmode="decimal" step="any" oninput="editRow('earth',${idx},'単距',this.value)" onblur="editRow('earth',${idx},'単距',this.value,true)" onkeydown="handleKey(event)"></td>
       <td><input value="${r.追距||''}" class="readonly" readonly></td>
-      <td><input value="${r.幅員||''}" type="number" inputmode="decimal" step="any" oninput="editRow('earth',${idx},'幅員',this.value)" onblur="editRow('earth',${idx},'幅員',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
+      <td><input data-type="earth" data-idx="${idx}" data-key="幅員" value="${r.幅員||''}" type="number" inputmode="decimal" step="any" oninput="editRow('earth',${idx},'幅員',this.value)" onblur="editRow('earth',${idx},'幅員',this.value,true)" onkeydown="handleKey(event)"></td>
       <td><input value="${r.面積||''}" class="readonly" readonly></td>
     </tr>`;
   });
@@ -378,10 +391,10 @@ function renderTableDemo() {
   let tbody = '';
   list.forEach((r,idx)=>{
     tbody += `<tr>
-      <td><input value="${r.測点||''}" inputmode="text" pattern="[0-9A-Za-z]*" oninput="editRow('demo',${idx},'測点',this.value)" onblur="editRow('demo',${idx},'測点',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
-      <td><input value="${r.単距||''}" type="number" inputmode="decimal" step="any" oninput="editRow('demo',${idx},'単距',this.value)" onblur="editRow('demo',${idx},'単距',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
+      <td><input data-type="demo" data-idx="${idx}" data-key="測点" value="${r.測点||''}" inputmode="text" pattern="[0-9A-Za-z]*" oninput="editRow('demo',${idx},'測点',this.value)" onblur="editRow('demo',${idx},'測点',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="demo" data-idx="${idx}" data-key="単距" value="${r.単距||''}" type="number" inputmode="decimal" step="any" oninput="editRow('demo',${idx},'単距',this.value)" onblur="editRow('demo',${idx},'単距',this.value,true)" onkeydown="handleKey(event)"></td>
       <td><input value="${r.追距||''}" class="readonly" readonly></td>
-      <td><input value="${r.幅員||''}" type="number" inputmode="decimal" step="any" oninput="editRow('demo',${idx},'幅員',this.value)" onblur="editRow('demo',${idx},'幅員',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
+      <td><input data-type="demo" data-idx="${idx}" data-key="幅員" value="${r.幅員||''}" type="number" inputmode="decimal" step="any" oninput="editRow('demo',${idx},'幅員',this.value)" onblur="editRow('demo',${idx},'幅員',this.value,true)" onkeydown="handleKey(event)"></td>
       <td><input value="${r.面積||''}" class="readonly" readonly></td>
     </tr>`;
   });
@@ -941,6 +954,32 @@ function saveAndUpdate(update = true) {
   }
   if(update) renderAllAndSave();
 }
+
+function handleKey(e) {
+  if(e.key === 'Enter' || e.key === 'Tab') {
+    e.preventDefault();
+    const focusable = Array.from(document.querySelectorAll('input[data-idx], select[data-idx]'));
+    const idx = focusable.indexOf(e.target);
+    if(idx !== -1 && idx < focusable.length - 1) {
+      const n = focusable[idx + 1];
+      nextFocus = {type: n.dataset.type, idx: n.dataset.idx, key: n.dataset.key};
+    } else {
+      nextFocus = null;
+    }
+    e.target.blur();
+  }
+}
+
+function handlePointerDown(e) {
+  const t = e.target.closest('input[data-idx], select[data-idx]');
+  if(t) {
+    nextFocus = {type: t.dataset.type, idx: t.dataset.idx, key: t.dataset.key};
+  } else {
+    nextFocus = null;
+  }
+}
+
+document.addEventListener('pointerdown', handlePointerDown, true);
 
 window.addEventListener('DOMContentLoaded', () => {
   loadData();
