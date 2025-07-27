@@ -11,6 +11,7 @@ const worksList = [
   { id: "Anzen", label: "安全施設工", chk: "chkWorksAnzen", panel: "panelAnzen" },
   { id: "Kari", label: "仮設工", chk: "chkWorksKari", panel: "panelKari" },
   { id: "Zatsu", label: "雑工", chk: "chkWorksZatsu", panel: null },
+  { id: "Data", label: "データ管理・出力", always: true, panel: "panelData" },
   { id: "Disclaimer", label: "免責事項", always: true, panel: "panelDisclaimer"}
 ];
 
