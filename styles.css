@@ -1,9 +1,9 @@
-9　body {
-     font-family: 'San Francisco', 'SF Pro Display', 'Segoe UI', 'Meiryo', sans-serif;
-     background: linear-gradient(135deg, #f6f6f7 0%, #eaeef3 100%);
-     margin: 0;
-     color: #222;
-   }
+body {
+  font-family: 'San Francisco', 'SF Pro Display', 'Segoe UI', 'Meiryo', sans-serif;
+  background: linear-gradient(135deg, #f6f6f7 0%, #eaeef3 100%);
+  margin: 0;
+  color: #222;
+}
     .container {
       max-width: 900px;
       margin: 32px auto;
@@ -213,8 +213,14 @@
       .ss-table { min-width: 600px; }
     }
     @media (max-width: 600px) {
-      body { font-size: 14px; }
-      .container { width: 100%; max-width: none; margin: 10px 0; padding: 8px; }
+      body { font-size: 14px; margin: 0; }
+      .container {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        padding: 8px;
+        border-radius: 0;
+      }
       .tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 8px; }
       .block { margin: 10px 0; padding: 8px 6px; display:flex; flex-direction: column; }
       .block label { display:block; margin-right:0; margin-bottom:6px; }
