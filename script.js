@@ -275,10 +275,10 @@ function renderTablePave() {
           ${paveTypes.map(tp=>`<option value="${tp}"${r.種別===tp?' selected':''}>${tp}</option>`).join('')}
         </select>
       </td>
-      <td><input value="${r.測点||''}" oninput="editRow('pave',${idx},'測点',this.value)" onblur="editRow('pave',${idx},'測点',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
-      <td><input value="${r.単距||''}" oninput="editRow('pave',${idx},'単距',this.value)" onblur="editRow('pave',${idx},'単距',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
+      <td><input value="${r.測点||''}" inputmode="text" pattern="[0-9A-Za-z]*" oninput="editRow('pave',${idx},'測点',this.value)" onblur="editRow('pave',${idx},'測点',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
+      <td><input value="${r.単距||''}" type="number" inputmode="decimal" step="any" oninput="editRow('pave',${idx},'単距',this.value)" onblur="editRow('pave',${idx},'単距',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
       <td><input value="${r.追距||''}" class="readonly" readonly></td>
-      <td><input value="${r.幅員||''}" oninput="editRow('pave',${idx},'幅員',this.value)" onblur="editRow('pave',${idx},'幅員',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>      <td><input value="${r.平均幅員||''}" class="readonly" readonly></td>
+      <td><input value="${r.幅員||''}" type="number" inputmode="decimal" step="any" oninput="editRow('pave',${idx},'幅員',this.value)" onblur="editRow('pave',${idx},'幅員',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>      <td><input value="${r.平均幅員||''}" class="readonly" readonly></td>
       <td><input value="${r.面積||''}" class="readonly" readonly></td>
     </tr>`;
   });
@@ -337,10 +337,10 @@ function renderTableEarth() {
   let tbody = '';
   list.forEach((r,idx)=>{
     tbody += `<tr>
-      <td><input value="${r.測点||''}" oninput="editRow('earth',${idx},'測点',this.value)" onblur="editRow('earth',${idx},'測点',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
-      <td><input value="${r.単距||''}" oninput="editRow('earth',${idx},'単距',this.value)" onblur="editRow('earth',${idx},'単距',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
+      <td><input value="${r.測点||''}" inputmode="text" pattern="[0-9A-Za-z]*" oninput="editRow('earth',${idx},'測点',this.value)" onblur="editRow('earth',${idx},'測点',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
+      <td><input value="${r.単距||''}" type="number" inputmode="decimal" step="any" oninput="editRow('earth',${idx},'単距',this.value)" onblur="editRow('earth',${idx},'単距',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
       <td><input value="${r.追距||''}" class="readonly" readonly></td>
-      <td><input value="${r.幅員||''}" oninput="editRow('earth',${idx},'幅員',this.value)" onblur="editRow('earth',${idx},'幅員',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
+      <td><input value="${r.幅員||''}" type="number" inputmode="decimal" step="any" oninput="editRow('earth',${idx},'幅員',this.value)" onblur="editRow('earth',${idx},'幅員',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
       <td><input value="${r.面積||''}" class="readonly" readonly></td>
     </tr>`;
   });
@@ -378,10 +378,10 @@ function renderTableDemo() {
   let tbody = '';
   list.forEach((r,idx)=>{
     tbody += `<tr>
-      <td><input value="${r.測点||''}" oninput="editRow('demo',${idx},'測点',this.value)" onblur="editRow('demo',${idx},'測点',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
-      <td><input value="${r.単距||''}" oninput="editRow('demo',${idx},'単距',this.value)" onblur="editRow('demo',${idx},'単距',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
+      <td><input value="${r.測点||''}" inputmode="text" pattern="[0-9A-Za-z]*" oninput="editRow('demo',${idx},'測点',this.value)" onblur="editRow('demo',${idx},'測点',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
+      <td><input value="${r.単距||''}" type="number" inputmode="decimal" step="any" oninput="editRow('demo',${idx},'単距',this.value)" onblur="editRow('demo',${idx},'単距',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
       <td><input value="${r.追距||''}" class="readonly" readonly></td>
-      <td><input value="${r.幅員||''}" oninput="editRow('demo',${idx},'幅員',this.value)" onblur="editRow('demo',${idx},'幅員',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
+      <td><input value="${r.幅員||''}" type="number" inputmode="decimal" step="any" oninput="editRow('demo',${idx},'幅員',this.value)" onblur="editRow('demo',${idx},'幅員',this.value,true)" onkeydown="if(event.key==='Enter') this.blur();"></td>
       <td><input value="${r.面積||''}" class="readonly" readonly></td>
     </tr>`;
   });
