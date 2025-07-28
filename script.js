@@ -822,7 +822,14 @@ function getQuantityHtml() {
   html += `<tr><th style="${thStyle}">箇所名</th><th style="${thStyle}">工種</th><th style="${thStyle}">規格</th><th style="${thStyle}">計算式</th><th style="${thStyle}">単位</th><th style="${thStyle}">数量</th></tr>`;
 
   const addRow = (site, work, spec, formula, unit, qty) => {
-    html += `<tr><td style="${tdStyle}">${site}</td><td style="${tdStyle}">${work}</td><td style="${tdStyle}">${spec}</td><td style="${tdStyle}">${formula}</td><td style="${tdStyle}">${unit}</td><td style="${tdStyle}">${qty}</td></tr>`;
+    html += `<tr>` +
+            `<td style="${tdStyle}">${site}</td>` +
+            `<td style="${tdStyle}"><br>${work}</td>` +
+            `<td style="${tdStyle}"><br>${spec}</td>` +
+            `<td style="${tdStyle}">${formula}</td>` +
+            `<td style="${tdStyle}">${unit}</td>` +
+            `<td style="${tdStyle}">${qty}</td>` +
+            `</tr>`;
   };
   
   const addCatRow = (site, label) => {
