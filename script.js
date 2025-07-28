@@ -991,7 +991,7 @@ function makeZip(files) {
     const dv = new DataView(local.buffer);
     dv.setUint32(0, 0x04034b50, true);
     dv.setUint16(4, 20, true);
-    dv.setUint16(6, 0, true);
+    dv.setUint16(6, 0x0800, true);
     dv.setUint16(8, 0, true);
     dv.setUint16(10, 0, true);
     dv.setUint16(12, 0, true);
@@ -1008,7 +1008,7 @@ function makeZip(files) {
     cdv.setUint32(0, 0x02014b50, true);
     cdv.setUint16(4, 20, true);
     cdv.setUint16(6, 20, true);
-    cdv.setUint16(8, 0, true);
+    cdv.setUint16(8, 0x0800, true);
     cdv.setUint16(10, 0, true);
     cdv.setUint16(12, 0, true);
     cdv.setUint16(14, 0, true);
