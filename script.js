@@ -832,8 +832,16 @@ function getQuantityHtml() {
   const addRow = (site, work, spec, formula, unit, qty) => {
     html += `<tr>` +
             `<td style="${tdStyle}">${site}</td>` +
-            `<td style="${tdStyle}"><br>${work}</td>` +
-            `<td style="${tdStyle}"><br>${spec}</td>` +
+            `<td style="${tdStyle}"></td>` +
+            `<td style="${tdStyle}"></td>` +
+            `<td style="${tdStyle}"></td>` +
+            `<td style="${tdStyle}"></td>` +
+            `<td style="${tdStyle}"></td>` +
+            `</tr>` +
+            `<tr>` +
+            `<td style="${tdStyle}"></td>` +
+            `<td style="${tdStyle}">${work}</td>` +
+            `<td style="${tdStyle}">${spec}</td>` +
             `<td style="${tdStyle}">${formula}</td>` +
             `<td style="${tdStyle}">${unit}</td>` +
             `<td style="${tdStyle}">${qty}</td>` +
