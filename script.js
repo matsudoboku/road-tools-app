@@ -819,6 +819,14 @@ function getQuantityHtml() {
   const catStyle = `border:${border} solid #555;background:#f3f3f3;font-weight:bold;text-align:left;padding:6px 5px;`;
 
   let html = `<table class="ss-table" style="${tableStyle}">`;
+  html += `<colgroup>` +
+          `<col>` +
+          `<col style="width:15mm">` +
+          `<col style="width:20mm">` +
+          `<col style="width:60mm">` +
+          `<col style="width:5mm">` +
+          `<col style="width:15mm">` +
+          `</colgroup>`;
   html += `<tr><th style="${thStyle}">箇所名</th><th style="${thStyle}">工種</th><th style="${thStyle}">規格</th><th style="${thStyle}">計算式</th><th style="${thStyle}">単位</th><th style="${thStyle}">数量</th></tr>`;
 
   const addRow = (site, work, spec, formula, unit, qty) => {
@@ -952,7 +960,7 @@ function getQuantityHtml() {
 }
 
 function exportQuantityExcel() {
-  const html = '<html><head><meta charset="UTF-8"></head><body>' +
+  const html = '<html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;}</style></head><body>' +
                getQuantityHtml() +
                '</body></html>';
   const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
@@ -1064,7 +1072,7 @@ function exportAllZip() {
   const summaryHtml = '<html><head><meta charset="UTF-8"></head><body>' +
                       getSummaryHtml(true) + '</body></html>';
   files.push({name: '合計表.xls', data: enc.encode(summaryHtml)});
-  const quantityHtml = '<html><head><meta charset="UTF-8"></head><body>' +
+  const quantityHtml = '<html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;}</style></head><body>' +
                        getQuantityHtml() + '</body></html>';
   files.push({name: '数量計算書.xls', data: enc.encode(quantityHtml)});
   Object.keys(allSites).forEach(site => {
