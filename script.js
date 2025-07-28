@@ -1056,10 +1056,10 @@ function exportAllZip() {
   const files = [];
   const summaryHtml = '<html><head><meta charset="UTF-8"></head><body>' +
                       getSummaryHtml(true) + '</body></html>';
-  files.push({name: 'summary.xls', data: enc.encode(summaryHtml)});
+  files.push({name: '合計表.xls', data: enc.encode(summaryHtml)});
   const quantityHtml = '<html><head><meta charset="UTF-8"></head><body>' +
                        getQuantityHtml() + '</body></html>';
-  files.push({name: 'quantity.xls', data: enc.encode(quantityHtml)});
+  files.push({name: '数量計算書.xls', data: enc.encode(quantityHtml)});
   Object.keys(allSites).forEach(site => {
     const dxf = generateDXF(site);
     if(dxf) {
