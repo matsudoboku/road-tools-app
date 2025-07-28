@@ -179,11 +179,11 @@ body {
     .ss-table tr td:last-child, .ss-table tr th:last-child { border-right: none; }
     .ss-table tr:last-child td { border-bottom: none; }
     table input { min-width: 120px; }
-    .sum {
+.sum {
       margin-top: 14px;
       font-weight: 600;
       color: #007aff;
-      font-size: 1.17em;
+      font-size: 1em;
       letter-spacing: 0.5px;
     }
     .hidden { display: none !important; }
