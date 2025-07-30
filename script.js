@@ -72,15 +72,18 @@ function saveData() {
 function loadData() {
   try {
     const dat = JSON.parse(localStorage.getItem(LS_KEY));
-    if (dat && typeof dat === "object") {
-      Object.values(dat).forEach(s => {
-        if(!s.kari) s.kari = { traffic_b: 0, temp_signal: 0, machine_transport: 0 };
-        if(!s.curb) s.curb = { use: false, std: 0, small: 0, hand: 0 };
-        if(!s.works) s.works = { earth: false, demo: false, anzen: false, kari: false, zatsu: false };
-        if(!s.zatsu) s.zatsu = [];
-        if(!s.demoSetting) s.demoSetting = { same: true, type: 'As', thick: 0, cutting: 0 };
-        else if(s.demoSetting.cutting === undefined) s.demoSetting.cutting = 0;
-      });
+      if (dat && typeof dat === "object") {
+        Object.values(dat).forEach(s => {
+          if(!s.kari) s.kari = { traffic_b: 0, temp_signal: 0, machine_transport: 0 };
+          if(!s.curb) s.curb = { use: false, std: 0, small: 0, hand: 0 };
+          if(!s.works) s.works = { earth: false, demo: false, anzen: false, kari: false, zatsu: false };
+          if(!s.zatsu) s.zatsu = [];
+          if(Array.isArray(s.zatsu)) {
+            s.zatsu.forEach(z => { if(z.spec === undefined) z.spec = ''; });
+          }
+          if(!s.demoSetting) s.demoSetting = { same: true, type: 'As', thick: 0, cutting: 0 };
+          else if(s.demoSetting.cutting === undefined) s.demoSetting.cutting = 0;
+        });
         allSites = dat;
       // サイトリスト描画
       const siteList = Object.keys(allSites);
@@ -111,6 +114,11 @@ function importData(e) {
     try {
       const dat = JSON.parse(ev.target.result);
       if (dat && typeof dat === 'object') {
+        Object.values(dat).forEach(s => {
+          if(Array.isArray(s.zatsu)) {
+            s.zatsu.forEach(z => { if(z.spec === undefined) z.spec = ''; });
+          }
+        });
         allSites = dat;
         const siteList = Object.keys(allSites);
         if (siteList.length) {
@@ -225,7 +233,7 @@ function addRow(type) {
    } else if (type === 'earth' || type === 'demo') {
     allSites[currentSite][type].push({測点:'', 単距:'', 追距:'', 幅員:'', 面積:''});
   } else if (type === 'zatsu') {
-    allSites[currentSite].zatsu.push({name:'', unit:'', qty:''});
+    allSites[currentSite].zatsu.push({ name:'', spec:'', unit:'', qty:'' });
   }
   renderAllAndSave();
 }
@@ -528,6 +536,7 @@ function renderTableZatsu() {
   list.forEach((r, idx) => {
     tbody += `<tr>
       <td><input list="zatsuNameList" data-type="zatsu" data-idx="${idx}" data-key="name" value="${r.name||''}" type="text" oninput="editRow('zatsu',${idx},'name',this.value)" onblur="editRow('zatsu',${idx},'name',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="zatsu" data-idx="${idx}" data-key="spec" value="${r.spec||''}" type="text" oninput="editRow('zatsu',${idx},'spec',this.value)" onblur="editRow('zatsu',${idx},'spec',this.value,true)" onkeydown="handleKey(event)"></td>
       <td><input data-type="zatsu" data-idx="${idx}" data-key="unit" value="${r.unit||''}" type="text" oninput="editRow('zatsu',${idx},'unit',this.value)" onblur="editRow('zatsu',${idx},'unit',this.value,true)" onkeydown="handleKey(event)"></td>
       <td><input data-type="zatsu" data-idx="${idx}" data-key="qty" value="${r.qty||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('zatsu',${idx},'qty',this.value)" onblur="editRow('zatsu',${idx},'qty',this.value,true)" onkeydown="handleKey(event)"></td>
     </tr>`;
@@ -1055,7 +1064,7 @@ function getQuantityHtml() {
     if(dat.works && dat.works.zatsu) {
       (dat.zatsu || []).forEach(z => {
         const q = parseFloat(z.qty) || 0;
-        if(q>0) zatsuRows.push(['雑工', z.name || '', '', z.unit || '', q]);
+        if(q>0) zatsuRows.push([z.name || '', z.spec || '', '', z.unit || '', q]);
       });
     }
     if(zatsuRows.length>0) {
