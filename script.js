@@ -921,6 +921,8 @@ function getQuantityHtml() {
   const tableStyle = `min-width:1200px;border-collapse:collapse;border:${border} solid #555;background:#fff;width:auto;`;
   const thStyle = `border:${border} solid #555;background:#e6eef5;color:#007acc;font-weight:bold;text-align:center;padding:8px 5px;`;
   const tdStyle = `border:${border} solid #555;text-align:center;padding:6px 5px;`;
+  const tdStyleFirst = tdStyle + 'border-bottom:none;';
+  const tdStyleSecond = tdStyle + 'border-top:none;';
   const catStyle = `border:${border} solid #555;background:#f3f3f3;font-weight:bold;text-align:left;padding:6px 5px;`;
 
   let html = `<table class="ss-table" style="${tableStyle}">`;
@@ -936,20 +938,20 @@ function getQuantityHtml() {
 
   const addRow = (site, work, spec, formula, unit, qty) => {
     html += `<tr>` +
-            `<td style="${tdStyle}">${site}</td>` +
-            `<td style="${tdStyle}"></td>` +
-            `<td style="${tdStyle}"></td>` +
-            `<td style="${tdStyle}"></td>` +
-            `<td style="${tdStyle}"></td>` +
-            `<td style="${tdStyle}"></td>` +
+            `<td style="${tdStyleFirst}">${site}</td>` +
+            `<td style="${tdStyleFirst}"></td>` +
+            `<td style="${tdStyleFirst}"></td>` +
+            `<td style="${tdStyleFirst}"></td>` +
+            `<td style="${tdStyleFirst}"></td>` +
+            `<td style="${tdStyleFirst}"></td>` +
             `</tr>` +
             `<tr>` +
-            `<td style="${tdStyle}"></td>` +
-            `<td style="${tdStyle}">${work}</td>` +
-            `<td style="${tdStyle}">${spec}</td>` +
-            `<td style="${tdStyle}">${formula}</td>` +
-            `<td style="${tdStyle}">${unit}</td>` +
-            `<td style="${tdStyle}">${qty}</td>` +
+            `<td style="${tdStyleSecond}"></td>` +
+            `<td style="${tdStyleSecond}">${work}</td>` +
+            `<td style="${tdStyleSecond}">${spec}</td>` +
+            `<td style="${tdStyleSecond}">${formula}</td>` +
+            `<td style="${tdStyleSecond}">${unit}</td>` +
+            `<td style="${tdStyleSecond}">${qty}</td>` +
             `</tr>`;
   };
   
