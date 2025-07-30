@@ -11,7 +11,7 @@ const worksList = [
   { id: "Demo", label: "取り壊し工", chk: "chkWorksDemo", setting: "worksDemoSetting", panel: "panelDemo" },
   { id: "Anzen", label: "安全施設工", chk: "chkWorksAnzen", setting: "worksAnzenSetting", panel: null },
   { id: "Kari", label: "仮設工", chk: "chkWorksKari", setting: "worksKariSetting", panel: null },
-  { id: "Zatsu", label: "雑工", chk: "chkWorksZatsu", panel: null },
+  { id: "Zatsu", label: "雑工", chk: "chkWorksZatsu", panel: "panelZatsu" },
   { id: "Data", label: "データ管理・出力", always: true, panel: "panelData" },
   { id: "Disclaimer", label: "免責事項", always: true, panel: "panelDisclaimer"}
 ];
@@ -224,6 +224,8 @@ function addRow(type) {
     });
    } else if (type === 'earth' || type === 'demo') {
     allSites[currentSite][type].push({測点:'', 単距:'', 追距:'', 幅員:'', 面積:''});
+  } else if (type === 'zatsu') {
+    allSites[currentSite].zatsu.push({name:'', unit:'', qty:''});
   }
   renderAllAndSave();
 }
@@ -507,6 +509,35 @@ function renderCurbInputs() {
   document.getElementById('curbHand').value = dat.hand || 0;
 }
 
+function updateZatsuNameList() {
+  const listEl = document.getElementById('zatsuNameList');
+  if(!listEl) return;
+  const set = new Set();
+  Object.values(allSites).forEach(s => {
+    if(Array.isArray(s.zatsu)) {
+      s.zatsu.forEach(z => { if(z && z.name) set.add(z.name); });
+    }
+  });
+  listEl.innerHTML = Array.from(set).map(n => `<option value="${n}"></option>`).join('');
+}
+
+function renderTableZatsu() {
+  if(!currentSite) return;
+  const list = allSites[currentSite].zatsu || [];
+  let tbody = '';
+  list.forEach((r, idx) => {
+    tbody += `<tr>
+      <td><input list="zatsuNameList" data-type="zatsu" data-idx="${idx}" data-key="name" value="${r.name||''}" type="text" oninput="editRow('zatsu',${idx},'name',this.value)" onblur="editRow('zatsu',${idx},'name',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="zatsu" data-idx="${idx}" data-key="unit" value="${r.unit||''}" type="text" oninput="editRow('zatsu',${idx},'unit',this.value)" onblur="editRow('zatsu',${idx},'unit',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="zatsu" data-idx="${idx}" data-key="qty" value="${r.qty||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('zatsu',${idx},'qty',this.value)" onblur="editRow('zatsu',${idx},'qty',this.value,true)" onkeydown="handleKey(event)"></td>
+    </tr>`;
+  });
+  document.getElementById('tbodyZatsu').innerHTML = tbody;
+  const sum = list.reduce((a,r)=>a+(parseFloat(r.qty)||0),0);
+  document.getElementById('zatsuResult').innerHTML = sum>0 ? `<div>合計：${sum.toFixed(2)}</div>` : '';
+  updateZatsuNameList();
+}
+
 function renderWorksChk() {
   if(!currentSite) return;
   const w = allSites[currentSite].works || { earth:false, demo:false, anzen:false, kari:false, zatsu:false };
@@ -539,6 +570,7 @@ function renderAll() {
   renderEarthResult();
   renderTableDemo();
   renderDemoResult();
+  renderTableZatsu();
   renderCurbInputs();
   renderAnzenInputs();
   renderKariInputs();
@@ -1204,4 +1236,5 @@ window.addEventListener('DOMContentLoaded', () => {
   loadData();
   renderAll();
   renderTabs();
+  updateZatsuNameList();
 });
