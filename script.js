@@ -77,6 +77,7 @@ function loadData() {
         if(!s.kari) s.kari = { traffic_b: 0, temp_signal: 0, machine_transport: 0 };
         if(!s.curb) s.curb = { use: false, std: 0, small: 0, hand: 0 };
         if(!s.works) s.works = { earth: false, demo: false, anzen: false, kari: false, zatsu: false };
+        if(!s.zatsu) s.zatsu = [];
         if(!s.demoSetting) s.demoSetting = { same: true, type: 'As', thick: 0, cutting: 0 };
         else if(s.demoSetting.cutting === undefined) s.demoSetting.cutting = 0;
       });
@@ -156,6 +157,7 @@ function addSite() {
     demo: [],
     anzen: { line_outer: 0, line_stop: 0, line_symbol: 0 },
     kari: { traffic_b: 0, temp_signal: 0, machine_transport: 0 },
+    zatsu: [],
     curb: { use: false, std: 0, small: 0, hand: 0 },
     works: { earth: false, demo: false, anzen: false, kari: false, zatsu: false },
     earthSetting: { same: true, type: '標準掘削', thick: 0 },
@@ -648,6 +650,19 @@ function getSummaryHtml(forExcel = false) {
   const tdStyle = `border:${border} solid #555;text-align:center;padding:6px 5px;`;
   const tdStyleFirst = tdStyle + "border-bottom:none;";
   const tdStyleSecond = tdStyle + "border-top:none;";
+
+  const zatsuEnabled = Object.values(allSites).some(s => s.works && s.works.zatsu);
+  let zatsuNames = [];
+  if(zatsuEnabled) {
+    const set = new Set();
+    Object.values(allSites).forEach(s => {
+      if(s.works && s.works.zatsu && Array.isArray(s.zatsu)) {
+        s.zatsu.forEach(z => { if(z && z.name) set.add(z.name); });
+      }
+    });
+    zatsuNames = Array.from(set);
+  }
+
   const dataCols = [
     "site",
     "machine_excavation", "residual_soil",
@@ -659,8 +674,9 @@ function getSummaryHtml(forExcel = false) {
     "con_total",
     "curb_std", "curb_small", "curb_hand",
     "line_outer", "line_stop", "line_symbol",
-    "traffic_b", "temp_signal", "machine_transport"  ];
-  let html = `<div style="overflow-x:auto;"><table class="ss-table" style="${tableStyle}">`;
+    "traffic_b", "temp_signal", "machine_transport"
+  ];
+  dataCols.push(...zatsuNames);  let html = `<div style="overflow-x:auto;"><table class="ss-table" style="${tableStyle}">`;
   html += `
 <tr>
     <th rowspan="3" style="${thStyle1}">箇所名</th>
@@ -669,7 +685,7 @@ function getSummaryHtml(forExcel = false) {
     <th colspan="12" style="${thStyle1}">舗装工</th>
     <th colspan="3" style="${thStyle1}">安全施設工</th>
     <th colspan="3" style="${thStyle1}">仮設工</th>
-    <th colspan="3" style="${thStyle1}">雑工</th>
+    ${zatsuEnabled ? `<th colspan="${zatsuNames.length}" style="${thStyle1}">雑工</th>` : ''}
   </tr>
   <tr>
     <th rowspan="2" style="${thStyle2}">機械掘削</th>
@@ -690,6 +706,7 @@ function getSummaryHtml(forExcel = false) {
     <th rowspan="2" style="${thStyle2}">交通誘導員B</th>
     <th rowspan="2" style="${thStyle2}">仮設信号機</th>
     <th rowspan="2" style="${thStyle2}">重機運搬費</th>
+    ${zatsuNames.map(n=>`<th rowspan="2" style="${thStyle2}">${n}</th>`).join('')}
   </tr>
   <tr>
     <th style="${thStyle2}">t=4cm<br>1.4未満</th>
@@ -794,6 +811,20 @@ function getSummaryHtml(forExcel = false) {
     row.traffic_b = kari.traffic_b || "";
     row.temp_signal = kari.temp_signal || "";
     row.machine_transport = kari.machine_transport || "";
+ 
+    if(zatsuEnabled) {
+      const sums = {};
+      zatsuNames.forEach(n => sums[n] = 0);
+      if(allSites[site].works && allSites[site].works.zatsu && Array.isArray(allSites[site].zatsu)) {
+        allSites[site].zatsu.forEach(z => {
+          const n = z.name;
+          if(sums[n] !== undefined) sums[n] += parseFloat(z.qty) || 0;
+        });
+      }
+      zatsuNames.forEach(n => {
+        row[n] = sums[n] > 0 ? sums[n].toFixed(2) : "";
+      });
+    }
 
     dataCols.forEach(k => {
       if (k !== "site") totalRow[k] += parseFloat(row[k]) || 0;
@@ -986,6 +1017,18 @@ function getQuantityHtml() {
     if(kariRows.length>0) {
       cat('仮設工');
       kariRows.forEach(r => row(...r));
+    }
+
+    const zatsuRows = [];
+    if(dat.works && dat.works.zatsu) {
+      (dat.zatsu || []).forEach(z => {
+        const q = parseFloat(z.qty) || 0;
+        if(q>0) zatsuRows.push(['雑工', z.name || '', '', z.unit || '', q]);
+      });
+    }
+    if(zatsuRows.length>0) {
+      cat('雑工');
+      zatsuRows.forEach(r => row(...r));
     }
   });
   html += '</table>';
