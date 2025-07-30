@@ -52,9 +52,19 @@
     </div>
     <div>
       <label>安全施設工 <input type="checkbox" id="chkWorksAnzen" onchange="renderTabs()"></label>
+      <div id="worksAnzenSetting" class="works-setting hidden">
+        <label>外側線：<input id="anzenLineOuter" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editAnzen('line_outer', this.value)" onblur="editAnzen('line_outer', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>停止線：<input id="anzenLineStop" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editAnzen('line_stop', this.value)" onblur="editAnzen('line_stop', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>文字記号：<input id="anzenLineSymbol" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editAnzen('line_symbol', this.value)" onblur="editAnzen('line_symbol', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      </div>
     </div>
     <div>
       <label>仮設工 <input type="checkbox" id="chkWorksKari" onchange="renderTabs()"></label>
+      <div id="worksKariSetting" class="works-setting hidden">
+        <label>交通誘導員B：<input id="kariTrafficB" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editKari('traffic_b', this.value)" onblur="editKari('traffic_b', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>仮設信号機：<input id="kariTempSignal" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editKari('temp_signal', this.value)" onblur="editKari('temp_signal', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>重機運搬費：<input id="kariMachineTrans" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editKari('machine_transport', this.value)" onblur="editKari('machine_transport', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      </div>
     </div>
     <div>
       <label>雑工 <input type="checkbox" id="chkWorksZatsu" onchange="renderTabs()"></label>
@@ -147,22 +157,6 @@
     <div style="overflow-x:auto;">
       <div class="summary-table"></div>
     </div>
-  </div>  <!-- 安全施設工タブ -->
-  <div id="panelAnzen" class="block hidden">
-    <h4>安全施設工</h4>
-    <label>外側線：<input id="anzenLineOuter" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editAnzen('line_outer', this.value)" onblur="editAnzen('line_outer', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-    <label>停止線：<input id="anzenLineStop" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editAnzen('line_stop', this.value)" onblur="editAnzen('line_stop', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-    <label>文字記号：<input id="anzenLineSymbol" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editAnzen('line_symbol', this.value)" onblur="editAnzen('line_symbol', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-    <div style="overflow-x:auto;">
-      <div class="summary-table"></div>
-    </div>
-  </div>
-  <!-- 仮設工タブ -->
-  <div id="panelKari" class="block hidden">
-    <h4>仮設工</h4>
-  <label>交通誘導員B：<input id="kariTrafficB" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editKari('traffic_b', this.value)" onblur="editKari('traffic_b', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-  <label>仮設信号機：<input id="kariTempSignal" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editKari('temp_signal', this.value)" onblur="editKari('temp_signal', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-  <label>重機運搬費：<input id="kariMachineTrans" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editKari('machine_transport', this.value)" onblur="editKari('machine_transport', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
   </div>
   <!-- データ管理・出力タブ -->
   <div id="panelData" class="block hidden">
