@@ -30,7 +30,7 @@
     <div>
       <label>土工 <input type="checkbox" id="chkWorksEarth" onchange="renderTabs()"></label>
       <div id="worksEarthSetting" class="works-setting hidden">
-        <label>舗装面積と同じ <input type="checkbox" id="earthSamePave" onchange="saveAndUpdate()"></label>
+        <label>舗装面積と同じ <input type="checkbox" id="earthSamePave" onchange="saveAndUpdate();renderTabs()"></label>
         <select id="earthType" onchange="saveAndUpdate()">
           <option>標準掘削</option>
           <option>標準以下掘削</option>
@@ -40,7 +40,7 @@
     <div>
       <label>取り壊し工 <input type="checkbox" id="chkWorksDemo" onchange="renderTabs()"></label>
       <div id="worksDemoSetting" class="works-setting hidden">
-        <label>舗装面積と同じ <input type="checkbox" id="demoSamePave" onchange="saveAndUpdate()"></label>
+        <label>舗装面積と同じ <input type="checkbox" id="demoSamePave" onchange="saveAndUpdate();renderTabs()"></label>
         <select id="demoType" onchange="saveAndUpdate()">
           <option>As</option>
           <option>Con</option>
