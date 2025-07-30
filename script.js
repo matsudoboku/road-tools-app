@@ -822,6 +822,10 @@ function getSummaryHtml(forExcel = false) {
 
     let as_lt1_4 = 0, as_ge1_4 = 0, as_ge3_0 = 0,
         ovl_lt1_4 = 0, ovl_ge1_4 = 0, ovl_ge3_0 = 0, con_total = 0;
+    const paveFormulaMap = {
+      as_lt1_4: [], as_ge1_4: [], as_ge3_0: [],
+      ovl_lt1_4: [], ovl_ge1_4: [], ovl_ge3_0: [], con_total: []
+    };
 
     (allSites[site].pave || []).forEach(r => {
       let area = parseFloat(r.面積) || 0;
@@ -925,6 +929,17 @@ function getQuantityHtml() {
   const tdStyleSecond = tdStyle + 'border-top:none;';
   const catStyle = `border:${border} solid #555;background:#f3f3f3;font-weight:bold;text-align:left;padding:6px 5px;`;
 
+    const getAreaFormula = (list, idx) => {
+    const r = list[idx] || {};
+    const d = parseFloat(r.単距) || 0;
+    const w = parseFloat(r.幅員) || 0;
+    if(idx === 0) {
+      return `${d}×${w}`;
+    }
+    const prevW = parseFloat(list[idx - 1].幅員) || 0;
+    return `${d}×(${prevW}+${w})/2`;
+  };
+
   let html = `<table class="ss-table" style="${tableStyle}">`;
   html += `<colgroup>` +
           `<col>` +
@@ -967,8 +982,10 @@ function getQuantityHtml() {
     const cat = label => addCatRow(getSite(), label);
     
     let paveSum = 0;
-    (dat.pave || []).forEach(r => paveSum += parseFloat(r.面積) || 0);
-
+    (dat.pave || []).forEach(r => {
+      paveSum += parseFloat(r.面積) || 0;
+    });
+    
     if(dat.works && dat.works.earth) {
       const set = dat.earthSetting || {};
       const thick = parseFloat(set.thick) || 0;
@@ -985,7 +1002,9 @@ function getQuantityHtml() {
       const set = dat.demoSetting || {};
       const demoType = set.type;
       const thick = parseFloat(set.thick) || 0;
-      const areaDemo = set.same ? paveSum : (dat.demo || []).reduce((a,r)=>a+(parseFloat(r.面積)||0),0);
+      const demoList = set.same ? (dat.pave || []) : (dat.demo || []);
+      const areaDemoFormula = demoList.map((_,i)=>getAreaFormula(demoList, i)).join(' + ');
+      const areaDemo = demoList.reduce((a,r)=>a+(parseFloat(r.面積)||0),0)     
       const cutting = parseFloat(set.cutting)||0;
 
       let break_as=0, break_con=0;
@@ -996,47 +1015,49 @@ function getQuantityHtml() {
       if(cutting>0 || break_as>0 || break_con>0) {
         cat('取り壊し工');
         if(cutting>0) row('舗装版切断','',`${cutting}`, 'm', cutting.toFixed(1));
-        if(break_as>0) {
-          row('舗装版破砕','As',`${areaDemo.toFixed(1)}`,'m²',break_as.toFixed(1));
-          const unpan = break_as * thick / 100;
-          row('廃材運搬','As',`${break_as.toFixed(1)}×(${thick}/100)`,'m³',unpan.toFixed(2));
-          row('廃材処理','As',`${unpan.toFixed(2)}×2.35`,'t',(unpan*2.35).toFixed(2));
-        }
-        if(break_con>0) {
-          row('舗装版破砕','Con',`${areaDemo.toFixed(1)}`,'m²',break_con.toFixed(1));
-          const unpan = break_con * thick / 100;
-          row('廃材運搬','Con',`${break_con.toFixed(1)}×(${thick}/100)`,'m³',unpan.toFixed(2));
-          row('廃材処理','Con',`${unpan.toFixed(2)}×2.35`,'t',(unpan*2.35).toFixed(2));
-        }
+          if(break_as>0) {
+            row('舗装版破砕','As',areaDemoFormula,'m²',break_as.toFixed(1));
+            const unpan = break_as * thick / 100;
+            row('廃材運搬','As',`(${areaDemoFormula})×(${thick}/100)`,'m³',unpan.toFixed(2));
+            row('廃材処理','As',`(${areaDemoFormula})×(${thick}/100)×2.35`,'t',(unpan*2.35).toFixed(2));
+          }
+          if(break_con>0) {
+            row('舗装版破砕','Con',areaDemoFormula,'m²',break_con.toFixed(1));
+            const unpan = break_con * thick / 100;
+            row('廃材運搬','Con',`(${areaDemoFormula})×(${thick}/100)`,'m³',unpan.toFixed(2));
+            row('廃材処理','Con',`(${areaDemoFormula})×(${thick}/100)×2.35`,'t',(unpan*2.35).toFixed(2));
+          }
       }
     }
 
     let as_lt1_4 = 0, as_ge1_4 = 0, as_ge3_0 = 0,
         ovl_lt1_4 = 0, ovl_ge1_4 = 0, ovl_ge3_0 = 0, con_total = 0;
 
-    (dat.pave || []).forEach(r => {
+    (dat.pave || []).forEach((r, idx) => {
       const area = parseFloat(r.面積) || 0;
+      const f = getAreaFormula(dat.pave, idx);
       if (r.種別 === 'アスファルト') {
-        if (r.平均幅員 === '1.4未満') as_lt1_4 += area;
-        else if (r.平均幅員 === '1.4以上') as_ge1_4 += area;
-        else if (r.平均幅員 === '3.0以上') as_ge3_0 += area;
+        if (r.平均幅員 === '1.4未満') { as_lt1_4 += area; paveFormulaMap.as_lt1_4.push(f); }
+        else if (r.平均幅員 === '1.4以上') { as_ge1_4 += area; paveFormulaMap.as_ge1_4.push(f); }
+        else if (r.平均幅員 === '3.0以上') { as_ge3_0 += area; paveFormulaMap.as_ge3_0.push(f); }
       } else if (r.種別 === 'オーバーレイ') {
-        if (r.平均幅員 === '1.4未満') ovl_lt1_4 += area;
-        else if (r.平均幅員 === '1.4以上') ovl_ge1_4 += area;
-        else if (r.平均幅員 === '3.0以上') ovl_ge3_0 += area;
+        if (r.平均幅員 === '1.4未満') { ovl_lt1_4 += area; paveFormulaMap.ovl_lt1_4.push(f); }
+        else if (r.平均幅員 === '1.4以上') { ovl_ge1_4 += area; paveFormulaMap.ovl_ge1_4.push(f); }
+        else if (r.平均幅員 === '3.0以上') { ovl_ge3_0 += area; paveFormulaMap.ovl_ge3_0.push(f); }
       } else if (r.種別 === 'コンクリート') {
         con_total += area;
+        paveFormulaMap.con_total.push(f);
       }
     });
 
     const paveRows = [];
-    if(as_lt1_4>0) paveRows.push(['アスファルト','t=4cm 1.4未満','', 'm²', as_lt1_4.toFixed(1)]);
-    if(as_ge1_4>0) paveRows.push(['アスファルト','t=4cm 1.4以上','', 'm²', as_ge1_4.toFixed(1)]);
-    if(as_ge3_0>0) paveRows.push(['アスファルト','t=4cm 3.0以上','', 'm²', as_ge3_0.toFixed(1)]);
-    if(ovl_lt1_4>0) paveRows.push(['オーバーレイ','t=4cm 1.4未満','', 'm²', ovl_lt1_4.toFixed(1)]);
-    if(ovl_ge1_4>0) paveRows.push(['オーバーレイ','t=4cm 1.4以上','', 'm²', ovl_ge1_4.toFixed(1)]);
-    if(ovl_ge3_0>0) paveRows.push(['オーバーレイ','t=4cm 3.0以上','', 'm²', ovl_ge3_0.toFixed(1)]);
-    if(con_total>0) paveRows.push(['コンクリート','', '', 'm²', con_total.toFixed(1)]);
+      if(as_lt1_4>0) paveRows.push(['アスファルト','t=4cm 1.4未満',paveFormulaMap.as_lt1_4.join(' + '), 'm²', as_lt1_4.toFixed(1)]);
+      if(as_ge1_4>0) paveRows.push(['アスファルト','t=4cm 1.4以上',paveFormulaMap.as_ge1_4.join(' + '), 'm²', as_ge1_4.toFixed(1)]);
+      if(as_ge3_0>0) paveRows.push(['アスファルト','t=4cm 3.0以上',paveFormulaMap.as_ge3_0.join(' + '), 'm²', as_ge3_0.toFixed(1)]);
+      if(ovl_lt1_4>0) paveRows.push(['オーバーレイ','t=4cm 1.4未満',paveFormulaMap.ovl_lt1_4.join(' + '), 'm²', ovl_lt1_4.toFixed(1)]);
+      if(ovl_ge1_4>0) paveRows.push(['オーバーレイ','t=4cm 1.4以上',paveFormulaMap.ovl_ge1_4.join(' + '), 'm²', ovl_ge1_4.toFixed(1)]);
+      if(ovl_ge3_0>0) paveRows.push(['オーバーレイ','t=4cm 3.0以上',paveFormulaMap.ovl_ge3_0.join(' + '), 'm²', ovl_ge3_0.toFixed(1)]);
+      if(con_total>0) paveRows.push(['コンクリート','', paveFormulaMap.con_total.join(' + '), 'm²', con_total.toFixed(1)]);
 
     const curb = dat.curb || {};
     if(curb.use) {
