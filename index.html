@@ -158,6 +158,29 @@
       <div class="summary-table"></div>
     </div>
   </div>
+  <!-- 雑工タブ -->
+  <div id="panelZatsu" class="block hidden">
+    <h4>雑工</h4>
+    <button class="btn" onclick="addRow('zatsu')">行追加</button>
+    <div style="overflow-x:auto;">
+      <div class="scroll-x-guide">(横スクロール可)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>工種</th>
+            <th>単位</th>
+            <th>数量</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyZatsu"></tbody>
+      </table>
+      <datalist id="zatsuNameList"></datalist>
+    </div>
+    <div id="zatsuResult" class="sum"></div>
+    <div style="overflow-x:auto;">
+      <div class="summary-table"></div>
+    </div>
+  </div>
   <!-- データ管理・出力タブ -->
   <div id="panelData" class="block hidden">
     <button class="btn" onclick="exportSummaryExcel()">合計表出力</button>
