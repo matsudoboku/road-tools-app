@@ -162,6 +162,23 @@ function addSite() {
   renderTabs();
   renderAllAndSave();
 }
+function renameSite() {
+  const newName = document.getElementById('siteName').value.trim();
+  if (!currentSite || !newName || newName === currentSite || allSites[newName]) return;
+  saveAndUpdate(false);
+  allSites[newName] = allSites[currentSite];
+  delete allSites[currentSite];
+  currentSite = newName;
+  let opt = '';
+  for (const s of Object.keys(allSites)) opt += `<option>${s}</option>`;
+  document.getElementById('siteList').innerHTML = opt;
+  document.getElementById('siteList').value = currentSite;
+  renderEarthSetting();
+  renderDemoSetting();
+  renderWorksChk();
+  renderTabs();
+  renderAllAndSave();
+}
 function switchSite() {
   saveAndUpdate();
   currentSite = document.getElementById('siteList').value;
