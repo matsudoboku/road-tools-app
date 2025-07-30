@@ -9,8 +9,8 @@ const worksList = [
   { id: "Earth", label: "土工", chk: "chkWorksEarth", setting: "worksEarthSetting", panel: "panelEarth" },
   { id: "Pave", label: "舗装工", always: true, panel: "panelPave" },
   { id: "Demo", label: "取り壊し工", chk: "chkWorksDemo", setting: "worksDemoSetting", panel: "panelDemo" },
-  { id: "Anzen", label: "安全施設工", chk: "chkWorksAnzen", panel: "panelAnzen" },
-  { id: "Kari", label: "仮設工", chk: "chkWorksKari", panel: "panelKari" },
+  { id: "Anzen", label: "安全施設工", chk: "chkWorksAnzen", setting: "worksAnzenSetting", panel: null },
+  { id: "Kari", label: "仮設工", chk: "chkWorksKari", setting: "worksKariSetting", panel: null },
   { id: "Zatsu", label: "雑工", chk: "chkWorksZatsu", panel: null },
   { id: "Data", label: "データ管理・出力", always: true, panel: "panelData" },
   { id: "Disclaimer", label: "免責事項", always: true, panel: "panelDisclaimer"}
@@ -27,8 +27,9 @@ function renderTabs() {
     let show = w.always || (chkEl && chkEl.checked);
     if(w.id === 'Earth' && earthSame) show = false;
     if(w.id === 'Demo' && demoSame) show = false;
-    if(show) {
-      tabHtml += `<div class="tab" id="tab${w.id}" onclick="showTab('${w.id}')">${w.label}</div>`;    }
+    if(show && w.panel) {
+      tabHtml += `<div class="tab" id="tab${w.id}" onclick="showTab('${w.id}')">${w.label}</div>`;
+    }
     if(w.setting) {
       const settingDiv = document.getElementById(w.setting);
       if(settingDiv)
@@ -42,7 +43,7 @@ function renderTabs() {
   const firstActive = worksList.find(w => {
     const el = document.getElementById(w.chk);
     const same = (w.id === 'Earth' && earthSame) || (w.id === 'Demo' && demoSame);
-    return w.always || (el && el.checked && !same);
+    return (w.always || (el && el.checked && !same)) && w.panel;
   });
   if(firstActive) showTab(firstActive.id);
   saveAndUpdate();
