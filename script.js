@@ -542,8 +542,16 @@ function renderTableZatsu() {
     </tr>`;
   });
   document.getElementById('tbodyZatsu').innerHTML = tbody;
-  const sum = list.reduce((a,r)=>a+(parseFloat(r.qty)||0),0);
-  document.getElementById('zatsuResult').innerHTML = sum>0 ? `<div>合計：${sum.toFixed(2)}</div>` : '';
+  const totals = {};
+  list.forEach(r => {
+    const n = r.name || '';
+    totals[n] = (totals[n] || 0) + (parseFloat(r.qty) || 0);
+  });
+  const html = Object.entries(totals)
+    .filter(([n, t]) => t && n)
+    .map(([n, t]) => `${n}: ${t.toFixed(2)}`)
+    .join('　');
+  document.getElementById('zatsuResult').innerHTML = html ? `<div>${html}</div>` : '';
   updateZatsuNameList();
 }
 
