@@ -19,25 +19,32 @@ const worksList = [
 // ▼ タブUI生成＆切り替え
 function renderTabs() {
   if(currentSite && allSites[currentSite]) saveWorksChk();
+  const earthSame = document.getElementById('earthSamePave')?.checked;
+  const demoSame = document.getElementById('demoSamePave')?.checked;
   let tabHtml = '';
   for(const w of worksList) {
     const chkEl = document.getElementById(w.chk);
-    if(w.always || (chkEl && chkEl.checked)) {      tabHtml += `<div class="tab" id="tab${w.id}" onclick="showTab('${w.id}')">${w.label}</div>`;
-    }
+    let show = w.always || (chkEl && chkEl.checked);
+    if(w.id === 'Earth' && earthSame) show = false;
+    if(w.id === 'Demo' && demoSame) show = false;
+    if(show) {
+      tabHtml += `<div class="tab" id="tab${w.id}" onclick="showTab('${w.id}')">${w.label}</div>`;    }
     if(w.setting) {
       const settingDiv = document.getElementById(w.setting);
       if(settingDiv)
         document.getElementById(w.chk).checked ? settingDiv.classList.remove('hidden') : settingDiv.classList.add('hidden');
     }
     if(w.panel && w.chk) {
-      document.getElementById(w.panel).classList[document.getElementById(w.chk).checked ? "remove" : "add"]('hidden');
-    }
+      const panelEl = document.getElementById(w.panel);
+      if(panelEl) panelEl.classList[show ? 'remove' : 'add']('hidden');    }
   }
   document.getElementById('tabsArea').innerHTML = tabHtml;
   const firstActive = worksList.find(w => {
     const el = document.getElementById(w.chk);
-    return w.always || (el && el.checked);
-  });  if(firstActive) showTab(firstActive.id);
+    const same = (w.id === 'Earth' && earthSame) || (w.id === 'Demo' && demoSame);
+    return w.always || (el && el.checked && !same);
+  });
+  if(firstActive) showTab(firstActive.id);
   saveAndUpdate();
 }
 function showTab(tabId) {
