@@ -1454,8 +1454,14 @@ function handlePointerDown(e) {
 
 function openCalc() {
   document.getElementById('calcOverlay').classList.remove('hidden');
-  document.getElementById('calcInput').focus();
+  const input = document.getElementById('calcInput');
   document.getElementById('calcResult').textContent = '';
+  if (window.matchMedia('(pointer: coarse)').matches) {
+    input.setAttribute('readonly', '');
+  } else {
+    input.removeAttribute('readonly');
+    input.focus();
+  }
 }
 
 function closeCalc() {
