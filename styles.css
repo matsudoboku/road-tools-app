@@ -235,8 +235,18 @@ body {
   font-weight: bold;
   margin-bottom: 12px;
   min-height: 1.2em;
-}    .hidden { display: none !important; }
-    .alert { color: #e12b43; font-weight: bold;}
+}
+.calc-keypad {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.calc-keypad button {
+  padding: 10px 0;
+  font-size: 1.2em;
+}
+.hidden { display: none !important; }    .alert { color: #e12b43; font-weight: bold;}
     .works-setting {
       margin-left: 22px;
       margin-top: 7px;
