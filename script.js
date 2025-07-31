@@ -1,8 +1,10 @@
 // ▼ グローバル定義
 const LS_KEY = 'paveAppAllSites_v5'; // 新バージョンに合わせて更新
+const PRICE_KEY = 'paveAppPrices_v1';
 let allSites = {};
 let currentSite = '';
 let nextFocus = null;
+let prices = {};
 const paveTypes = ["アスファルト", "コンクリート", "オーバーレイ"];
 const worksList = [
   { id: "Works", label: "工種設定", always: true, panel: "panelWorks" },
@@ -98,6 +100,28 @@ function loadData() {
       }
     }
   } catch(e){}
+}
+
+function savePrices() {
+  const data = {};
+  document.querySelectorAll('input[data-price-work]').forEach(el => {
+    data[el.dataset.priceWork] = parseFloat(el.value) || 0;
+  });
+  prices = data;
+  try { localStorage.setItem(PRICE_KEY, JSON.stringify(prices)); } catch(e) {}
+}
+
+function loadPrices() {
+  try {
+    const dat = JSON.parse(localStorage.getItem(PRICE_KEY));
+    if(dat && typeof dat === 'object') {
+      prices = dat;
+      Object.entries(prices).forEach(([work, val]) => {
+        const el = document.querySelector(`input[data-price-work="${work}"]`);
+        if(el) el.value = val;
+      });
+    }
+  } catch(e) {}
 }
 
 // ▼ バックアップ・インポート
@@ -1301,7 +1325,11 @@ document.addEventListener('pointerdown', handlePointerDown, true);
 
 window.addEventListener('DOMContentLoaded', () => {
   loadData();
+  loadPrices();
   renderAll();
   renderTabs();
   updateZatsuNameList();
+  document.querySelectorAll('input[data-price-work]').forEach(el => {
+    el.addEventListener('input', savePrices);
+  });
 });
