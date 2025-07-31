@@ -1445,13 +1445,34 @@ function closeCalc() {
 
 function calcKey(e) {
   if(e.key === 'Enter') {
-    try {
-      const v = document.getElementById('calcInput').value;
-      const r = eval(v);
-      document.getElementById('calcResult').textContent = r;
-    } catch(err) {
-      document.getElementById('calcResult').textContent = 'Error';
-    }
+    calcEqual();
+  }
+}
+
+function calcAdd(str) {
+  const input = document.getElementById('calcInput');
+  input.value += str;
+  input.focus();
+}
+
+function calcBackspace() {
+  const input = document.getElementById('calcInput');
+  input.value = input.value.slice(0, -1);
+  input.focus();
+}
+
+function calcClear() {
+  document.getElementById('calcInput').value = '';
+  document.getElementById('calcResult').textContent = '';
+}
+
+function calcEqual() {
+  try {
+    const v = document.getElementById('calcInput').value;
+    const r = eval(v);
+    document.getElementById('calcResult').textContent = r;
+  } catch(err) {
+    document.getElementById('calcResult').textContent = 'Error';
   }
 }
 
