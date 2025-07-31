@@ -6,6 +6,22 @@ let currentSite = '';
 let nextFocus = null;
 let prices = {};
 
+function ensureCurrentSite() {
+  if (!currentSite) {
+    alert('先に現場を追加してください');
+    return false;
+  }
+  return true;
+}
+
+function updateRowAddButtons() {
+  const disabled = !currentSite;
+  document.querySelectorAll('.row-add').forEach(btn => {
+    btn.disabled = disabled;
+  });
+}
+
+
 function escapeHtml(str) {
   const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
   return String(str ?? '').replace(/[&<>"']/g, s => map[s]);
@@ -117,6 +133,7 @@ function loadData() {
         document.getElementById('siteList').innerHTML = opt;
         document.getElementById('siteList').value = currentSite;
       }
+      updateRowAddButtons();
     }
   } catch(e){}
 }
@@ -188,6 +205,7 @@ function importData(e) {
           document.getElementById('siteList').innerHTML = opt;
           document.getElementById('siteList').value = currentSite;
         }
+        updateRowAddButtons();
         renderAllAndSave();
       } else {
         alert('読み込み失敗');
@@ -246,6 +264,7 @@ function addSite() {
   document.getElementById('siteList').innerHTML += `<option>${escapeHtml(name)}</option>`;
   document.getElementById('siteList').value = name;
   currentSite = name;
+  updateRowAddButtons();
   renderEarthSetting();
   renderDemoSetting();
   renderWorksChk();
@@ -263,6 +282,7 @@ function renameSite() {
   for (const s of Object.keys(allSites)) opt += `<option>${escapeHtml(s)}</option>`;
   document.getElementById('siteList').innerHTML = opt;
   document.getElementById('siteList').value = currentSite;
+  updateRowAddButtons();
   renderEarthSetting();
   renderDemoSetting();
   renderWorksChk();
@@ -272,6 +292,7 @@ function renameSite() {
 function switchSite() {
   saveAndUpdate();
   currentSite = document.getElementById('siteList').value;
+  updateRowAddButtons();
   renderEarthSetting();
   renderDemoSetting();
   renderWorksChk();
@@ -297,7 +318,7 @@ function getDemoSetting() {
 
 // ▼ 舗装工タブ
 function addRow(type) {
-  if (!currentSite) return;
+  if (!ensureCurrentSite()) return;
   if(type === 'pave') {
     allSites[currentSite].pave.push({
       種別:"アスファルト", 測点:'', 単距:'', 追距:'', 幅員:'', 平均幅員:'', 面積:''
@@ -310,6 +331,7 @@ function addRow(type) {
   renderAllAndSave();
 }
 function editRow(type, idx, key, val, update = false) {
+  if (!ensureCurrentSite()) return;
   if (type === "pave" && key === "種別") {
     for (let i = idx; i < allSites[currentSite][type].length; i++) {
       allSites[currentSite][type][i][key] = val;
@@ -320,7 +342,7 @@ function editRow(type, idx, key, val, update = false) {
   // 入力中は再描画しない！
   if (update) renderAllAndSave();
 }
-function editAnzen(key, val, update = false) {  if (!currentSite) return;
+function editAnzen(key, val, update = false) {  if (!ensureCurrentSite()) return;
   if (!allSites[currentSite].anzen) {
     allSites[currentSite].anzen = { line_outer: 0, line_stop: 0, line_symbol: 0 };
   }
@@ -328,7 +350,7 @@ function editAnzen(key, val, update = false) {  if (!currentSite) return;
   if(update) renderAllAndSave();
 }
 function editKari(key, val, update = false) {
-  if (!currentSite) return;
+  if (!ensureCurrentSite()) return;
   if (!allSites[currentSite].kari) {
     allSites[currentSite].kari = { traffic_b: 0, temp_signal: 0, machine_transport: 0 };
   }
@@ -355,7 +377,7 @@ function editPrice(key, val, update = false) {
   if(update) renderAllAndSave();
 }
 function toggleCurbInputs() {
-  if(!currentSite) return;
+  if(!ensureCurrentSite()) return;
   const use = document.getElementById('chkCurbUse').checked;
   const area = document.getElementById('curbInputs');
   if(use) area.classList.remove('hidden');
@@ -367,7 +389,7 @@ function toggleCurbInputs() {
   renderAllAndSave();
 }
 function editCurb(key, val, update = false) {
-  if(!currentSite) return;
+  if(!ensureCurrentSite()) return;
   if(!allSites[currentSite].curb) {
     allSites[currentSite].curb = { use: false, std: 0, small: 0, hand: 0 };
   }
@@ -1389,6 +1411,7 @@ document.addEventListener('pointerdown', handlePointerDown, true);
 window.addEventListener('DOMContentLoaded', () => {
   loadData();
   loadPrices();
+  updateRowAddButtons();
   renderAll();
   renderTabs();
   updateZatsuNameList();
