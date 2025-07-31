@@ -217,8 +217,16 @@
     </p>
   </div>
   <div id="fatalAlert" class="alert hidden"></div>
-<script src="script.js"></script>
-<script>
+  <button id="calcButton" class="calc-fab" onclick="openCalc()">🖩</button>
+  <div id="calcOverlay" class="calc-overlay hidden" onclick="if(event.target.id==='calcOverlay') closeCalc()">
+    <div class="calc-dialog" onclick="event.stopPropagation()">
+      <input id="calcInput" type="text" onkeydown="calcKey(event)" placeholder="0" inputmode="decimal" pattern="[0-9.+\-*/()]*">
+      <div id="calcResult" class="result"></div>
+      <button class="btn" onclick="closeCalc()">閉じる</button>
+    </div>
+  </div>
+  <script src="script.js"></script>
+  <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js');
