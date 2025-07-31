@@ -182,6 +182,18 @@
       <div class="summary-table"></div>
     </div>
   </div>
+  <!-- 単価設定タブ -->
+  <div id="panelPrice" class="block hidden">
+    <h4>単価設定</h4>
+    <div>
+      <label>土工：<input id="priceEarth" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('earth', this.value)" onblur="editPrice('earth', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>取壊工：<input id="priceDemo" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('demo', this.value)" onblur="editPrice('demo', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>舗装工：<input id="pricePave" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('pave', this.value)" onblur="editPrice('pave', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>安全施設工：<input id="priceAnzen" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('anzen', this.value)" onblur="editPrice('anzen', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>仮設工：<input id="priceKari" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('kari', this.value)" onblur="editPrice('kari', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>雑工：<input id="priceZatsu" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('zatsu', this.value)" onblur="editPrice('zatsu', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+    </div>
+  </div>
   <!-- データ管理・出力タブ -->
   <div id="panelData" class="block hidden">
     <button class="btn" onclick="exportSummaryExcel()">合計表出力</button>
