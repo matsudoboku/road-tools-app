@@ -254,6 +254,28 @@
     <div class="calc-dialog" onclick="event.stopPropagation()">
       <input id="calcInput" type="text" onkeydown="calcKey(event)" placeholder="0" inputmode="decimal" pattern="[0-9.+\-*/()]*">
       <div id="calcResult" class="result"></div>
+      <div id="calcKeypad" class="calc-keypad">
+        <button onclick="calcAdd('7')">7</button>
+        <button onclick="calcAdd('8')">8</button>
+        <button onclick="calcAdd('9')">9</button>
+        <button onclick="calcAdd('/')">/</button>
+        <button onclick="calcAdd('4')">4</button>
+        <button onclick="calcAdd('5')">5</button>
+        <button onclick="calcAdd('6')">6</button>
+        <button onclick="calcAdd('*')">*</button>
+        <button onclick="calcAdd('1')">1</button>
+        <button onclick="calcAdd('2')">2</button>
+        <button onclick="calcAdd('3')">3</button>
+        <button onclick="calcAdd('-')">-</button>
+        <button onclick="calcAdd('0')">0</button>
+        <button onclick="calcAdd('.')">.</button>
+        <button onclick="calcAdd('(')">(</button>
+        <button onclick="calcAdd(')')">)</button>
+        <button onclick="calcClear()">C</button>
+        <button onclick="calcBackspace()">←</button>
+        <button onclick="calcAdd('+')">+</button>
+        <button onclick="calcEqual()">=</button>
+      </div>
       <button class="btn" onclick="closeCalc()">閉じる</button>
     </div>
   </div>
