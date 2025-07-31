@@ -1032,6 +1032,10 @@ function getQuantityHtml() {
 
     let as_lt1_4 = 0, as_ge1_4 = 0, as_ge3_0 = 0,
         ovl_lt1_4 = 0, ovl_ge1_4 = 0, ovl_ge3_0 = 0, con_total = 0;
+    const paveFormulaMap = {
+      as_lt1_4: [], as_ge1_4: [], as_ge3_0: [],
+      ovl_lt1_4: [], ovl_ge1_4: [], ovl_ge3_0: [], con_total: []
+    };
 
     (dat.pave || []).forEach((r, idx) => {
       const area = parseFloat(r.面積) || 0;
