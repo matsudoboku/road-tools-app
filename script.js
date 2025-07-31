@@ -82,11 +82,19 @@ function showTab(tabId) {
     }
   }
   const activeTabEl = document.getElementById('tab'+tabId);
-  if(activeTabEl) activeTabEl.classList.add('active');  worksList.forEach(w => {
-    if(w.id === tabId && w.panel) {
+  if(activeTabEl) activeTabEl.classList.add('active');
+  worksList.forEach(w => {    if(w.id === tabId && w.panel) {
       const panelEl = document.getElementById(w.panel);
       if(panelEl) panelEl.classList.remove('hidden');
-    }  });
+    }
+  });
+  const summaryEls = document.querySelectorAll('.summary-table');
+  if(tabId === 'Works' || tabId === 'Pave' || tabId === 'Zatsu') {
+    summaryEls.forEach(el => { el.style.display = ''; });
+    showSummary();
+  } else {
+    summaryEls.forEach(el => { el.innerHTML = ''; el.style.display = 'none'; });
+  }
 }
 
 // ▼ データ保存・復元
