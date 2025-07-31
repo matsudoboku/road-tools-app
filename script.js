@@ -976,12 +976,12 @@ function getQuantityHtml() {
   const tdStyleSecond = tdStyle + 'border-top:none;';
   const catStyle = `border:${border} solid #555;background:#f3f3f3;font-weight:bold;text-align:left;padding:6px 5px;`;
 
-    const getAreaFormula = (list, idx) => {
+  const getAreaFormula = (list, idx) => {
     const r = list[idx] || {};
     const d = parseFloat(r.単距) || 0;
     const w = parseFloat(r.幅員) || 0;
     if(idx === 0) {
-      return `${d}×${w}`;
+      return d ? `${d}×${w}` : '';
     }
     const prevW = parseFloat(list[idx - 1].幅員) || 0;
     return `${d}×(${prevW}+${w})/2`;
@@ -1050,8 +1050,10 @@ function getQuantityHtml() {
       const demoType = set.type;
       const thick = parseFloat(set.thick) || 0;
       const demoList = set.same ? (dat.pave || []) : (dat.demo || []);
-      const areaDemoFormula = demoList.map((_,i)=>getAreaFormula(demoList, i)).join(' + ');
-      const areaDemo = demoList.reduce((a,r)=>a+(parseFloat(r.面積)||0),0)     
+      const areaDemoFormula = demoList
+        .map((_, i) => getAreaFormula(demoList, i))
+        .filter(f => f)
+        .join(' + ');      const areaDemo = demoList.reduce((a,r)=>a+(parseFloat(r.面積)||0),0)     
       const cutting = parseFloat(set.cutting)||0;
 
       let break_as=0, break_con=0;
@@ -1088,16 +1090,30 @@ function getQuantityHtml() {
       const area = parseFloat(r.面積) || 0;
       const f = getAreaFormula(dat.pave, idx);
       if (r.種別 === 'アスファルト') {
-        if (r.平均幅員 === '1.4未満') { as_lt1_4 += area; paveFormulaMap.as_lt1_4.push(f); }
-        else if (r.平均幅員 === '1.4以上') { as_ge1_4 += area; paveFormulaMap.as_ge1_4.push(f); }
-        else if (r.平均幅員 === '3.0以上') { as_ge3_0 += area; paveFormulaMap.as_ge3_0.push(f); }
+        if (r.平均幅員 === '1.4未満') {
+          as_lt1_4 += area;
+          if (f) paveFormulaMap.as_lt1_4.push(f);
+        } else if (r.平均幅員 === '1.4以上') {
+          as_ge1_4 += area;
+          if (f) paveFormulaMap.as_ge1_4.push(f);
+        } else if (r.平均幅員 === '3.0以上') {
+          as_ge3_0 += area;
+          if (f) paveFormulaMap.as_ge3_0.push(f);
+        }
       } else if (r.種別 === 'オーバーレイ') {
-        if (r.平均幅員 === '1.4未満') { ovl_lt1_4 += area; paveFormulaMap.ovl_lt1_4.push(f); }
-        else if (r.平均幅員 === '1.4以上') { ovl_ge1_4 += area; paveFormulaMap.ovl_ge1_4.push(f); }
-        else if (r.平均幅員 === '3.0以上') { ovl_ge3_0 += area; paveFormulaMap.ovl_ge3_0.push(f); }
+        if (r.平均幅員 === '1.4未満') {
+          ovl_lt1_4 += area;
+          if (f) paveFormulaMap.ovl_lt1_4.push(f);
+        } else if (r.平均幅員 === '1.4以上') {
+          ovl_ge1_4 += area;
+          if (f) paveFormulaMap.ovl_ge1_4.push(f);
+        } else if (r.平均幅員 === '3.0以上') {
+          ovl_ge3_0 += area;
+          if (f) paveFormulaMap.ovl_ge3_0.push(f);
+        }
       } else if (r.種別 === 'コンクリート') {
         con_total += area;
-        paveFormulaMap.con_total.push(f);
+        if (f) paveFormulaMap.con_total.push(f);
       }
     });
 
