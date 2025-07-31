@@ -82,20 +82,6 @@ function loadData() {
           if(!s.works) s.works = { earth: false, demo: false, anzen: false, kari: false, zatsu: false };
           if(!s.zatsu) s.zatsu = [];
           if(!s.price) s.price = { earth: 0, demo: 0, pave: 0, anzen: 0, kari: 0, zatsu: 0 };
-          const p = s.price;
-          const defaults = {
-            machine_excavation: 0, residual_soil: 0,
-            cutting: 0, break_as: 0, haizan_unpan_as: 0, haizan_shori_as: 0,
-            break_con: 0, haizan_unpan_con: 0, haizan_shori_con: 0,
-            as_lt1_4: 0, as_ge1_4: 0, as_ge3_0: 0,
-            base_course: 0,
-            ovl_lt1_4: 0, ovl_ge1_4: 0, ovl_ge3_0: 0,
-            con_total: 0,
-            curb_std: 0, curb_small: 0, curb_hand: 0,
-            line_outer: 0, line_stop: 0, line_symbol: 0,
-            traffic_b: 0, temp_signal: 0, machine_transport: 0
-          };
-          Object.entries(defaults).forEach(([k,v])=>{ if(p[k]===undefined) p[k]=v; });
           if(Array.isArray(s.zatsu)) {
             s.zatsu.forEach(z => { if(z.spec === undefined) z.spec = ''; });
           }
@@ -159,20 +145,6 @@ function importData(e) {
             s.zatsu.forEach(z => { if(z.spec === undefined) z.spec = ''; });
           }
           if(!s.price) s.price = { earth: 0, demo: 0, pave: 0, anzen: 0, kari: 0, zatsu: 0 };
-          const p = s.price;
-          const defaults = {
-            machine_excavation: 0, residual_soil: 0,
-            cutting: 0, break_as: 0, haizan_unpan_as: 0, haizan_shori_as: 0,
-            break_con: 0, haizan_unpan_con: 0, haizan_shori_con: 0,
-            as_lt1_4: 0, as_ge1_4: 0, as_ge3_0: 0,
-            base_course: 0,
-            ovl_lt1_4: 0, ovl_ge1_4: 0, ovl_ge3_0: 0,
-            con_total: 0,
-            curb_std: 0, curb_small: 0, curb_hand: 0,
-            line_outer: 0, line_stop: 0, line_symbol: 0,
-            traffic_b: 0, temp_signal: 0, machine_transport: 0
-          };
-          Object.entries(defaults).forEach(([k,v])=>{ if(p[k]===undefined) p[k]=v; });
         });
         allSites = dat;
         const siteList = Object.keys(allSites);
@@ -221,19 +193,8 @@ function addSite() {
     anzen: { line_outer: 0, line_stop: 0, line_symbol: 0 },
     kari: { traffic_b: 0, temp_signal: 0, machine_transport: 0 },
     zatsu: [],
-    price: {
-      earth: 0, demo: 0, pave: 0, anzen: 0, kari: 0, zatsu: 0,
-      machine_excavation: 0, residual_soil: 0,
-      cutting: 0, break_as: 0, haizan_unpan_as: 0, haizan_shori_as: 0,
-      break_con: 0, haizan_unpan_con: 0, haizan_shori_con: 0,
-      as_lt1_4: 0, as_ge1_4: 0, as_ge3_0: 0,
-      base_course: 0,
-      ovl_lt1_4: 0, ovl_ge1_4: 0, ovl_ge3_0: 0,
-      con_total: 0,
-      curb_std: 0, curb_small: 0, curb_hand: 0,
-      line_outer: 0, line_stop: 0, line_symbol: 0,
-      traffic_b: 0, temp_signal: 0, machine_transport: 0
-    },    curb: { use: false, std: 0, small: 0, hand: 0 },
+    price: { earth: 0, demo: 0, pave: 0, anzen: 0, kari: 0, zatsu: 0 },
+    curb: { use: false, std: 0, small: 0, hand: 0 },
     works: { earth: false, demo: false, anzen: false, kari: false, zatsu: false },
     earthSetting: { same: true, type: '標準掘削', thick: 0 },
     demoSetting: { same: true, type: 'As', thick: 0, cutting: 0 }
@@ -333,19 +294,8 @@ function editKari(key, val, update = false) {
 function editPrice(key, val, update = false) {
   if(!currentSite) return;
   if(!allSites[currentSite].price) {
-    allSites[currentSite].price = {
-      earth: 0, demo: 0, pave: 0, anzen: 0, kari: 0, zatsu: 0,
-      machine_excavation: 0, residual_soil: 0,
-      cutting: 0, break_as: 0, haizan_unpan_as: 0, haizan_shori_as: 0,
-      break_con: 0, haizan_unpan_con: 0, haizan_shori_con: 0,
-      as_lt1_4: 0, as_ge1_4: 0, as_ge3_0: 0,
-      base_course: 0,
-      ovl_lt1_4: 0, ovl_ge1_4: 0, ovl_ge3_0: 0,
-      con_total: 0,
-      curb_std: 0, curb_small: 0, curb_hand: 0,
-      line_outer: 0, line_stop: 0, line_symbol: 0,
-      traffic_b: 0, temp_signal: 0, machine_transport: 0
-    };  }
+    allSites[currentSite].price = { earth: 0, demo: 0, pave: 0, anzen: 0, kari: 0, zatsu: 0 };
+  }
   allSites[currentSite].price[key] = parseFloat(val) || 0;
   if(update) renderAllAndSave();
 }
@@ -597,32 +547,6 @@ function renderPriceInputs() {
   document.getElementById('priceAnzen').value = dat.anzen || 0;
   document.getElementById('priceKari').value = dat.kari || 0;
   document.getElementById('priceZatsu').value = dat.zatsu || 0;
-  document.getElementById('priceMachineExcavation').value = dat.machine_excavation || 0;
-  document.getElementById('priceResidualSoil').value = dat.residual_soil || 0;
-  document.getElementById('priceCutting').value = dat.cutting || 0;
-  document.getElementById('priceBreakAs').value = dat.break_as || 0;
-  document.getElementById('priceHaizanUnpanAs').value = dat.haizan_unpan_as || 0;
-  document.getElementById('priceHaizanShoriAs').value = dat.haizan_shori_as || 0;
-  document.getElementById('priceBreakCon').value = dat.break_con || 0;
-  document.getElementById('priceHaizanUnpanCon').value = dat.haizan_unpan_con || 0;
-  document.getElementById('priceHaizanShoriCon').value = dat.haizan_shori_con || 0;
-  document.getElementById('priceAsLt14').value = dat.as_lt1_4 || 0;
-  document.getElementById('priceAsGe14').value = dat.as_ge1_4 || 0;
-  document.getElementById('priceAsGe30').value = dat.as_ge3_0 || 0;
-  document.getElementById('priceBaseCourse').value = dat.base_course || 0;
-  document.getElementById('priceOvlLt14').value = dat.ovl_lt1_4 || 0;
-  document.getElementById('priceOvlGe14').value = dat.ovl_ge1_4 || 0;
-  document.getElementById('priceOvlGe30').value = dat.ovl_ge3_0 || 0;
-  document.getElementById('priceConTotal').value = dat.con_total || 0;
-  document.getElementById('priceCurbStd').value = dat.curb_std || 0;
-  document.getElementById('priceCurbSmall').value = dat.curb_small || 0;
-  document.getElementById('priceCurbHand').value = dat.curb_hand || 0;
-  document.getElementById('priceLineOuter').value = dat.line_outer || 0;
-  document.getElementById('priceLineStop').value = dat.line_stop || 0;
-  document.getElementById('priceLineSymbol').value = dat.line_symbol || 0;
-  document.getElementById('priceTrafficB').value = dat.traffic_b || 0;
-  document.getElementById('priceTempSignal').value = dat.temp_signal || 0;
-  document.getElementById('priceMachineTransport').value = dat.machine_transport || 0;
 }
 function renderCurbInputs() {
   if(!currentSite) return;
@@ -895,10 +819,9 @@ function getSummaryHtml(forExcel = false) {
     <th style="${thStyle2}">文字記号</th>
   </tr>`;
 
-  let totalRow = {}, totalCostRow = {};
-  dataCols.forEach(k => { totalRow[k] = 0; totalCostRow[k] = 0; });
+  let totalRow = {};
+  dataCols.forEach(k => totalRow[k] = 0);
   totalRow.site = "総合計";
-  totalCostRow.site = 0;
 
   Object.keys(allSites).forEach(site => {
     let row = {};
@@ -1003,40 +926,21 @@ function getSummaryHtml(forExcel = false) {
       });
     }
 
-    const sitePrice = allSites[site].price || {};
-    let costRow = { site: 0 };
     dataCols.forEach(k => {
-      if (k !== "site") {
-        totalRow[k] += parseFloat(row[k]) || 0;
-        const sub = (parseFloat(row[k]) || 0) * (sitePrice[k] || 0);
-        costRow[k] = sub > 0 ? sub.toFixed(0) : "";
-        totalCostRow[k] += sub;
-        costRow.site += sub;
-      }    
+      if (k !== "site") totalRow[k] += parseFloat(row[k]) || 0;
     });
-    const siteTotalStr = costRow.site > 0 ? costRow.site.toFixed(0) : "";
-    costRow.site = siteTotalStr;
-    totalCostRow.site += parseFloat(siteTotalStr) || 0;
-    
+
     if (forExcel) {
       html += `<tr>${dataCols.map(k => `<td style="${tdStyleFirst}"></td>`).join("")}</tr>`;
       html += `<tr>${dataCols.map(k => `<td style="${tdStyleSecond}">${row[k] || ""}</td>`).join("")}</tr>`;
-      html += `<tr>${dataCols.map(k => `<td style="${tdStyleFirst}"></td>`).join("")}</tr>`;
-      html += `<tr>${dataCols.map(k => `<td style="${tdStyleSecond}">${costRow[k] || ""}</td>`).join("")}</tr>`
     } else {
       html += `<tr>${dataCols.map(k => `<td style="${tdStyle}">${row[k] || ""}</td>`).join("")}</tr>`;
-      html += `<tr>${dataCols.map(k => `<td style="${tdStyle}">${costRow[k] || ""}</td>`).join("")}</tr>`;
     }
   });
 
   html += `<tr style="background:#f3f9ff;font-weight:bold;">${
     dataCols.map(k =>
       `<td style="${tdStyle}">${k==="site" ? "総合計" : (totalRow[k] ? totalRow[k].toFixed(2) : "")}</td>`
-    ).join("")
-  }</tr>`;
-  html += `<tr style="background:#e8f7e0;font-weight:bold;">${
-    dataCols.map(k =>
-      `<td style="${tdStyle}">${k==="site" ? "総合計金額" : (totalCostRow[k] ? totalCostRow[k].toFixed(0) : "")}</td>`
     ).join("")
   }</tr>`;
   html += '</table></div>';
@@ -1430,28 +1334,6 @@ function handlePointerDown(e) {
     nextFocus = {type: t.dataset.type, idx: t.dataset.idx, key: t.dataset.key};
   } else {
     nextFocus = null;
-  }
-}
-
-function openCalc() {
-  document.getElementById('calcOverlay').classList.remove('hidden');
-  document.getElementById('calcInput').focus();
-  document.getElementById('calcResult').textContent = '';
-}
-
-function closeCalc() {
-  document.getElementById('calcOverlay').classList.add('hidden');
-}
-
-function calcKey(e) {
-  if(e.key === 'Enter') {
-    try {
-      const v = document.getElementById('calcInput').value;
-      const r = eval(v);
-      document.getElementById('calcResult').textContent = r;
-    } catch(err) {
-      document.getElementById('calcResult').textContent = 'Error';
-    }
   }
 }
 
