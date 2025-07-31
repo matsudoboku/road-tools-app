@@ -1337,6 +1337,28 @@ function handlePointerDown(e) {
   }
 }
 
+function openCalc() {
+  document.getElementById('calcOverlay').classList.remove('hidden');
+  document.getElementById('calcInput').focus();
+  document.getElementById('calcResult').textContent = '';
+}
+
+function closeCalc() {
+  document.getElementById('calcOverlay').classList.add('hidden');
+}
+
+function calcKey(e) {
+  if(e.key === 'Enter') {
+    try {
+      const v = document.getElementById('calcInput').value;
+      const r = eval(v);
+      document.getElementById('calcResult').textContent = r;
+    } catch(err) {
+      document.getElementById('calcResult').textContent = 'Error';
+    }
+  }
+}
+
 document.addEventListener('pointerdown', handlePointerDown, true);
 
 window.addEventListener('DOMContentLoaded', () => {
