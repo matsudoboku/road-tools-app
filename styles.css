@@ -204,8 +204,14 @@ body {
       flex-direction: column;
       align-items: flex-start;
       margin-bottom: 6px;
-    }    .scroll-x-guide {
-      text-align: right;
+    }
+    #panelPrice > div {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .scroll-x-guide {      text-align: right;
       color: #aaa;
       font-size: 0.94em;
       padding: 0 4px 0 0;
