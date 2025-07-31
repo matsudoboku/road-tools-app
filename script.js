@@ -12,6 +12,7 @@ const worksList = [
   { id: "Anzen", label: "安全施設工", chk: "chkWorksAnzen", setting: "worksAnzenSetting", panel: null },
   { id: "Kari", label: "仮設工", chk: "chkWorksKari", setting: "worksKariSetting", panel: null },
   { id: "Zatsu", label: "雑工", chk: "chkWorksZatsu", panel: "panelZatsu" },
+  { id: "Price", label: "単価設定", always: true, panel: "panelPrice" },
   { id: "Data", label: "データ管理・出力", always: true, panel: "panelData" },
   { id: "Disclaimer", label: "免責事項", always: true, panel: "panelDisclaimer"}
 ];
@@ -78,6 +79,7 @@ function loadData() {
           if(!s.curb) s.curb = { use: false, std: 0, small: 0, hand: 0 };
           if(!s.works) s.works = { earth: false, demo: false, anzen: false, kari: false, zatsu: false };
           if(!s.zatsu) s.zatsu = [];
+          if(!s.price) s.price = { earth: 0, demo: 0, pave: 0, anzen: 0, kari: 0, zatsu: 0 };
           if(Array.isArray(s.zatsu)) {
             s.zatsu.forEach(z => { if(z.spec === undefined) z.spec = ''; });
           }
@@ -118,6 +120,7 @@ function importData(e) {
           if(Array.isArray(s.zatsu)) {
             s.zatsu.forEach(z => { if(z.spec === undefined) z.spec = ''; });
           }
+          if(!s.price) s.price = { earth: 0, demo: 0, pave: 0, anzen: 0, kari: 0, zatsu: 0 };
         });
         allSites = dat;
         const siteList = Object.keys(allSites);
@@ -166,6 +169,7 @@ function addSite() {
     anzen: { line_outer: 0, line_stop: 0, line_symbol: 0 },
     kari: { traffic_b: 0, temp_signal: 0, machine_transport: 0 },
     zatsu: [],
+    price: { earth: 0, demo: 0, pave: 0, anzen: 0, kari: 0, zatsu: 0 },
     curb: { use: false, std: 0, small: 0, hand: 0 },
     works: { earth: false, demo: false, anzen: false, kari: false, zatsu: false },
     earthSetting: { same: true, type: '標準掘削', thick: 0 },
@@ -261,6 +265,14 @@ function editKari(key, val, update = false) {
     allSites[currentSite].kari = { traffic_b: 0, temp_signal: 0, machine_transport: 0 };
   }
   allSites[currentSite].kari[key] = parseFloat(val) || 0;
+  if(update) renderAllAndSave();
+}
+function editPrice(key, val, update = false) {
+  if(!currentSite) return;
+  if(!allSites[currentSite].price) {
+    allSites[currentSite].price = { earth: 0, demo: 0, pave: 0, anzen: 0, kari: 0, zatsu: 0 };
+  }
+  allSites[currentSite].price[key] = parseFloat(val) || 0;
   if(update) renderAllAndSave();
 }
 function toggleCurbInputs() {
@@ -502,6 +514,16 @@ function renderKariInputs() {
   document.getElementById('kariTempSignal').value = dat.temp_signal || 0;
   document.getElementById('kariMachineTrans').value = dat.machine_transport || 0;
 }
+function renderPriceInputs() {
+  if(!currentSite) return;
+  const dat = allSites[currentSite].price || {};
+  document.getElementById('priceEarth').value = dat.earth || 0;
+  document.getElementById('priceDemo').value = dat.demo || 0;
+  document.getElementById('pricePave').value = dat.pave || 0;
+  document.getElementById('priceAnzen').value = dat.anzen || 0;
+  document.getElementById('priceKari').value = dat.kari || 0;
+  document.getElementById('priceZatsu').value = dat.zatsu || 0;
+}
 function renderCurbInputs() {
   if(!currentSite) return;
   const dat = allSites[currentSite].curb || { use: false, std: 0, small: 0, hand: 0 };
@@ -591,6 +613,7 @@ function renderAll() {
   renderCurbInputs();
   renderAnzenInputs();
   renderKariInputs();
+  renderPriceInputs();
   showSummary();
 }
 
