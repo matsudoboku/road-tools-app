@@ -5,27 +5,6 @@ let allSites = {};
 let currentSite = '';
 let nextFocus = null;
 let prices = {};
-
-function ensureCurrentSite() {
-  if (!currentSite) {
-    alert('先に現場を追加してください');
-    return false;
-  }
-  return true;
-}
-
-function updateRowAddButtons() {
-  const disabled = !currentSite;
-  document.querySelectorAll('.row-add').forEach(btn => {
-    btn.disabled = disabled;
-  });
-}
-
-
-function escapeHtml(str) {
-  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
-  return String(str ?? '').replace(/[&<>"']/g, s => map[s]);
-}
 const paveTypes = ["アスファルト", "コンクリート", "オーバーレイ"];
 const worksList = [
   { id: "Works", label: "工種設定", always: true, panel: "panelWorks" },
@@ -82,19 +61,11 @@ function showTab(tabId) {
     }
   }
   const activeTabEl = document.getElementById('tab'+tabId);
-  if(activeTabEl) activeTabEl.classList.add('active');
-  worksList.forEach(w => {    if(w.id === tabId && w.panel) {
+  if(activeTabEl) activeTabEl.classList.add('active');  worksList.forEach(w => {
+    if(w.id === tabId && w.panel) {
       const panelEl = document.getElementById(w.panel);
       if(panelEl) panelEl.classList.remove('hidden');
-    }
-  });
-  const summaryEls = document.querySelectorAll('.summary-table');
-  if(tabId === 'Works' || tabId === 'Pave' || tabId === 'Zatsu') {
-    summaryEls.forEach(el => { el.style.display = ''; });
-    showSummary();
-  } else {
-    summaryEls.forEach(el => { el.innerHTML = ''; el.style.display = 'none'; });
-  }
+    }  });
 }
 
 // ▼ データ保存・復元
@@ -110,7 +81,7 @@ function loadData() {
           if(!s.curb) s.curb = { use: false, std: 0, small: 0, hand: 0 };
           if(!s.works) s.works = { earth: false, demo: false, anzen: false, kari: false, zatsu: false };
           if(!s.zatsu) s.zatsu = [];
-          if(!s.price) s.price = { zatsu: 0 };
+          if(!s.price) s.price = { earth: 0, demo: 0, pave: 0, anzen: 0, kari: 0, zatsu: 0 };
           const p = s.price;
           const defaults = {
             machine_excavation: 0, residual_soil: 0,
@@ -141,7 +112,6 @@ function loadData() {
         document.getElementById('siteList').innerHTML = opt;
         document.getElementById('siteList').value = currentSite;
       }
-      updateRowAddButtons();
     }
   } catch(e){}
 }
@@ -188,7 +158,7 @@ function importData(e) {
           if(Array.isArray(s.zatsu)) {
             s.zatsu.forEach(z => { if(z.spec === undefined) z.spec = ''; });
           }
-          if(!s.price) s.price = { zatsu: 0 };
+          if(!s.price) s.price = { earth: 0, demo: 0, pave: 0, anzen: 0, kari: 0, zatsu: 0 };
           const p = s.price;
           const defaults = {
             machine_excavation: 0, residual_soil: 0,
@@ -209,11 +179,10 @@ function importData(e) {
         if (siteList.length) {
           currentSite = siteList[0];
           let opt = '';
-          for (const s of siteList) opt += `<option>${escapeHtml(s)}</option>`;
+          for (const s of siteList) opt += `<option>${s}</option>`;
           document.getElementById('siteList').innerHTML = opt;
           document.getElementById('siteList').value = currentSite;
         }
-        updateRowAddButtons();
         renderAllAndSave();
       } else {
         alert('読み込み失敗');
@@ -253,7 +222,7 @@ function addSite() {
     kari: { traffic_b: 0, temp_signal: 0, machine_transport: 0 },
     zatsu: [],
     price: {
-      zatsu: 0,
+      earth: 0, demo: 0, pave: 0, anzen: 0, kari: 0, zatsu: 0,
       machine_excavation: 0, residual_soil: 0,
       cutting: 0, break_as: 0, haizan_unpan_as: 0, haizan_shori_as: 0,
       break_con: 0, haizan_unpan_con: 0, haizan_shori_con: 0,
@@ -269,10 +238,9 @@ function addSite() {
     earthSetting: { same: true, type: '標準掘削', thick: 0 },
     demoSetting: { same: true, type: 'As', thick: 0, cutting: 0 }
   };
-  document.getElementById('siteList').innerHTML += `<option>${escapeHtml(name)}</option>`;
+  document.getElementById('siteList').innerHTML += `<option>${name}</option>`;
   document.getElementById('siteList').value = name;
   currentSite = name;
-  updateRowAddButtons();
   renderEarthSetting();
   renderDemoSetting();
   renderWorksChk();
@@ -287,10 +255,9 @@ function renameSite() {
   delete allSites[currentSite];
   currentSite = newName;
   let opt = '';
-  for (const s of Object.keys(allSites)) opt += `<option>${escapeHtml(s)}</option>`;
+  for (const s of Object.keys(allSites)) opt += `<option>${s}</option>`;
   document.getElementById('siteList').innerHTML = opt;
   document.getElementById('siteList').value = currentSite;
-  updateRowAddButtons();
   renderEarthSetting();
   renderDemoSetting();
   renderWorksChk();
@@ -300,7 +267,6 @@ function renameSite() {
 function switchSite() {
   saveAndUpdate();
   currentSite = document.getElementById('siteList').value;
-  updateRowAddButtons();
   renderEarthSetting();
   renderDemoSetting();
   renderWorksChk();
@@ -326,7 +292,7 @@ function getDemoSetting() {
 
 // ▼ 舗装工タブ
 function addRow(type) {
-  if (!ensureCurrentSite()) return;
+  if (!currentSite) return;
   if(type === 'pave') {
     allSites[currentSite].pave.push({
       種別:"アスファルト", 測点:'', 単距:'', 追距:'', 幅員:'', 平均幅員:'', 面積:''
@@ -339,7 +305,6 @@ function addRow(type) {
   renderAllAndSave();
 }
 function editRow(type, idx, key, val, update = false) {
-  if (!ensureCurrentSite()) return;
   if (type === "pave" && key === "種別") {
     for (let i = idx; i < allSites[currentSite][type].length; i++) {
       allSites[currentSite][type][i][key] = val;
@@ -350,7 +315,7 @@ function editRow(type, idx, key, val, update = false) {
   // 入力中は再描画しない！
   if (update) renderAllAndSave();
 }
-function editAnzen(key, val, update = false) {  if (!ensureCurrentSite()) return;
+function editAnzen(key, val, update = false) {  if (!currentSite) return;
   if (!allSites[currentSite].anzen) {
     allSites[currentSite].anzen = { line_outer: 0, line_stop: 0, line_symbol: 0 };
   }
@@ -358,7 +323,7 @@ function editAnzen(key, val, update = false) {  if (!ensureCurrentSite()) return
   if(update) renderAllAndSave();
 }
 function editKari(key, val, update = false) {
-  if (!ensureCurrentSite()) return;
+  if (!currentSite) return;
   if (!allSites[currentSite].kari) {
     allSites[currentSite].kari = { traffic_b: 0, temp_signal: 0, machine_transport: 0 };
   }
@@ -369,7 +334,7 @@ function editPrice(key, val, update = false) {
   if(!currentSite) return;
   if(!allSites[currentSite].price) {
     allSites[currentSite].price = {
-      zatsu: 0,
+      earth: 0, demo: 0, pave: 0, anzen: 0, kari: 0, zatsu: 0,
       machine_excavation: 0, residual_soil: 0,
       cutting: 0, break_as: 0, haizan_unpan_as: 0, haizan_shori_as: 0,
       break_con: 0, haizan_unpan_con: 0, haizan_shori_con: 0,
@@ -385,7 +350,7 @@ function editPrice(key, val, update = false) {
   if(update) renderAllAndSave();
 }
 function toggleCurbInputs() {
-  if(!ensureCurrentSite()) return;
+  if(!currentSite) return;
   const use = document.getElementById('chkCurbUse').checked;
   const area = document.getElementById('curbInputs');
   if(use) area.classList.remove('hidden');
@@ -397,7 +362,7 @@ function toggleCurbInputs() {
   renderAllAndSave();
 }
 function editCurb(key, val, update = false) {
-  if(!ensureCurrentSite()) return;
+  if(!currentSite) return;
   if(!allSites[currentSite].curb) {
     allSites[currentSite].curb = { use: false, std: 0, small: 0, hand: 0 };
   }
@@ -447,10 +412,10 @@ function renderTablePave() {
           ${paveTypes.map(tp=>`<option value="${tp}"${r.種別===tp?' selected':''}>${tp}</option>`).join('')}
         </select>
       </td>
-      <td><input data-type="pave" data-idx="${idx}" data-key="測点" value="${st}" type="text" inputmode="decimal" pattern="[0-9+\-.]*" oninput="editRow('pave',${idx},'測点',this.value)" onblur="editRow('pave',${idx},'測点',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input data-type="pave" data-idx="${idx}" data-key="単距" value="${len}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('pave',${idx},'単距',this.value)" onblur="editRow('pave',${idx},'単距',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input value="${run}" class="readonly" readonly></td>
-      <td><input data-type="pave" data-idx="${idx}" data-key="幅員" value="${width}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('pave',${idx},'幅員',this.value)" onblur="editRow('pave',${idx},'幅員',this.value,true)" onkeydown="handleKey(event)"></td>      <td><input value="${avg}" class="readonly" readonly></td>      <td><input value="${area}" class="readonly" readonly></td>
+      <td><input data-type="pave" data-idx="${idx}" data-key="測点" value="${r.測点||''}" type="text" inputmode="decimal" pattern="[0-9+\-.]*" oninput="editRow('pave',${idx},'測点',this.value)" onblur="editRow('pave',${idx},'測点',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="pave" data-idx="${idx}" data-key="単距" value="${r.単距||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('pave',${idx},'単距',this.value)" onblur="editRow('pave',${idx},'単距',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input value="${r.追距||''}" class="readonly" readonly></td>
+      <td><input data-type="pave" data-idx="${idx}" data-key="幅員" value="${r.幅員||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('pave',${idx},'幅員',this.value)" onblur="editRow('pave',${idx},'幅員',this.value,true)" onkeydown="handleKey(event)"></td>      <td><input value="${r.平均幅員||''}" class="readonly" readonly></td>      <td><input value="${r.面積||''}" class="readonly" readonly></td>
     </tr>`;
   });
   document.getElementById('tbodyPave').innerHTML = tbody;
@@ -469,7 +434,7 @@ function renderTablePave() {
         <th>オーバーレイ合計</th>
       </tr>
       <tr>
-        <td>${escapeHtml(currentSite)}</td>
+        <td>${currentSite}</td>
         <td>${sum.アスファルト.toFixed(2)}</td>
         <td>${sum.コンクリート.toFixed(2)}</td>
         <td>${sum.オーバーレイ.toFixed(2)}</td>
@@ -507,17 +472,12 @@ function renderTableEarth() {
   }
   let tbody = '';
   list.forEach((r,idx)=>{
-    const st = escapeHtml(r.測点 || '');
-    const len = escapeHtml(r.単距 || '');
-    const run = escapeHtml(r.追距 || '');
-    const width = escapeHtml(r.幅員 || '');
-    const area = escapeHtml(r.面積 || '');
     tbody += `<tr>
-      <td><input data-type="earth" data-idx="${idx}" data-key="測点" value="${st}" type="text" inputmode="decimal" pattern="[0-9+\-.]*" oninput="editRow('earth',${idx},'測点',this.value)" onblur="editRow('earth',${idx},'測点',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input data-type="earth" data-idx="${idx}" data-key="単距" value="${len}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('earth',${idx},'単距',this.value)" onblur="editRow('earth',${idx},'単距',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input value="${run}" class="readonly" readonly></td>
-      <td><input data-type="earth" data-idx="${idx}" data-key="幅員" value="${width}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('earth',${idx},'幅員',this.value)" onblur="editRow('earth',${idx},'幅員',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input value="${area}" class="readonly" readonly></td>
+      <td><input data-type="earth" data-idx="${idx}" data-key="測点" value="${r.測点||''}" type="text" inputmode="decimal" pattern="[0-9+\-.]*" oninput="editRow('earth',${idx},'測点',this.value)" onblur="editRow('earth',${idx},'測点',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="earth" data-idx="${idx}" data-key="単距" value="${r.単距||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('earth',${idx},'単距',this.value)" onblur="editRow('earth',${idx},'単距',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input value="${r.追距||''}" class="readonly" readonly></td>
+      <td><input data-type="earth" data-idx="${idx}" data-key="幅員" value="${r.幅員||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('earth',${idx},'幅員',this.value)" onblur="editRow('earth',${idx},'幅員',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input value="${r.面積||''}" class="readonly" readonly></td>
     </tr>`;
   });
   document.getElementById('tbodyEarth').innerHTML = tbody;
@@ -553,17 +513,12 @@ function renderTableDemo() {
   }
   let tbody = '';
   list.forEach((r,idx)=>{
-    const st = escapeHtml(r.測点 || '');
-    const len = escapeHtml(r.単距 || '');
-    const run = escapeHtml(r.追距 || '');
-    const width = escapeHtml(r.幅員 || '');
-    const area = escapeHtml(r.面積 || '');
     tbody += `<tr>
-      <td><input data-type="demo" data-idx="${idx}" data-key="測点" value="${st}" type="text" inputmode="decimal" pattern="[0-9+\-.]*" oninput="editRow('demo',${idx},'測点',this.value)" onblur="editRow('demo',${idx},'測点',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input data-type="demo" data-idx="${idx}" data-key="単距" value="${len}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('demo',${idx},'単距',this.value)" onblur="editRow('demo',${idx},'単距',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input value="${run}" class="readonly" readonly></td>
-      <td><input data-type="demo" data-idx="${idx}" data-key="幅員" value="${width}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('demo',${idx},'幅員',this.value)" onblur="editRow('demo',${idx},'幅員',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input value="${area}" class="readonly" readonly></td>
+      <td><input data-type="demo" data-idx="${idx}" data-key="測点" value="${r.測点||''}" type="text" inputmode="decimal" pattern="[0-9+\-.]*" oninput="editRow('demo',${idx},'測点',this.value)" onblur="editRow('demo',${idx},'測点',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="demo" data-idx="${idx}" data-key="単距" value="${r.単距||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('demo',${idx},'単距',this.value)" onblur="editRow('demo',${idx},'単距',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input value="${r.追距||''}" class="readonly" readonly></td>
+      <td><input data-type="demo" data-idx="${idx}" data-key="幅員" value="${r.幅員||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('demo',${idx},'幅員',this.value)" onblur="editRow('demo',${idx},'幅員',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input value="${r.面積||''}" class="readonly" readonly></td>
     </tr>`;
   });
   document.getElementById('tbodyDemo').innerHTML = tbody;
@@ -636,6 +591,12 @@ function renderKariInputs() {
 function renderPriceInputs() {
   if(!currentSite) return;
   const dat = allSites[currentSite].price || {};
+  document.getElementById('priceEarth').value = dat.earth || 0;
+  document.getElementById('priceDemo').value = dat.demo || 0;
+  document.getElementById('pricePave').value = dat.pave || 0;
+  document.getElementById('priceAnzen').value = dat.anzen || 0;
+  document.getElementById('priceKari').value = dat.kari || 0;
+  document.getElementById('priceZatsu').value = dat.zatsu || 0;
   document.getElementById('priceMachineExcavation').value = dat.machine_excavation || 0;
   document.getElementById('priceResidualSoil').value = dat.residual_soil || 0;
   document.getElementById('priceCutting').value = dat.cutting || 0;
@@ -687,7 +648,7 @@ function updateZatsuNameList() {
       s.zatsu.forEach(z => { if(z && z.name) set.add(z.name); });
     }
   });
-  listEl.innerHTML = Array.from(set).map(n => `<option value="${escapeHtml(n)}"></option>`).join('');
+  listEl.innerHTML = Array.from(set).map(n => `<option value="${n}"></option>`).join('');
 }
 
 function renderTableZatsu() {
@@ -695,15 +656,11 @@ function renderTableZatsu() {
   const list = allSites[currentSite].zatsu || [];
   let tbody = '';
   list.forEach((r, idx) => {
-    const name = escapeHtml(r.name || '');
-    const spec = escapeHtml(r.spec || '');
-    const unit = escapeHtml(r.unit || '');
-    const qty = escapeHtml(r.qty || '');
     tbody += `<tr>
-      <td><input list="zatsuNameList" data-type="zatsu" data-idx="${idx}" data-key="name" value="${name}" type="text" oninput="editRow('zatsu',${idx},'name',this.value)" onblur="editRow('zatsu',${idx},'name',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input data-type="zatsu" data-idx="${idx}" data-key="spec" value="${spec}" type="text" oninput="editRow('zatsu',${idx},'spec',this.value)" onblur="editRow('zatsu',${idx},'spec',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input data-type="zatsu" data-idx="${idx}" data-key="unit" value="${unit}" type="text" oninput="editRow('zatsu',${idx},'unit',this.value)" onblur="editRow('zatsu',${idx},'unit',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input data-type="zatsu" data-idx="${idx}" data-key="qty" value="${qty}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('zatsu',${idx},'qty',this.value)" onblur="editRow('zatsu',${idx},'qty',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input list="zatsuNameList" data-type="zatsu" data-idx="${idx}" data-key="name" value="${r.name||''}" type="text" oninput="editRow('zatsu',${idx},'name',this.value)" onblur="editRow('zatsu',${idx},'name',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="zatsu" data-idx="${idx}" data-key="spec" value="${r.spec||''}" type="text" oninput="editRow('zatsu',${idx},'spec',this.value)" onblur="editRow('zatsu',${idx},'spec',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="zatsu" data-idx="${idx}" data-key="unit" value="${r.unit||''}" type="text" oninput="editRow('zatsu',${idx},'unit',this.value)" onblur="editRow('zatsu',${idx},'unit',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="zatsu" data-idx="${idx}" data-key="qty" value="${r.qty||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('zatsu',${idx},'qty',this.value)" onblur="editRow('zatsu',${idx},'qty',this.value,true)" onkeydown="handleKey(event)"></td>
     </tr>`;
   });
   document.getElementById('tbodyZatsu').innerHTML = tbody;
@@ -714,7 +671,7 @@ function renderTableZatsu() {
   });
   const html = Object.entries(totals)
     .filter(([n, t]) => t && n)
-    .map(([n, t]) => `${escapeHtml(n)}: ${t.toFixed(2)}`)
+    .map(([n, t]) => `${n}: ${t.toFixed(2)}`)
     .join('　');
   document.getElementById('zatsuResult').innerHTML = html ? `<div>${html}</div>` : '';
   updateZatsuNameList();
@@ -859,12 +816,27 @@ function exportDXF() {
 // ▼ 全集計（従来形式）
 function getSummaryHtml(forExcel = false) {
   const border = forExcel ? "1px" : "2px";
-  const tableStyle = `min-width:400px;border-collapse:collapse;border:${border} solid #555;background:#fff;width:auto;`;
-  const thStyle = `border:${border} solid #555;background:#e6eef5;color:#007acc;font-weight:bold;text-align:center;padding:8px 5px;`;
+  const tableStyle = `min-width:1200px;border-collapse:collapse;border:${border} solid #555;background:#fff;width:auto;`;
+  const thStyle1 = `border:${border} solid #555;background:#e6eef5;color:#007acc;font-weight:bold;text-align:center;padding:8px 5px;`;
+  const thStyle2 = `border:${border} solid #555;background:#f7fbff;color:#007acc;font-weight:bold;text-align:center;padding:5px 5px;`;
   const tdStyle = `border:${border} solid #555;text-align:center;padding:6px 5px;`;
+  const tdStyleFirst = tdStyle + "border-bottom:none;";
+  const tdStyleSecond = tdStyle + "border-top:none;";
 
+  const zatsuEnabled = Object.values(allSites).some(s => s.works && s.works.zatsu);
+  let zatsuNames = [];
+  if(zatsuEnabled) {
+    const set = new Set();
+    Object.values(allSites).forEach(s => {
+      if(s.works && s.works.zatsu && Array.isArray(s.zatsu)) {
+        s.zatsu.forEach(z => { if(z && z.name) set.add(z.name); });
+      }
+    });
+    zatsuNames = Array.from(set);
+  }
 
   const dataCols = [
+    "site",
     "machine_excavation", "residual_soil",
     "cutting", "break_as", "haizan_unpan_as", "haizan_shori_as",
     "break_con", "haizan_unpan_con", "haizan_shori_con",
@@ -876,13 +848,62 @@ function getSummaryHtml(forExcel = false) {
     "line_outer", "line_stop", "line_symbol",
     "traffic_b", "temp_signal", "machine_transport"
   ];
+  dataCols.push(...zatsuNames);  let html = `<div style="overflow-x:auto;"><table class="ss-table" style="${tableStyle}">`;
+  html += `
+<tr>
+    <th rowspan="3" style="${thStyle1}">箇所名</th>
+    <th colspan="2" style="${thStyle1}">土工</th>
+    <th colspan="6" style="${thStyle1}">取壊工</th>
+    <th colspan="12" style="${thStyle1}">舗装工</th>
+    <th colspan="3" style="${thStyle1}">安全施設工</th>
+    <th colspan="3" style="${thStyle1}">仮設工</th>
+    ${zatsuEnabled ? `<th colspan="${zatsuNames.length}" style="${thStyle1}">雑工</th>` : ''}
+  </tr>
+  <tr>
+    <th rowspan="2" style="${thStyle2}">機械掘削</th>
+    <th rowspan="2" style="${thStyle2}">残土処理</th>
+    <th rowspan="2" style="${thStyle2}">舗装版切断</th>
+    <th rowspan="2" style="${thStyle2}">舗装版破砕As</th>
+    <th rowspan="2" style="${thStyle2}">廃材運搬As</th>
+    <th rowspan="2" style="${thStyle2}">廃材処理As</th>
+    <th rowspan="2" style="${thStyle2}">舗装版破砕Con</th>
+    <th rowspan="2" style="${thStyle2}">廃材運搬Con</th>
+    <th rowspan="2" style="${thStyle2}">廃材処理Con</th>
+    <th colspan="3" style="${thStyle2}">アスファルト</th>
+    <th rowspan="2" style="${thStyle2}">上層路盤工</th>
+    <th colspan="3" style="${thStyle2}">オーバーレイ</th>
+    <th rowspan="2" style="${thStyle2}">コンクリート</th>
+    <th colspan="3" style="${thStyle2}">アスカーブ</th>
+    <th colspan="3" style="${thStyle2}">区画線設置</th>
+    <th rowspan="2" style="${thStyle2}">交通誘導員B</th>
+    <th rowspan="2" style="${thStyle2}">仮設信号機</th>
+    <th rowspan="2" style="${thStyle2}">重機運搬費</th>
+    ${zatsuNames.map(n=>`<th rowspan="2" style="${thStyle2}">${n}</th>`).join('')}
+  </tr>
+  <tr>
+    <th style="${thStyle2}">t=4cm<br>1.4未満</th>
+    <th style="${thStyle2}">t=4cm<br>1.4以上</th>
+    <th style="${thStyle2}">t=4cm<br>3.0以上</th>
+    <th style="${thStyle2}">t=4cm<br>1.4未満</th>
+    <th style="${thStyle2}">t=4cm<br>1.4以上</th>
+    <th style="${thStyle2}">t=4cm<br>3.0以上</th>
+    <th style="${thStyle2}">標準</th>
+    <th style="${thStyle2}">小型</th>
+    <th style="${thStyle2}">手盛</th>
+    <th style="${thStyle2}">外側線</th>
+    <th style="${thStyle2}">停止線</th>
+    <th style="${thStyle2}">文字記号</th>
+  </tr>`;
 
-  let html = `<div style="overflow-x:auto;"><table class="ss-table" style="${tableStyle}">`;
-  html += `<tr><th style="${thStyle}">箇所名</th><th style="${thStyle}">金額</th></tr>`;
+  let totalRow = {}, totalCostRow = {};
+  dataCols.forEach(k => { totalRow[k] = 0; totalCostRow[k] = 0; });
+  totalRow.site = "総合計";
+  totalCostRow.site = 0;
 
-  let totalAll = 0;
   Object.keys(allSites).forEach(site => {
     let row = {};
+    row.site = site;
+
     let machine_excavation = 0, residual_soil = 0;
     let earthSetting = allSites[site].earthSetting || {};
     let paveSum = 0;
@@ -891,8 +912,8 @@ function getSummaryHtml(forExcel = false) {
       let thick = parseFloat(earthSetting.thick) || 0;
       machine_excavation = residual_soil = paveSum * thick / 100;
     }
-    row.machine_excavation = machine_excavation;
-    row.residual_soil = residual_soil;
+    row.machine_excavation = machine_excavation > 0 ? machine_excavation.toFixed(2) : "";
+    row.residual_soil = residual_soil > 0 ? residual_soil.toFixed(2) : "";
 
     let cutting = 0, break_as = 0, break_con = 0;
     let haizan_unpan_as = 0, haizan_shori_as = 0, haizan_unpan_con = 0, haizan_shori_con = 0;
@@ -915,16 +936,20 @@ function getSummaryHtml(forExcel = false) {
       haizan_unpan_con = break_con * demoThick / 100;
       haizan_shori_con = haizan_unpan_con * 2.35;
     }
-    row.cutting = cutting;
-    row.break_as = break_as;
-    row.haizan_unpan_as = haizan_unpan_as;
-    row.haizan_shori_as = haizan_shori_as;
-    row.break_con = break_con;
-    row.haizan_unpan_con = haizan_unpan_con;
-    row.haizan_shori_con = haizan_shori_con;
+    row.cutting = cutting > 0 ? cutting.toFixed(1) : "";
+    row.break_as = break_as > 0 ? break_as.toFixed(1) : "";
+    row.haizan_unpan_as = haizan_unpan_as > 0 ? haizan_unpan_as.toFixed(2) : "";
+    row.haizan_shori_as = haizan_shori_as > 0 ? haizan_shori_as.toFixed(2) : "";
+    row.break_con = break_con > 0 ? break_con.toFixed(1) : "";
+    row.haizan_unpan_con = haizan_unpan_con > 0 ? haizan_unpan_con.toFixed(2) : "";
+    row.haizan_shori_con = haizan_shori_con > 0 ? haizan_shori_con.toFixed(2) : "";
 
     let as_lt1_4 = 0, as_ge1_4 = 0, as_ge3_0 = 0,
         ovl_lt1_4 = 0, ovl_ge1_4 = 0, ovl_ge3_0 = 0, con_total = 0;
+    const paveFormulaMap = {
+      as_lt1_4: [], as_ge1_4: [], as_ge3_0: [],
+      ovl_lt1_4: [], ovl_ge1_4: [], ovl_ge3_0: [], con_total: []
+    };
 
     (allSites[site].pave || []).forEach(r => {
       let area = parseFloat(r.面積) || 0;
@@ -940,37 +965,80 @@ function getSummaryHtml(forExcel = false) {
         con_total += area;
       }
     });
-    row.as_lt1_4 = as_lt1_4;
-    row.as_ge1_4 = as_ge1_4;
-    row.as_ge3_0 = as_ge3_0;
-    row.base_course = 0;
-    row.ovl_lt1_4 = ovl_lt1_4;
-    row.ovl_ge1_4 = ovl_ge1_4;
-    row.ovl_ge3_0 = ovl_ge3_0;
-    row.con_total = con_total;
+    row.as_lt1_4 = as_lt1_4 > 0 ? as_lt1_4.toFixed(1) : "";
+    row.as_ge1_4 = as_ge1_4 > 0 ? as_ge1_4.toFixed(1) : "";
+    row.as_ge3_0 = as_ge3_0 > 0 ? as_ge3_0.toFixed(1) : "";
+    row.base_course = "";
+    row.ovl_lt1_4 = ovl_lt1_4 > 0 ? ovl_lt1_4.toFixed(1) : "";
+    row.ovl_ge1_4 = ovl_ge1_4 > 0 ? ovl_ge1_4.toFixed(1) : "";
+    row.ovl_ge3_0 = ovl_ge3_0 > 0 ? ovl_ge3_0.toFixed(1) : "";
+    row.con_total = con_total > 0 ? con_total.toFixed(1) : "";
     const curb = allSites[site].curb || {};
-    row.curb_std = curb.use ? curb.std || 0 : 0;
-    row.curb_small = curb.use ? curb.small || 0 : 0;
-    row.curb_hand = curb.use ? curb.hand || 0 : 0;
+    row.curb_std = (curb.use && curb.std > 0) ? curb.std : "";
+    row.curb_small = (curb.use && curb.small > 0) ? curb.small : "";
+    row.curb_hand = (curb.use && curb.hand > 0) ? curb.hand : "";
     const anzen = allSites[site].anzen || {};
-    row.line_outer = anzen.line_outer || 0;
-    row.line_stop = anzen.line_stop || 0;
-    row.line_symbol = anzen.line_symbol || 0;
+    row.line_outer = anzen.line_outer || "";
+    row.line_stop = anzen.line_stop || "";
+    row.line_symbol = anzen.line_symbol || "";
+    row.traffic_b = "";
+    row.temp_signal = "";
+    row.machine_transport = "";
     const kari = allSites[site].kari || {};
-    row.traffic_b = kari.traffic_b || 0;
-    row.temp_signal = kari.temp_signal || 0;
-    row.machine_transport = kari.machine_transport || 0;
+    row.traffic_b = kari.traffic_b || "";
+    row.temp_signal = kari.temp_signal || "";
+    row.machine_transport = kari.machine_transport || "";
+ 
+    if(zatsuEnabled) {
+      const sums = {};
+      zatsuNames.forEach(n => sums[n] = 0);
+      if(allSites[site].works && allSites[site].works.zatsu && Array.isArray(allSites[site].zatsu)) {
+        allSites[site].zatsu.forEach(z => {
+          const n = z.name;
+          if(sums[n] !== undefined) sums[n] += parseFloat(z.qty) || 0;
+        });
+      }
+      zatsuNames.forEach(n => {
+        row[n] = sums[n] > 0 ? sums[n].toFixed(2) : "";
+      });
+    }
 
     const sitePrice = allSites[site].price || {};
-    let siteTotal = 0;
+    let costRow = { site: 0 };
     dataCols.forEach(k => {
-      siteTotal += (parseFloat(row[k]) || 0) * (sitePrice[k] || 0);
+      if (k !== "site") {
+        totalRow[k] += parseFloat(row[k]) || 0;
+        const sub = (parseFloat(row[k]) || 0) * (sitePrice[k] || 0);
+        costRow[k] = sub > 0 ? sub.toFixed(0) : "";
+        totalCostRow[k] += sub;
+        costRow.site += sub;
+      }    
     });
-    totalAll += siteTotal;
-    html += `<tr><td style="${tdStyle}">${escapeHtml(site)}</td><td style="${tdStyle}">${siteTotal ? siteTotal.toFixed(0) : ''}</td></tr>`;
+    const siteTotalStr = costRow.site > 0 ? costRow.site.toFixed(0) : "";
+    costRow.site = siteTotalStr;
+    totalCostRow.site += parseFloat(siteTotalStr) || 0;
+    
+    if (forExcel) {
+      html += `<tr>${dataCols.map(k => `<td style="${tdStyleFirst}"></td>`).join("")}</tr>`;
+      html += `<tr>${dataCols.map(k => `<td style="${tdStyleSecond}">${row[k] || ""}</td>`).join("")}</tr>`;
+      html += `<tr>${dataCols.map(k => `<td style="${tdStyleFirst}"></td>`).join("")}</tr>`;
+      html += `<tr>${dataCols.map(k => `<td style="${tdStyleSecond}">${costRow[k] || ""}</td>`).join("")}</tr>`
+    } else {
+      html += `<tr>${dataCols.map(k => `<td style="${tdStyle}">${row[k] || ""}</td>`).join("")}</tr>`;
+      html += `<tr>${dataCols.map(k => `<td style="${tdStyle}">${costRow[k] || ""}</td>`).join("")}</tr>`;
+    }
   });
 
-  html += `<tr style="background:#e8f7e0;font-weight:bold;"><td style="${tdStyle}">総合計</td><td style="${tdStyle}">${totalAll.toFixed(0)}</td></tr>`;
+  html += `<tr style="background:#f3f9ff;font-weight:bold;">${
+    dataCols.map(k =>
+      `<td style="${tdStyle}">${k==="site" ? "総合計" : (totalRow[k] ? totalRow[k].toFixed(2) : "")}</td>`
+    ).join("")
+  }</tr>`;
+  html += `<tr style="background:#e8f7e0;font-weight:bold;">${
+    dataCols.map(k =>
+      `<td style="${tdStyle}">${k==="site" ? "総合計金額" : (totalCostRow[k] ? totalCostRow[k].toFixed(0) : "")}</td>`
+    ).join("")
+  }</tr>`;
   html += '</table></div>';
   return html;
 }
@@ -1367,14 +1435,8 @@ function handlePointerDown(e) {
 
 function openCalc() {
   document.getElementById('calcOverlay').classList.remove('hidden');
-  const input = document.getElementById('calcInput');
+  document.getElementById('calcInput').focus();
   document.getElementById('calcResult').textContent = '';
-  if (window.matchMedia('(pointer: coarse)').matches) {
-    input.setAttribute('readonly', '');
-  } else {
-    input.removeAttribute('readonly');
-    input.focus();
-  }
 }
 
 function closeCalc() {
@@ -1383,34 +1445,13 @@ function closeCalc() {
 
 function calcKey(e) {
   if(e.key === 'Enter') {
-    calcEqual();
-  }
-}
-
-function calcAdd(str) {
-  const input = document.getElementById('calcInput');
-  input.value += str;
-  input.focus();
-}
-
-function calcBackspace() {
-  const input = document.getElementById('calcInput');
-  input.value = input.value.slice(0, -1);
-  input.focus();
-}
-
-function calcClear() {
-  document.getElementById('calcInput').value = '';
-  document.getElementById('calcResult').textContent = '';
-}
-
-function calcEqual() {
-  try {
-    const v = document.getElementById('calcInput').value;
-    const r = eval(v);
-    document.getElementById('calcResult').textContent = r;
-  } catch(err) {
-    document.getElementById('calcResult').textContent = 'Error';
+    try {
+      const v = document.getElementById('calcInput').value;
+      const r = eval(v);
+      document.getElementById('calcResult').textContent = r;
+    } catch(err) {
+      document.getElementById('calcResult').textContent = 'Error';
+    }
   }
 }
 
@@ -1419,7 +1460,6 @@ document.addEventListener('pointerdown', handlePointerDown, true);
 window.addEventListener('DOMContentLoaded', () => {
   loadData();
   loadPrices();
-  updateRowAddButtons();
   renderAll();
   renderTabs();
   updateZatsuNameList();
