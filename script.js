@@ -5,6 +5,11 @@ let allSites = {};
 let currentSite = '';
 let nextFocus = null;
 let prices = {};
+
+function escapeHtml(str) {
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  return String(str ?? '').replace(/[&<>"']/g, s => map[s]);
+}
 const paveTypes = ["アスファルト", "コンクリート", "オーバーレイ"];
 const worksList = [
   { id: "Works", label: "工種設定", always: true, panel: "panelWorks" },
@@ -179,7 +184,7 @@ function importData(e) {
         if (siteList.length) {
           currentSite = siteList[0];
           let opt = '';
-          for (const s of siteList) opt += `<option>${s}</option>`;
+          for (const s of siteList) opt += `<option>${escapeHtml(s)}</option>`;
           document.getElementById('siteList').innerHTML = opt;
           document.getElementById('siteList').value = currentSite;
         }
@@ -238,7 +243,7 @@ function addSite() {
     earthSetting: { same: true, type: '標準掘削', thick: 0 },
     demoSetting: { same: true, type: 'As', thick: 0, cutting: 0 }
   };
-  document.getElementById('siteList').innerHTML += `<option>${name}</option>`;
+  document.getElementById('siteList').innerHTML += `<option>${escapeHtml(name)}</option>`;
   document.getElementById('siteList').value = name;
   currentSite = name;
   renderEarthSetting();
@@ -255,7 +260,7 @@ function renameSite() {
   delete allSites[currentSite];
   currentSite = newName;
   let opt = '';
-  for (const s of Object.keys(allSites)) opt += `<option>${s}</option>`;
+  for (const s of Object.keys(allSites)) opt += `<option>${escapeHtml(s)}</option>`;
   document.getElementById('siteList').innerHTML = opt;
   document.getElementById('siteList').value = currentSite;
   renderEarthSetting();
@@ -412,10 +417,10 @@ function renderTablePave() {
           ${paveTypes.map(tp=>`<option value="${tp}"${r.種別===tp?' selected':''}>${tp}</option>`).join('')}
         </select>
       </td>
-      <td><input data-type="pave" data-idx="${idx}" data-key="測点" value="${r.測点||''}" type="text" inputmode="decimal" pattern="[0-9+\-.]*" oninput="editRow('pave',${idx},'測点',this.value)" onblur="editRow('pave',${idx},'測点',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input data-type="pave" data-idx="${idx}" data-key="単距" value="${r.単距||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('pave',${idx},'単距',this.value)" onblur="editRow('pave',${idx},'単距',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input value="${r.追距||''}" class="readonly" readonly></td>
-      <td><input data-type="pave" data-idx="${idx}" data-key="幅員" value="${r.幅員||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('pave',${idx},'幅員',this.value)" onblur="editRow('pave',${idx},'幅員',this.value,true)" onkeydown="handleKey(event)"></td>      <td><input value="${r.平均幅員||''}" class="readonly" readonly></td>      <td><input value="${r.面積||''}" class="readonly" readonly></td>
+      <td><input data-type="pave" data-idx="${idx}" data-key="測点" value="${st}" type="text" inputmode="decimal" pattern="[0-9+\-.]*" oninput="editRow('pave',${idx},'測点',this.value)" onblur="editRow('pave',${idx},'測点',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="pave" data-idx="${idx}" data-key="単距" value="${len}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('pave',${idx},'単距',this.value)" onblur="editRow('pave',${idx},'単距',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input value="${run}" class="readonly" readonly></td>
+      <td><input data-type="pave" data-idx="${idx}" data-key="幅員" value="${width}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('pave',${idx},'幅員',this.value)" onblur="editRow('pave',${idx},'幅員',this.value,true)" onkeydown="handleKey(event)"></td>      <td><input value="${avg}" class="readonly" readonly></td>      <td><input value="${area}" class="readonly" readonly></td>
     </tr>`;
   });
   document.getElementById('tbodyPave').innerHTML = tbody;
@@ -434,7 +439,7 @@ function renderTablePave() {
         <th>オーバーレイ合計</th>
       </tr>
       <tr>
-        <td>${currentSite}</td>
+        <td>${escapeHtml(currentSite)}</td>
         <td>${sum.アスファルト.toFixed(2)}</td>
         <td>${sum.コンクリート.toFixed(2)}</td>
         <td>${sum.オーバーレイ.toFixed(2)}</td>
@@ -472,12 +477,17 @@ function renderTableEarth() {
   }
   let tbody = '';
   list.forEach((r,idx)=>{
+    const st = escapeHtml(r.測点 || '');
+    const len = escapeHtml(r.単距 || '');
+    const run = escapeHtml(r.追距 || '');
+    const width = escapeHtml(r.幅員 || '');
+    const area = escapeHtml(r.面積 || '');
     tbody += `<tr>
-      <td><input data-type="earth" data-idx="${idx}" data-key="測点" value="${r.測点||''}" type="text" inputmode="decimal" pattern="[0-9+\-.]*" oninput="editRow('earth',${idx},'測点',this.value)" onblur="editRow('earth',${idx},'測点',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input data-type="earth" data-idx="${idx}" data-key="単距" value="${r.単距||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('earth',${idx},'単距',this.value)" onblur="editRow('earth',${idx},'単距',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input value="${r.追距||''}" class="readonly" readonly></td>
-      <td><input data-type="earth" data-idx="${idx}" data-key="幅員" value="${r.幅員||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('earth',${idx},'幅員',this.value)" onblur="editRow('earth',${idx},'幅員',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input value="${r.面積||''}" class="readonly" readonly></td>
+      <td><input data-type="earth" data-idx="${idx}" data-key="測点" value="${st}" type="text" inputmode="decimal" pattern="[0-9+\-.]*" oninput="editRow('earth',${idx},'測点',this.value)" onblur="editRow('earth',${idx},'測点',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="earth" data-idx="${idx}" data-key="単距" value="${len}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('earth',${idx},'単距',this.value)" onblur="editRow('earth',${idx},'単距',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input value="${run}" class="readonly" readonly></td>
+      <td><input data-type="earth" data-idx="${idx}" data-key="幅員" value="${width}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('earth',${idx},'幅員',this.value)" onblur="editRow('earth',${idx},'幅員',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input value="${area}" class="readonly" readonly></td>
     </tr>`;
   });
   document.getElementById('tbodyEarth').innerHTML = tbody;
@@ -513,12 +523,17 @@ function renderTableDemo() {
   }
   let tbody = '';
   list.forEach((r,idx)=>{
+    const st = escapeHtml(r.測点 || '');
+    const len = escapeHtml(r.単距 || '');
+    const run = escapeHtml(r.追距 || '');
+    const width = escapeHtml(r.幅員 || '');
+    const area = escapeHtml(r.面積 || '');
     tbody += `<tr>
-      <td><input data-type="demo" data-idx="${idx}" data-key="測点" value="${r.測点||''}" type="text" inputmode="decimal" pattern="[0-9+\-.]*" oninput="editRow('demo',${idx},'測点',this.value)" onblur="editRow('demo',${idx},'測点',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input data-type="demo" data-idx="${idx}" data-key="単距" value="${r.単距||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('demo',${idx},'単距',this.value)" onblur="editRow('demo',${idx},'単距',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input value="${r.追距||''}" class="readonly" readonly></td>
-      <td><input data-type="demo" data-idx="${idx}" data-key="幅員" value="${r.幅員||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('demo',${idx},'幅員',this.value)" onblur="editRow('demo',${idx},'幅員',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input value="${r.面積||''}" class="readonly" readonly></td>
+      <td><input data-type="demo" data-idx="${idx}" data-key="測点" value="${st}" type="text" inputmode="decimal" pattern="[0-9+\-.]*" oninput="editRow('demo',${idx},'測点',this.value)" onblur="editRow('demo',${idx},'測点',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="demo" data-idx="${idx}" data-key="単距" value="${len}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('demo',${idx},'単距',this.value)" onblur="editRow('demo',${idx},'単距',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input value="${run}" class="readonly" readonly></td>
+      <td><input data-type="demo" data-idx="${idx}" data-key="幅員" value="${width}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('demo',${idx},'幅員',this.value)" onblur="editRow('demo',${idx},'幅員',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input value="${area}" class="readonly" readonly></td>
     </tr>`;
   });
   document.getElementById('tbodyDemo').innerHTML = tbody;
@@ -648,7 +663,7 @@ function updateZatsuNameList() {
       s.zatsu.forEach(z => { if(z && z.name) set.add(z.name); });
     }
   });
-  listEl.innerHTML = Array.from(set).map(n => `<option value="${n}"></option>`).join('');
+  listEl.innerHTML = Array.from(set).map(n => `<option value="${escapeHtml(n)}"></option>`).join('');
 }
 
 function renderTableZatsu() {
@@ -656,11 +671,15 @@ function renderTableZatsu() {
   const list = allSites[currentSite].zatsu || [];
   let tbody = '';
   list.forEach((r, idx) => {
+    const name = escapeHtml(r.name || '');
+    const spec = escapeHtml(r.spec || '');
+    const unit = escapeHtml(r.unit || '');
+    const qty = escapeHtml(r.qty || '');
     tbody += `<tr>
-      <td><input list="zatsuNameList" data-type="zatsu" data-idx="${idx}" data-key="name" value="${r.name||''}" type="text" oninput="editRow('zatsu',${idx},'name',this.value)" onblur="editRow('zatsu',${idx},'name',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input data-type="zatsu" data-idx="${idx}" data-key="spec" value="${r.spec||''}" type="text" oninput="editRow('zatsu',${idx},'spec',this.value)" onblur="editRow('zatsu',${idx},'spec',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input data-type="zatsu" data-idx="${idx}" data-key="unit" value="${r.unit||''}" type="text" oninput="editRow('zatsu',${idx},'unit',this.value)" onblur="editRow('zatsu',${idx},'unit',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input data-type="zatsu" data-idx="${idx}" data-key="qty" value="${r.qty||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('zatsu',${idx},'qty',this.value)" onblur="editRow('zatsu',${idx},'qty',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input list="zatsuNameList" data-type="zatsu" data-idx="${idx}" data-key="name" value="${name}" type="text" oninput="editRow('zatsu',${idx},'name',this.value)" onblur="editRow('zatsu',${idx},'name',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="zatsu" data-idx="${idx}" data-key="spec" value="${spec}" type="text" oninput="editRow('zatsu',${idx},'spec',this.value)" onblur="editRow('zatsu',${idx},'spec',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="zatsu" data-idx="${idx}" data-key="unit" value="${unit}" type="text" oninput="editRow('zatsu',${idx},'unit',this.value)" onblur="editRow('zatsu',${idx},'unit',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="zatsu" data-idx="${idx}" data-key="qty" value="${qty}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('zatsu',${idx},'qty',this.value)" onblur="editRow('zatsu',${idx},'qty',this.value,true)" onkeydown="handleKey(event)"></td>
     </tr>`;
   });
   document.getElementById('tbodyZatsu').innerHTML = tbody;
@@ -671,7 +690,7 @@ function renderTableZatsu() {
   });
   const html = Object.entries(totals)
     .filter(([n, t]) => t && n)
-    .map(([n, t]) => `${n}: ${t.toFixed(2)}`)
+    .map(([n, t]) => `${escapeHtml(n)}: ${t.toFixed(2)}`)
     .join('　');
   document.getElementById('zatsuResult').innerHTML = html ? `<div>${html}</div>` : '';
   updateZatsuNameList();
