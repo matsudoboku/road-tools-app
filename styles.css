@@ -255,6 +255,40 @@ body {
       .btn { width:100%; margin:8px 0; padding:12px; font-size:16px; }
       .siteName { width: 100% !important; max-width: none; }
       .numeric { width: 100% !important; min-width: 100px; }
-      .controls { flex-direction: column; align-items: stretch; }
-      .controls select, .controls button { margin-left:0; }
+    .controls { flex-direction: column; align-items: stretch; }
+    .controls select, .controls button { margin-left:0; }
     }
+
+.calc-keypad {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.calc-key {
+  padding: 14px 0;
+  font-size: 1.2em;
+  background: #f0f0f3;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.calc-key:active {
+  background: #dcdce0;
+}
+
+.calc-equal {
+  grid-column: span 4;
+  background: #007aff;
+  color: #fff;
+}
+
+@media (max-width: 480px) {
+  .calc-key {
+    padding: 18px 0;
+    font-size: 1.4em;
+  }
+}
