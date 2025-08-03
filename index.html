@@ -186,12 +186,50 @@
   <div id="panelPrice" class="block hidden">
     <h4>単価設定</h4>
     <div>
-      <label>土工：<input id="priceEarth" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('earth', this.value)" onblur="editPrice('earth', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-      <label>取壊工：<input id="priceDemo" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('demo', this.value)" onblur="editPrice('demo', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-      <label>舗装工：<input id="pricePave" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('pave', this.value)" onblur="editPrice('pave', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-      <label>安全施設工：<input id="priceAnzen" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('anzen', this.value)" onblur="editPrice('anzen', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-      <label>仮設工：<input id="priceKari" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('kari', this.value)" onblur="editPrice('kari', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-      <label>雑工：<input id="priceZatsu" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('zatsu', this.value)" onblur="editPrice('zatsu', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <div class="price-group">
+        <h5>土工</h5>
+        <label>機械掘削：<input id="priceEarthMachine" data-price-work="earth_machine" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('earth_machine', this.value)" onblur="editPrice('earth_machine', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>残土処理：<input id="priceEarthSoil" data-price-work="earth_soil" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('earth_soil', this.value)" onblur="editPrice('earth_soil', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      </div>
+      <div class="price-group">
+        <h5>取壊工</h5>
+        <label>舗装版切断：<input id="priceDemoCut" data-price-work="demo_cut" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('demo_cut', this.value)" onblur="editPrice('demo_cut', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>舗装版破砕As：<input id="priceDemoBreakAs" data-price-work="demo_break_as" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('demo_break_as', this.value)" onblur="editPrice('demo_break_as', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>廃材運搬As：<input id="priceDemoHaulAs" data-price-work="demo_haul_as" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('demo_haul_as', this.value)" onblur="editPrice('demo_haul_as', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>廃材処理As：<input id="priceDemoDisposeAs" data-price-work="demo_dispose_as" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('demo_dispose_as', this.value)" onblur="editPrice('demo_dispose_as', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>舗装版破砕Con：<input id="priceDemoBreakCon" data-price-work="demo_break_con" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('demo_break_con', this.value)" onblur="editPrice('demo_break_con', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>廃材運搬Con：<input id="priceDemoHaulCon" data-price-work="demo_haul_con" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('demo_haul_con', this.value)" onblur="editPrice('demo_haul_con', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>廃材処理Con：<input id="priceDemoDisposeCon" data-price-work="demo_dispose_con" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('demo_dispose_con', this.value)" onblur="editPrice('demo_dispose_con', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      </div>
+      <div class="price-group">
+        <h5>舗装・路盤</h5>
+        <label>アスファルト1.4未満：<input id="pricePaveAsLt14" data-price-work="pave_as_lt14" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('pave_as_lt14', this.value)" onblur="editPrice('pave_as_lt14', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>アスファルト1.4以上：<input id="pricePaveAsGe14" data-price-work="pave_as_ge14" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('pave_as_ge14', this.value)" onblur="editPrice('pave_as_ge14', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>アスファルト3.0以上：<input id="pricePaveAsGe3" data-price-work="pave_as_ge3" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('pave_as_ge3', this.value)" onblur="editPrice('pave_as_ge3', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>上層路盤工：<input id="pricePaveBase" data-price-work="pave_base" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('pave_base', this.value)" onblur="editPrice('pave_base', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>オーバーレイ1.4未満：<input id="pricePaveOverlayLt14" data-price-work="pave_overlay_lt14" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('pave_overlay_lt14', this.value)" onblur="editPrice('pave_overlay_lt14', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>オーバーレイ1.4以上：<input id="pricePaveOverlayGe14" data-price-work="pave_overlay_ge14" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('pave_overlay_ge14', this.value)" onblur="editPrice('pave_overlay_ge14', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>オーバーレイ3.0以上：<input id="pricePaveOverlayGe3" data-price-work="pave_overlay_ge3" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('pave_overlay_ge3', this.value)" onblur="editPrice('pave_overlay_ge3', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>コンクリート：<input id="pricePaveConcrete" data-price-work="pave_concrete" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('pave_concrete', this.value)" onblur="editPrice('pave_concrete', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      </div>
+      <div class="price-group">
+        <h5>縁石</h5>
+        <label>標準アスカーブ：<input id="priceCurbStd" data-price-work="curb_std" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('curb_std', this.value)" onblur="editPrice('curb_std', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>小型アスカーブ：<input id="priceCurbSmall" data-price-work="curb_small" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('curb_small', this.value)" onblur="editPrice('curb_small', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>手盛アスカーブ：<input id="priceCurbHand" data-price-work="curb_hand" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('curb_hand', this.value)" onblur="editPrice('curb_hand', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      </div>
+      <div class="price-group">
+        <h5>安全施設</h5>
+        <label>区画線設置 外側線：<input id="priceSafetyLineOuter" data-price-work="safety_line_outer" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('safety_line_outer', this.value)" onblur="editPrice('safety_line_outer', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>区画線設置 停止線：<input id="priceSafetyLineStop" data-price-work="safety_line_stop" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('safety_line_stop', this.value)" onblur="editPrice('safety_line_stop', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>区画線設置 文字記号：<input id="priceSafetyLineSymbol" data-price-work="safety_line_symbol" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('safety_line_symbol', this.value)" onblur="editPrice('safety_line_symbol', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>交通誘導員B：<input id="priceSafetyTrafficB" data-price-work="safety_traffic_b" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('safety_traffic_b', this.value)" onblur="editPrice('safety_traffic_b', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+        <label>仮設信号機：<input id="priceSafetyTempSignal" data-price-work="safety_temp_signal" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('safety_temp_signal', this.value)" onblur="editPrice('safety_temp_signal', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      </div>
+      <div class="price-group">
+        <h5>その他</h5>
+        <label>重機運搬費：<input id="priceOtherMachineTrans" data-price-work="other_machine_transport" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('other_machine_transport', this.value)" onblur="editPrice('other_machine_transport', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      </div>
     </div>
   </div>
   <!-- データ管理・出力タブ -->
