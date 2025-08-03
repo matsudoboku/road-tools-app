@@ -231,6 +231,7 @@
         <label>重機運搬費：<input id="priceOtherMachineTrans" data-price-work="other_machine_transport" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('other_machine_transport', this.value)" onblur="editPrice('other_machine_transport', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
       </div>
     </div>
+    <div id="priceTotal" class="sum"></div>
   </div>
   <!-- データ管理・出力タブ -->
   <div id="panelData" class="block hidden">
