@@ -260,6 +260,25 @@
   <div id="calcOverlay" class="calc-overlay hidden" onclick="if(event.target.id==='calcOverlay') closeCalc()">
     <div class="calc-dialog" onclick="event.stopPropagation()">
       <input id="calcInput" type="text" onkeydown="calcKey(event)" placeholder="0" inputmode="decimal" pattern="[0-9.+\-*/()]*">
+      <div class="calc-keypad">
+        <button class="calc-key" onclick="calcInsert('7')">7</button>
+        <button class="calc-key" onclick="calcInsert('8')">8</button>
+        <button class="calc-key" onclick="calcInsert('9')">9</button>
+        <button class="calc-key" onclick="calcInsert('/')">÷</button>
+        <button class="calc-key" onclick="calcInsert('4')">4</button>
+        <button class="calc-key" onclick="calcInsert('5')">5</button>
+        <button class="calc-key" onclick="calcInsert('6')">6</button>
+        <button class="calc-key" onclick="calcInsert('*')">×</button>
+        <button class="calc-key" onclick="calcInsert('1')">1</button>
+        <button class="calc-key" onclick="calcInsert('2')">2</button>
+        <button class="calc-key" onclick="calcInsert('3')">3</button>
+        <button class="calc-key" onclick="calcInsert('-')">−</button>
+        <button class="calc-key" onclick="calcInsert('0')">0</button>
+        <button class="calc-key" onclick="calcInsert('.')">.</button>
+        <button class="calc-key" onclick="calcClear()">C</button>
+        <button class="calc-key" onclick="calcInsert('+')">+</button>
+        <button class="calc-key calc-equal" onclick="calcCalculate()">=</button>
+      </div>
       <div id="calcResult" class="result"></div>
       <button class="btn" onclick="closeCalc()">閉じる</button>
     </div>
