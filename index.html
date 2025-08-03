@@ -186,12 +186,46 @@
   <div id="panelPrice" class="block hidden">
     <h4>単価設定</h4>
     <div>
-      <label>土工：<input id="priceEarth" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('earth', this.value)" onblur="editPrice('earth', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-      <label>取壊工：<input id="priceDemo" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('demo', this.value)" onblur="editPrice('demo', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-      <label>舗装工：<input id="pricePave" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('pave', this.value)" onblur="editPrice('pave', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-      <label>安全施設工：<input id="priceAnzen" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('anzen', this.value)" onblur="editPrice('anzen', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-      <label>仮設工：<input id="priceKari" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('kari', this.value)" onblur="editPrice('kari', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
-      <label>雑工：<input id="priceZatsu" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('zatsu', this.value)" onblur="editPrice('zatsu', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+    <div class="price-group">
+      <h5>土工</h5>
+      <label>機械掘削：<input id="price_machine_excavation" data-price-work="machine_excavation" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('machine_excavation', this.value)" onblur="editPrice('machine_excavation', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>残土処理：<input id="price_residual_soil" data-price-work="residual_soil" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('residual_soil', this.value)" onblur="editPrice('residual_soil', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+    </div>
+    <div class="price-group">
+      <h5>取壊工</h5>
+      <label>舗装版切断：<input id="price_cutting" data-price-work="cutting" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('cutting', this.value)" onblur="editPrice('cutting', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>舗装版破砕As：<input id="price_break_as" data-price-work="break_as" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('break_as', this.value)" onblur="editPrice('break_as', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>廃材運搬As：<input id="price_haizan_unpan_as" data-price-work="haizan_unpan_as" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('haizan_unpan_as', this.value)" onblur="editPrice('haizan_unpan_as', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>廃材処理As：<input id="price_haizan_shori_as" data-price-work="haizan_shori_as" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('haizan_shori_as', this.value)" onblur="editPrice('haizan_shori_as', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>舗装版破砕Con：<input id="price_break_con" data-price-work="break_con" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('break_con', this.value)" onblur="editPrice('break_con', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>廃材運搬Con：<input id="price_haizan_unpan_con" data-price-work="haizan_unpan_con" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('haizan_unpan_con', this.value)" onblur="editPrice('haizan_unpan_con', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>廃材処理Con：<input id="price_haizan_shori_con" data-price-work="haizan_shori_con" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('haizan_shori_con', this.value)" onblur="editPrice('haizan_shori_con', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+    </div>
+    <div class="price-group">
+      <h5>舗装工</h5>
+      <label>アスファルト 1.4未満：<input id="price_as_lt1_4" data-price-work="as_lt1_4" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('as_lt1_4', this.value)" onblur="editPrice('as_lt1_4', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>アスファルト 1.4以上：<input id="price_as_ge1_4" data-price-work="as_ge1_4" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('as_ge1_4', this.value)" onblur="editPrice('as_ge1_4', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>アスファルト 3.0以上：<input id="price_as_ge3_0" data-price-work="as_ge3_0" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('as_ge3_0', this.value)" onblur="editPrice('as_ge3_0', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>上層路盤工：<input id="price_base_course" data-price-work="base_course" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('base_course', this.value)" onblur="editPrice('base_course', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>オーバーレイ 1.4未満：<input id="price_ovl_lt1_4" data-price-work="ovl_lt1_4" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('ovl_lt1_4', this.value)" onblur="editPrice('ovl_lt1_4', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>オーバーレイ 1.4以上：<input id="price_ovl_ge1_4" data-price-work="ovl_ge1_4" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('ovl_ge1_4', this.value)" onblur="editPrice('ovl_ge1_4', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>オーバーレイ 3.0以上：<input id="price_ovl_ge3_0" data-price-work="ovl_ge3_0" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('ovl_ge3_0', this.value)" onblur="editPrice('ovl_ge3_0', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>コンクリート：<input id="price_con_total" data-price-work="con_total" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('con_total', this.value)" onblur="editPrice('con_total', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>標準アスカーブ：<input id="price_curb_std" data-price-work="curb_std" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('curb_std', this.value)" onblur="editPrice('curb_std', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>小型アスカーブ：<input id="price_curb_small" data-price-work="curb_small" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('curb_small', this.value)" onblur="editPrice('curb_small', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>手盛アスカーブ：<input id="price_curb_hand" data-price-work="curb_hand" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('curb_hand', this.value)" onblur="editPrice('curb_hand', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+    </div>
+    <div class="price-group">
+      <h5>安全施設工</h5>
+      <label>区画線設置 外側線：<input id="price_line_outer" data-price-work="line_outer" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('line_outer', this.value)" onblur="editPrice('line_outer', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>区画線設置 停止線：<input id="price_line_stop" data-price-work="line_stop" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('line_stop', this.value)" onblur="editPrice('line_stop', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>区画線設置 文字記号：<input id="price_line_symbol" data-price-work="line_symbol" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('line_symbol', this.value)" onblur="editPrice('line_symbol', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+    </div>
+    <div class="price-group">
+      <h5>仮設工</h5>
+      <label>交通誘導員B：<input id="price_traffic_b" data-price-work="traffic_b" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('traffic_b', this.value)" onblur="editPrice('traffic_b', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>仮設信号機：<input id="price_temp_signal" data-price-work="temp_signal" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('temp_signal', this.value)" onblur="editPrice('temp_signal', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
+      <label>重機運搬費：<input id="price_machine_transport" data-price-work="machine_transport" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editPrice('machine_transport', this.value)" onblur="editPrice('machine_transport', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
     </div>
   </div>
   <!-- データ管理・出力タブ -->
