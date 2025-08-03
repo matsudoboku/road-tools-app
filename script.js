@@ -6,6 +6,15 @@ let currentSite = '';
 let nextFocus = null;
 let prices = {};
 const paveTypes = ["アスファルト", "コンクリート", "オーバーレイ"];
+  "machine_excavation", "residual_soil",
+  "cutting", "break_as", "haizan_unpan_as", "haizan_shori_as",
+  "break_con", "haizan_unpan_con", "haizan_shori_con",
+  "as_lt1_4", "as_ge1_4", "as_ge3_0", "base_course",
+  "ovl_lt1_4", "ovl_ge1_4", "ovl_ge3_0", "con_total",
+  "curb_std", "curb_small", "curb_hand",
+  "line_outer", "line_stop", "line_symbol",
+  "traffic_b", "temp_signal", "machine_transport"
+];
 const worksList = [
   { id: "Works", label: "工種設定", always: true, panel: "panelWorks" },
   { id: "Earth", label: "土工", chk: "chkWorksEarth", setting: "worksEarthSetting", panel: "panelEarth" },
@@ -81,8 +90,11 @@ function loadData() {
           if(!s.curb) s.curb = { use: false, std: 0, small: 0, hand: 0 };
           if(!s.works) s.works = { earth: false, demo: false, anzen: false, kari: false, zatsu: false };
           if(!s.zatsu) s.zatsu = [];
-          if(!s.price) s.price = { earth: 0, demo: 0, pave: 0, anzen: 0, kari: 0, zatsu: 0 };
-          if(Array.isArray(s.zatsu)) {
+          if(!s.price) {
+            s.price = Object.fromEntries(priceKeys.map(k => [k, 0]));
+          } else {
+            priceKeys.forEach(k => { if(s.price[k] === undefined) s.price[k] = 0; });
+          }          if(Array.isArray(s.zatsu)) {
             s.zatsu.forEach(z => { if(z.spec === undefined) z.spec = ''; });
           }
           if(!s.demoSetting) s.demoSetting = { same: true, type: 'As', thick: 0, cutting: 0 };
@@ -144,8 +156,11 @@ function importData(e) {
           if(Array.isArray(s.zatsu)) {
             s.zatsu.forEach(z => { if(z.spec === undefined) z.spec = ''; });
           }
-          if(!s.price) s.price = { earth: 0, demo: 0, pave: 0, anzen: 0, kari: 0, zatsu: 0 };
-        });
+          if(!s.price) {
+            s.price = Object.fromEntries(priceKeys.map(k => [k, 0]));
+          } else {
+            priceKeys.forEach(k => { if(s.price[k] === undefined) s.price[k] = 0; });
+          }        });
         allSites = dat;
         const siteList = Object.keys(allSites);
         if (siteList.length) {
@@ -193,7 +208,7 @@ function addSite() {
     anzen: { line_outer: 0, line_stop: 0, line_symbol: 0 },
     kari: { traffic_b: 0, temp_signal: 0, machine_transport: 0 },
     zatsu: [],
-    price: { earth: 0, demo: 0, pave: 0, anzen: 0, kari: 0, zatsu: 0 },
+    price: Object.fromEntries(priceKeys.map(k => [k, 0])),
     curb: { use: false, std: 0, small: 0, hand: 0 },
     works: { earth: false, demo: false, anzen: false, kari: false, zatsu: false },
     earthSetting: { same: true, type: '標準掘削', thick: 0 },
@@ -294,7 +309,7 @@ function editKari(key, val, update = false) {
 function editPrice(key, val, update = false) {
   if(!currentSite) return;
   if(!allSites[currentSite].price) {
-    allSites[currentSite].price = { earth: 0, demo: 0, pave: 0, anzen: 0, kari: 0, zatsu: 0 };
+    allSites[currentSite].price = Object.fromEntries(priceKeys.map(k => [k, 0]));
   }
   allSites[currentSite].price[key] = parseFloat(val) || 0;
   if(update) renderAllAndSave();
@@ -541,12 +556,10 @@ function renderKariInputs() {
 function renderPriceInputs() {
   if(!currentSite) return;
   const dat = allSites[currentSite].price || {};
-  document.getElementById('priceEarth').value = dat.earth || 0;
-  document.getElementById('priceDemo').value = dat.demo || 0;
-  document.getElementById('pricePave').value = dat.pave || 0;
-  document.getElementById('priceAnzen').value = dat.anzen || 0;
-  document.getElementById('priceKari').value = dat.kari || 0;
-  document.getElementById('priceZatsu').value = dat.zatsu || 0;
+  priceKeys.forEach(k => {
+    const el = document.getElementById('price_' + k);
+    if(el) el.value = dat[k] || 0;
+  });
 }
 function renderCurbInputs() {
   if(!currentSite) return;
