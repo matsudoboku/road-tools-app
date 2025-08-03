@@ -1,12 +1,12 @@
 const CACHE_NAME = 'road-tools-cache-v3';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/script.js',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
+  './',
+  './index.html',
+  './styles.css',
+  './script.js',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 self.addEventListener('install', event => {
