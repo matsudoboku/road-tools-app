@@ -335,6 +335,30 @@ function editCurb(key, val, update = false) {
   allSites[currentSite].curb[key] = parseFloat(val) || 0;
   if(update) renderAllAndSave();
 }
+function createInput(type, idx, key, value, opts = {}) {
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.dataset.type = type;
+  input.dataset.idx = idx;
+  input.dataset.key = key;
+  if (opts.inputmode) input.setAttribute('inputmode', opts.inputmode);
+  if (opts.pattern) input.setAttribute('pattern', opts.pattern);
+  if (opts.list) input.setAttribute('list', opts.list);
+  input.value = value || '';
+  input.addEventListener('input', e => editRow(type, idx, key, e.target.value));
+  input.addEventListener('blur', e => editRow(type, idx, key, e.target.value, true));
+  input.addEventListener('keydown', handleKey);
+  return input;
+}
+
+function createReadOnly(value) {
+  const input = document.createElement('input');
+  input.value = value || '';
+  input.className = 'readonly';
+  input.readOnly = true;
+  return input;
+}
+
 function renderTablePave() {
   if(!currentSite) return;
   const list = allSites[currentSite].pave;
@@ -371,41 +395,79 @@ function renderTablePave() {
     }
   }
   let tbody = '';
+  const tbodyEl = document.getElementById('tbodyPave');
+  tbodyEl.textContent = '';
   list.forEach((r,idx)=>{
-    tbody += `<tr>
-      <td>
-        <select class="pave-type" data-type="pave" data-idx="${idx}" data-key="種別" onchange="editRow('pave',${idx},'種別',this.value,true)" onkeydown="handleKey(event)">
-          ${paveTypes.map(tp=>`<option value="${tp}"${r.種別===tp?' selected':''}>${tp}</option>`).join('')}
-        </select>
-      </td>
-      <td><input data-type="pave" data-idx="${idx}" data-key="測点" value="${r.測点||''}" type="text" inputmode="decimal" pattern="[0-9+\-.]*" oninput="editRow('pave',${idx},'測点',this.value)" onblur="editRow('pave',${idx},'測点',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input data-type="pave" data-idx="${idx}" data-key="単距" value="${r.単距||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('pave',${idx},'単距',this.value)" onblur="editRow('pave',${idx},'単距',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input value="${r.追距||''}" class="readonly" readonly></td>
-      <td><input data-type="pave" data-idx="${idx}" data-key="幅員" value="${r.幅員||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('pave',${idx},'幅員',this.value)" onblur="editRow('pave',${idx},'幅員',this.value,true)" onkeydown="handleKey(event)"></td>      <td><input value="${r.平均幅員||''}" class="readonly" readonly></td>      <td><input value="${r.面積||''}" class="readonly" readonly></td>
-    </tr>`;
+    const tr = document.createElement('tr');
+
+    const tdType = document.createElement('td');
+    const sel = document.createElement('select');
+    sel.className = 'pave-type';
+    sel.dataset.type = 'pave';
+    sel.dataset.idx = idx;
+    sel.dataset.key = '種別';
+    sel.addEventListener('change', e => editRow('pave', idx, '種別', e.target.value, true));
+    sel.addEventListener('keydown', handleKey);
+    paveTypes.forEach(tp => {
+      const opt = document.createElement('option');
+      opt.value = tp;
+      opt.textContent = tp;
+      if(r.種別 === tp) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    tdType.appendChild(sel);
+    tr.appendChild(tdType);
+
+    let td = document.createElement('td');
+    td.appendChild(createInput('pave', idx, '測点', r.測点, {inputmode:'decimal', pattern:'[0-9+\\-.]*'}));
+    tr.appendChild(td);
+
+    td = document.createElement('td');
+    td.appendChild(createInput('pave', idx, '単距', r.単距, {inputmode:'decimal', pattern:'[0-9.+-]*'}));
+    tr.appendChild(td);
+
+    td = document.createElement('td');
+    td.appendChild(createReadOnly(r.追距));
+    tr.appendChild(td);
+
+    td = document.createElement('td');
+    td.appendChild(createInput('pave', idx, '幅員', r.幅員, {inputmode:'decimal', pattern:'[0-9.+-]*'}));
+    tr.appendChild(td);
+
+    td = document.createElement('td');
+    td.appendChild(createReadOnly(r.平均幅員));
+    tr.appendChild(td);
+
+    td = document.createElement('td');
+    td.appendChild(createReadOnly(r.面積));
+    tr.appendChild(td);
+
+    tbodyEl.appendChild(tr);
   });
-  document.getElementById('tbodyPave').innerHTML = tbody;
   let sum = {アスファルト:0, コンクリート:0, オーバーレイ:0};
   list.forEach(r=>{
     if(!isNaN(parseFloat(r.面積))){
       sum[r.種別] += parseFloat(r.面積);
     }
   });
-  document.getElementById('sumPave').innerHTML =
-    `<table class="ss-table">
-      <tr>
-        <th>現場名</th>
-        <th>アスファルト合計</th>
-        <th>コンクリート合計</th>
-        <th>オーバーレイ合計</th>
-      </tr>
-      <tr>
-        <td>${currentSite}</td>
-        <td>${sum.アスファルト.toFixed(2)}</td>
-        <td>${sum.コンクリート.toFixed(2)}</td>
-        <td>${sum.オーバーレイ.toFixed(2)}</td>
-      </tr>
-    </table>`;
+  const sumEl = document.getElementById('sumPave');
+  sumEl.textContent = '';
+  const table = document.createElement('table');
+  table.className = 'ss-table';
+  const header = document.createElement('tr');
+  ['現場名','アスファルト合計','コンクリート合計','オーバーレイ合計'].forEach(t => {
+    const th = document.createElement('th');
+    th.textContent = t;
+    header.appendChild(th);
+  });
+  table.appendChild(header);
+  const row = document.createElement('tr');
+  let td = document.createElement('td'); td.textContent = currentSite; row.appendChild(td);
+  td = document.createElement('td'); td.textContent = sum.アスファルト.toFixed(2); row.appendChild(td);
+  td = document.createElement('td'); td.textContent = sum.コンクリート.toFixed(2); row.appendChild(td);
+  td = document.createElement('td'); td.textContent = sum.オーバーレイ.toFixed(2); row.appendChild(td);
+  table.appendChild(row);
+  sumEl.appendChild(table);
 }
 
 function renderTableEarth() {
@@ -436,17 +498,34 @@ function renderTableEarth() {
       }
     }
   }
-  let tbody = '';
+  const tbodyEl = document.getElementById('tbodyEarth');
+  tbodyEl.textContent = '';  
   list.forEach((r,idx)=>{
     tbody += `<tr>
-      <td><input data-type="earth" data-idx="${idx}" data-key="測点" value="${r.測点||''}" type="text" inputmode="decimal" pattern="[0-9+\-.]*" oninput="editRow('earth',${idx},'測点',this.value)" onblur="editRow('earth',${idx},'測点',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input data-type="earth" data-idx="${idx}" data-key="単距" value="${r.単距||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('earth',${idx},'単距',this.value)" onblur="editRow('earth',${idx},'単距',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input value="${r.追距||''}" class="readonly" readonly></td>
-      <td><input data-type="earth" data-idx="${idx}" data-key="幅員" value="${r.幅員||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('earth',${idx},'幅員',this.value)" onblur="editRow('earth',${idx},'幅員',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input value="${r.面積||''}" class="readonly" readonly></td>
-    </tr>`;
+    const tr = document.createElement('tr');
+
+    let td = document.createElement('td');
+    td.appendChild(createInput('earth', idx, '測点', r.測点, {inputmode:'decimal', pattern:'[0-9+\-.]*'}));
+    tr.appendChild(td);
+
+    td = document.createElement('td');
+    td.appendChild(createInput('earth', idx, '単距', r.単距, {inputmode:'decimal', pattern:'[0-9.+-]*'}));
+    tr.appendChild(td);
+
+    td = document.createElement('td');
+    td.appendChild(createReadOnly(r.追距));
+    tr.appendChild(td);
+
+    td = document.createElement('td');
+    td.appendChild(createInput('earth', idx, '幅員', r.幅員, {inputmode:'decimal', pattern:'[0-9.+-]*'}));
+    tr.appendChild(td);
+
+    td = document.createElement('td');
+    td.appendChild(createReadOnly(r.面積));
+    tr.appendChild(td);
+
+    tbodyEl.appendChild(tr);
   });
-  document.getElementById('tbodyEarth').innerHTML = tbody;
 }
 
 function renderTableDemo() {
@@ -477,17 +556,33 @@ function renderTableDemo() {
       }
     }
   }
-  let tbody = '';
+  const tbodyEl = document.getElementById('tbodyDemo');
+  tbodyEl.textContent = '';
   list.forEach((r,idx)=>{
-    tbody += `<tr>
-      <td><input data-type="demo" data-idx="${idx}" data-key="測点" value="${r.測点||''}" type="text" inputmode="decimal" pattern="[0-9+\-.]*" oninput="editRow('demo',${idx},'測点',this.value)" onblur="editRow('demo',${idx},'測点',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input data-type="demo" data-idx="${idx}" data-key="単距" value="${r.単距||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('demo',${idx},'単距',this.value)" onblur="editRow('demo',${idx},'単距',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input value="${r.追距||''}" class="readonly" readonly></td>
-      <td><input data-type="demo" data-idx="${idx}" data-key="幅員" value="${r.幅員||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('demo',${idx},'幅員',this.value)" onblur="editRow('demo',${idx},'幅員',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input value="${r.面積||''}" class="readonly" readonly></td>
-    </tr>`;
+    const tr = document.createElement('tr');
+
+    let td = document.createElement('td');
+    td.appendChild(createInput('demo', idx, '測点', r.測点, {inputmode:'decimal', pattern:'[0-9+\-.]*'}));
+    tr.appendChild(td);
+
+    td = document.createElement('td');
+    td.appendChild(createInput('demo', idx, '単距', r.単距, {inputmode:'decimal', pattern:'[0-9.+-]*'}));
+    tr.appendChild(td);
+
+    td = document.createElement('td');
+    td.appendChild(createReadOnly(r.追距));
+    tr.appendChild(td);
+
+    td = document.createElement('td');
+    td.appendChild(createInput('demo', idx, '幅員', r.幅員, {inputmode:'decimal', pattern:'[0-9.+-]*'}));
+    tr.appendChild(td);
+
+    td = document.createElement('td');
+    td.appendChild(createReadOnly(r.面積));
+    tr.appendChild(td);
+
+    tbodyEl.appendChild(tr);
   });
-  document.getElementById('tbodyDemo').innerHTML = tbody;
 }
 
 // ▼ 土工集計
@@ -592,26 +687,45 @@ function updateZatsuNameList() {
 function renderTableZatsu() {
   if(!currentSite) return;
   const list = allSites[currentSite].zatsu || [];
-  let tbody = '';
+  const tbodyEl = document.getElementById('tbodyZatsu');
+  tbodyEl.textContent = '';  
   list.forEach((r, idx) => {
-    tbody += `<tr>
-      <td><input list="zatsuNameList" data-type="zatsu" data-idx="${idx}" data-key="name" value="${r.name||''}" type="text" oninput="editRow('zatsu',${idx},'name',this.value)" onblur="editRow('zatsu',${idx},'name',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input data-type="zatsu" data-idx="${idx}" data-key="spec" value="${r.spec||''}" type="text" oninput="editRow('zatsu',${idx},'spec',this.value)" onblur="editRow('zatsu',${idx},'spec',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input data-type="zatsu" data-idx="${idx}" data-key="unit" value="${r.unit||''}" type="text" oninput="editRow('zatsu',${idx},'unit',this.value)" onblur="editRow('zatsu',${idx},'unit',this.value,true)" onkeydown="handleKey(event)"></td>
-      <td><input data-type="zatsu" data-idx="${idx}" data-key="qty" value="${r.qty||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('zatsu',${idx},'qty',this.value)" onblur="editRow('zatsu',${idx},'qty',this.value,true)" onkeydown="handleKey(event)"></td>
-    </tr>`;
+    const tr = document.createElement('tr');
+
+    let td = document.createElement('td');
+    td.appendChild(createInput('zatsu', idx, 'name', r.name, {list:'zatsuNameList'}));
+    tr.appendChild(td);
+
+    td = document.createElement('td');
+    td.appendChild(createInput('zatsu', idx, 'spec', r.spec));
+    tr.appendChild(td);
+
+    td = document.createElement('td');
+    td.appendChild(createInput('zatsu', idx, 'unit', r.unit));
+    tr.appendChild(td);
+
+    td = document.createElement('td');
+    td.appendChild(createInput('zatsu', idx, 'qty', r.qty, {inputmode:'decimal', pattern:'[0-9.+-]*'}));
+    tr.appendChild(td);
+
+    tbodyEl.appendChild(tr);
   });
-  document.getElementById('tbodyZatsu').innerHTML = tbody;
   const totals = {};
   list.forEach(r => {
     const n = r.name || '';
     totals[n] = (totals[n] || 0) + (parseFloat(r.qty) || 0);
   });
-  const html = Object.entries(totals)
-    .filter(([n, t]) => t && n)
-    .map(([n, t]) => `${n}: ${t.toFixed(2)}`)
-    .join('　');
-  document.getElementById('zatsuResult').innerHTML = html ? `<div>${html}</div>` : '';
+  const resultEl = document.getElementById('zatsuResult');
+  resultEl.textContent = '';
+  const entries = Object.entries(totals).filter(([n, t]) => t && n);
+  if(entries.length){
+    const div = document.createElement('div');
+    entries.forEach(([n,t],i) => {
+      if(i>0) div.append(document.createTextNode('　'));
+      div.append(document.createTextNode(`${n}: ${t.toFixed(2)}`));
+    });
+    resultEl.appendChild(div);
+  }
   updateZatsuNameList();
 }
 
