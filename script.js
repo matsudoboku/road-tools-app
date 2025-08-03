@@ -5,6 +5,7 @@ let allSites = {};
 let currentSite = '';
 let nextFocus = null;
 let prices = {};
+const memoryStorage = { sites: null, prices: null };
 const paveTypes = ["アスファルト", "コンクリート", "オーバーレイ"];
 const priceKeys = [
   "machine_excavation", "residual_soil",
@@ -80,12 +81,24 @@ function showTab(tabId) {
 
 // ▼ データ保存・復元
 function saveData() {
-  try { localStorage.setItem(LS_KEY, JSON.stringify(allSites)); } catch(e) {}
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(allSites));
+  } catch(e) {
+    memoryStorage.sites = JSON.parse(JSON.stringify(allSites));
+    alert('データの保存に失敗しました: ' + e.message);
+  }
 }
 function loadData() {
+  let dat = null;
   try {
-    const dat = JSON.parse(localStorage.getItem(LS_KEY));
-      if (dat && typeof dat === "object") {
+    const stored = localStorage.getItem(LS_KEY);
+    if(stored) dat = JSON.parse(stored);
+  } catch(e) {
+    alert('データの読み込みに失敗しました: ' + e.message);
+    dat = memoryStorage.sites;
+  }
+  if(!dat && memoryStorage.sites) dat = memoryStorage.sites;
+  if (dat && typeof dat === "object") {
         Object.values(dat).forEach(s => {
           if(!s.kari) s.kari = { traffic_b: 0, temp_signal: 0, machine_transport: 0 };
           if(!s.curb) s.curb = { use: false, std: 0, small: 0, hand: 0 };
@@ -110,9 +123,8 @@ function loadData() {
         for (const s of siteList) opt += `<option>${s}</option>`;
         document.getElementById('siteList').innerHTML = opt;
         document.getElementById('siteList').value = currentSite;
-      }
     }
-  } catch(e){}
+  }
 }
 
 function savePrices() {
@@ -121,20 +133,30 @@ function savePrices() {
     data[el.dataset.priceWork] = parseFloat(el.value) || 0;
   });
   prices = data;
-  try { localStorage.setItem(PRICE_KEY, JSON.stringify(prices)); } catch(e) {}
-}
+  try {
+    localStorage.setItem(PRICE_KEY, JSON.stringify(prices));
+  } catch(e) {
+    memoryStorage.prices = JSON.parse(JSON.stringify(prices));
+    alert('単価データの保存に失敗しました: ' + e.message);
+  }}
 
 function loadPrices() {
+  let dat = null;
   try {
-    const dat = JSON.parse(localStorage.getItem(PRICE_KEY));
-    if(dat && typeof dat === 'object') {
-      prices = dat;
-      Object.entries(prices).forEach(([work, val]) => {
-        const el = document.querySelector(`input[data-price-work="${work}"]`);
-        if(el) el.value = val;
-      });
-    }
-  } catch(e) {}
+    const stored = localStorage.getItem(PRICE_KEY);
+    if(stored) dat = JSON.parse(stored);
+  } catch(e) {
+    alert('単価データの読み込みに失敗しました: ' + e.message);
+    dat = memoryStorage.prices;
+  }
+  if(!dat && memoryStorage.prices) dat = memoryStorage.prices;
+  if(dat && typeof dat === 'object') {
+    prices = dat;
+    Object.entries(prices).forEach(([work, val]) => {
+      const el = document.querySelector(`input[data-price-work="${work}"]`);
+      if(el) el.value = val;
+    });
+  }
 }
 
 // ▼ バックアップ・インポート
