@@ -205,12 +205,23 @@ body {
       align-items: flex-start;
       margin-bottom: 6px;
     }
-    #panelPrice > div {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
+  #panelPrice > div {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        align-items: flex-start;
+      }
+  .price-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+  #panelPrice h5 {
+        margin: 0 0 4px 0;
+        font-size: 1.05em;
+        color: #007aff;
+      }
     .scroll-x-guide {      text-align: right;
       color: #aaa;
       font-size: 0.94em;
