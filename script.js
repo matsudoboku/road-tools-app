@@ -5,18 +5,7 @@ let allSites = {};
 let currentSite = '';
 let nextFocus = null;
 let prices = {};
-const memoryStorage = { sites: null, prices: null };
 const paveTypes = ["アスファルト", "コンクリート", "オーバーレイ"];
-const priceKeys = [
-  "machine_excavation", "residual_soil",
-  "cutting", "break_as", "haizan_unpan_as", "haizan_shori_as",
-  "break_con", "haizan_unpan_con", "haizan_shori_con",
-  "as_lt1_4", "as_ge1_4", "as_ge3_0", "base_course",
-  "ovl_lt1_4", "ovl_ge1_4", "ovl_ge3_0", "con_total",
-  "curb_std", "curb_small", "curb_hand",
-  "line_outer", "line_stop", "line_symbol",
-  "traffic_b", "temp_signal", "machine_transport",
-];
 const worksList = [
   { id: "Works", label: "工種設定", always: true, panel: "panelWorks" },
   { id: "Earth", label: "土工", chk: "chkWorksEarth", setting: "worksEarthSetting", panel: "panelEarth" },
@@ -81,34 +70,19 @@ function showTab(tabId) {
 
 // ▼ データ保存・復元
 function saveData() {
-  try {
-    localStorage.setItem(LS_KEY, JSON.stringify(allSites));
-  } catch(e) {
-    memoryStorage.sites = JSON.parse(JSON.stringify(allSites));
-    alert('データの保存に失敗しました: ' + e.message);
-  }
+  try { localStorage.setItem(LS_KEY, JSON.stringify(allSites)); } catch(e) {}
 }
 function loadData() {
-  let dat = null;
   try {
-    const stored = localStorage.getItem(LS_KEY);
-    if(stored) dat = JSON.parse(stored);
-  } catch(e) {
-    alert('データの読み込みに失敗しました: ' + e.message);
-    dat = memoryStorage.sites;
-  }
-  if(!dat && memoryStorage.sites) dat = memoryStorage.sites;
-  if (dat && typeof dat === "object") {
+    const dat = JSON.parse(localStorage.getItem(LS_KEY));
+      if (dat && typeof dat === "object") {
         Object.values(dat).forEach(s => {
           if(!s.kari) s.kari = { traffic_b: 0, temp_signal: 0, machine_transport: 0 };
           if(!s.curb) s.curb = { use: false, std: 0, small: 0, hand: 0 };
           if(!s.works) s.works = { earth: false, demo: false, anzen: false, kari: false, zatsu: false };
           if(!s.zatsu) s.zatsu = [];
-          if(!s.price) {
-            s.price = Object.fromEntries(priceKeys.map(k => [k, 0]));
-          } else {
-            priceKeys.forEach(k => { if(s.price[k] === undefined) s.price[k] = 0; });
-          }          if(Array.isArray(s.zatsu)) {
+          if(!s.price) s.price = { earth: 0, demo: 0, pave: 0, anzen: 0, kari: 0, zatsu: 0 };
+          if(Array.isArray(s.zatsu)) {
             s.zatsu.forEach(z => { if(z.spec === undefined) z.spec = ''; });
           }
           if(!s.demoSetting) s.demoSetting = { same: true, type: 'As', thick: 0, cutting: 0 };
@@ -123,8 +97,9 @@ function loadData() {
         for (const s of siteList) opt += `<option>${s}</option>`;
         document.getElementById('siteList').innerHTML = opt;
         document.getElementById('siteList').value = currentSite;
+      }
     }
-  }
+  } catch(e){}
 }
 
 function savePrices() {
@@ -133,30 +108,20 @@ function savePrices() {
     data[el.dataset.priceWork] = parseFloat(el.value) || 0;
   });
   prices = data;
-  try {
-    localStorage.setItem(PRICE_KEY, JSON.stringify(prices));
-  } catch(e) {
-    memoryStorage.prices = JSON.parse(JSON.stringify(prices));
-    alert('単価データの保存に失敗しました: ' + e.message);
-  }}
+  try { localStorage.setItem(PRICE_KEY, JSON.stringify(prices)); } catch(e) {}
+}
 
 function loadPrices() {
-  let dat = null;
   try {
-    const stored = localStorage.getItem(PRICE_KEY);
-    if(stored) dat = JSON.parse(stored);
-  } catch(e) {
-    alert('単価データの読み込みに失敗しました: ' + e.message);
-    dat = memoryStorage.prices;
-  }
-  if(!dat && memoryStorage.prices) dat = memoryStorage.prices;
-  if(dat && typeof dat === 'object') {
-    prices = dat;
-    Object.entries(prices).forEach(([work, val]) => {
-      const el = document.querySelector(`input[data-price-work="${work}"]`);
-      if(el) el.value = val;
-    });
-  }
+    const dat = JSON.parse(localStorage.getItem(PRICE_KEY));
+    if(dat && typeof dat === 'object') {
+      prices = dat;
+      Object.entries(prices).forEach(([work, val]) => {
+        const el = document.querySelector(`input[data-price-work="${work}"]`);
+        if(el) el.value = val;
+      });
+    }
+  } catch(e) {}
 }
 
 // ▼ バックアップ・インポート
@@ -179,11 +144,8 @@ function importData(e) {
           if(Array.isArray(s.zatsu)) {
             s.zatsu.forEach(z => { if(z.spec === undefined) z.spec = ''; });
           }
-          if(!s.price) {
-            s.price = Object.fromEntries(priceKeys.map(k => [k, 0]));
-          } else {
-            priceKeys.forEach(k => { if(s.price[k] === undefined) s.price[k] = 0; });
-          }        });
+          if(!s.price) s.price = { earth: 0, demo: 0, pave: 0, anzen: 0, kari: 0, zatsu: 0 };
+        });
         allSites = dat;
         const siteList = Object.keys(allSites);
         if (siteList.length) {
@@ -231,7 +193,7 @@ function addSite() {
     anzen: { line_outer: 0, line_stop: 0, line_symbol: 0 },
     kari: { traffic_b: 0, temp_signal: 0, machine_transport: 0 },
     zatsu: [],
-    price: Object.fromEntries(priceKeys.map(k => [k, 0])),
+    price: { earth: 0, demo: 0, pave: 0, anzen: 0, kari: 0, zatsu: 0 },
     curb: { use: false, std: 0, small: 0, hand: 0 },
     works: { earth: false, demo: false, anzen: false, kari: false, zatsu: false },
     earthSetting: { same: true, type: '標準掘削', thick: 0 },
@@ -332,7 +294,7 @@ function editKari(key, val, update = false) {
 function editPrice(key, val, update = false) {
   if(!currentSite) return;
   if(!allSites[currentSite].price) {
-    allSites[currentSite].price = Object.fromEntries(priceKeys.map(k => [k, 0]));
+    allSites[currentSite].price = { earth: 0, demo: 0, pave: 0, anzen: 0, kari: 0, zatsu: 0 };
   }
   allSites[currentSite].price[key] = parseFloat(val) || 0;
   if(update) renderAllAndSave();
@@ -357,30 +319,6 @@ function editCurb(key, val, update = false) {
   allSites[currentSite].curb[key] = parseFloat(val) || 0;
   if(update) renderAllAndSave();
 }
-function createInput(type, idx, key, value, opts = {}) {
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.dataset.type = type;
-  input.dataset.idx = idx;
-  input.dataset.key = key;
-  if (opts.inputmode) input.setAttribute('inputmode', opts.inputmode);
-  if (opts.pattern) input.setAttribute('pattern', opts.pattern);
-  if (opts.list) input.setAttribute('list', opts.list);
-  input.value = value || '';
-  input.addEventListener('input', e => editRow(type, idx, key, e.target.value));
-  input.addEventListener('blur', e => editRow(type, idx, key, e.target.value, true));
-  input.addEventListener('keydown', handleKey);
-  return input;
-}
-
-function createReadOnly(value) {
-  const input = document.createElement('input');
-  input.value = value || '';
-  input.className = 'readonly';
-  input.readOnly = true;
-  return input;
-}
-
 function renderTablePave() {
   if(!currentSite) return;
   const list = allSites[currentSite].pave;
@@ -417,79 +355,41 @@ function renderTablePave() {
     }
   }
   let tbody = '';
-  const tbodyEl = document.getElementById('tbodyPave');
-  tbodyEl.textContent = '';
   list.forEach((r,idx)=>{
-    const tr = document.createElement('tr');
-
-    const tdType = document.createElement('td');
-    const sel = document.createElement('select');
-    sel.className = 'pave-type';
-    sel.dataset.type = 'pave';
-    sel.dataset.idx = idx;
-    sel.dataset.key = '種別';
-    sel.addEventListener('change', e => editRow('pave', idx, '種別', e.target.value, true));
-    sel.addEventListener('keydown', handleKey);
-    paveTypes.forEach(tp => {
-      const opt = document.createElement('option');
-      opt.value = tp;
-      opt.textContent = tp;
-      if(r.種別 === tp) opt.selected = true;
-      sel.appendChild(opt);
-    });
-    tdType.appendChild(sel);
-    tr.appendChild(tdType);
-
-    let td = document.createElement('td');
-    td.appendChild(createInput('pave', idx, '測点', r.測点, {inputmode:'decimal', pattern:'[0-9+\\-.]*'}));
-    tr.appendChild(td);
-
-    td = document.createElement('td');
-    td.appendChild(createInput('pave', idx, '単距', r.単距, {inputmode:'decimal', pattern:'[0-9.+-]*'}));
-    tr.appendChild(td);
-
-    td = document.createElement('td');
-    td.appendChild(createReadOnly(r.追距));
-    tr.appendChild(td);
-
-    td = document.createElement('td');
-    td.appendChild(createInput('pave', idx, '幅員', r.幅員, {inputmode:'decimal', pattern:'[0-9.+-]*'}));
-    tr.appendChild(td);
-
-    td = document.createElement('td');
-    td.appendChild(createReadOnly(r.平均幅員));
-    tr.appendChild(td);
-
-    td = document.createElement('td');
-    td.appendChild(createReadOnly(r.面積));
-    tr.appendChild(td);
-
-    tbodyEl.appendChild(tr);
+    tbody += `<tr>
+      <td>
+        <select class="pave-type" data-type="pave" data-idx="${idx}" data-key="種別" onchange="editRow('pave',${idx},'種別',this.value,true)" onkeydown="handleKey(event)">
+          ${paveTypes.map(tp=>`<option value="${tp}"${r.種別===tp?' selected':''}>${tp}</option>`).join('')}
+        </select>
+      </td>
+      <td><input data-type="pave" data-idx="${idx}" data-key="測点" value="${r.測点||''}" type="text" inputmode="decimal" pattern="[0-9+\-.]*" oninput="editRow('pave',${idx},'測点',this.value)" onblur="editRow('pave',${idx},'測点',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="pave" data-idx="${idx}" data-key="単距" value="${r.単距||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('pave',${idx},'単距',this.value)" onblur="editRow('pave',${idx},'単距',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input value="${r.追距||''}" class="readonly" readonly></td>
+      <td><input data-type="pave" data-idx="${idx}" data-key="幅員" value="${r.幅員||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('pave',${idx},'幅員',this.value)" onblur="editRow('pave',${idx},'幅員',this.value,true)" onkeydown="handleKey(event)"></td>      <td><input value="${r.平均幅員||''}" class="readonly" readonly></td>      <td><input value="${r.面積||''}" class="readonly" readonly></td>
+    </tr>`;
   });
+  document.getElementById('tbodyPave').innerHTML = tbody;
   let sum = {アスファルト:0, コンクリート:0, オーバーレイ:0};
   list.forEach(r=>{
     if(!isNaN(parseFloat(r.面積))){
       sum[r.種別] += parseFloat(r.面積);
     }
   });
-  const sumEl = document.getElementById('sumPave');
-  sumEl.textContent = '';
-  const table = document.createElement('table');
-  table.className = 'ss-table';
-  const header = document.createElement('tr');
-  ['現場名','アスファルト合計','コンクリート合計','オーバーレイ合計'].forEach(t => {
-    const th = document.createElement('th');
-    th.textContent = t;
-    header.appendChild(th);
-  });
-  table.appendChild(header);
-  const row = document.createElement('tr');
-  let td = document.createElement('td'); td.textContent = currentSite; row.appendChild(td);
-  td = document.createElement('td'); td.textContent = sum.アスファルト.toFixed(2); row.appendChild(td);
-  td = document.createElement('td'); td.textContent = sum.コンクリート.toFixed(2); row.appendChild(td);
-  td = document.createElement('td'); td.textContent = sum.オーバーレイ.toFixed(2); row.appendChild(td);
-  table.appendChild(row);
-  sumEl.appendChild(table);
+  document.getElementById('sumPave').innerHTML =
+    `<table class="ss-table">
+      <tr>
+        <th>現場名</th>
+        <th>アスファルト合計</th>
+        <th>コンクリート合計</th>
+        <th>オーバーレイ合計</th>
+      </tr>
+      <tr>
+        <td>${currentSite}</td>
+        <td>${sum.アスファルト.toFixed(2)}</td>
+        <td>${sum.コンクリート.toFixed(2)}</td>
+        <td>${sum.オーバーレイ.toFixed(2)}</td>
+      </tr>
+    </table>`;
 }
 
 function renderTableEarth() {
@@ -520,34 +420,17 @@ function renderTableEarth() {
       }
     }
   }
-  const tbodyEl = document.getElementById('tbodyEarth');
-  tbodyEl.textContent = '';  
+  let tbody = '';
   list.forEach((r,idx)=>{
     tbody += `<tr>
-    const tr = document.createElement('tr');
-
-    let td = document.createElement('td');
-    td.appendChild(createInput('earth', idx, '測点', r.測点, {inputmode:'decimal', pattern:'[0-9+\-.]*'}));
-    tr.appendChild(td);
-
-    td = document.createElement('td');
-    td.appendChild(createInput('earth', idx, '単距', r.単距, {inputmode:'decimal', pattern:'[0-9.+-]*'}));
-    tr.appendChild(td);
-
-    td = document.createElement('td');
-    td.appendChild(createReadOnly(r.追距));
-    tr.appendChild(td);
-
-    td = document.createElement('td');
-    td.appendChild(createInput('earth', idx, '幅員', r.幅員, {inputmode:'decimal', pattern:'[0-9.+-]*'}));
-    tr.appendChild(td);
-
-    td = document.createElement('td');
-    td.appendChild(createReadOnly(r.面積));
-    tr.appendChild(td);
-
-    tbodyEl.appendChild(tr);
+      <td><input data-type="earth" data-idx="${idx}" data-key="測点" value="${r.測点||''}" type="text" inputmode="decimal" pattern="[0-9+\-.]*" oninput="editRow('earth',${idx},'測点',this.value)" onblur="editRow('earth',${idx},'測点',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="earth" data-idx="${idx}" data-key="単距" value="${r.単距||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('earth',${idx},'単距',this.value)" onblur="editRow('earth',${idx},'単距',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input value="${r.追距||''}" class="readonly" readonly></td>
+      <td><input data-type="earth" data-idx="${idx}" data-key="幅員" value="${r.幅員||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('earth',${idx},'幅員',this.value)" onblur="editRow('earth',${idx},'幅員',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input value="${r.面積||''}" class="readonly" readonly></td>
+    </tr>`;
   });
+  document.getElementById('tbodyEarth').innerHTML = tbody;
 }
 
 function renderTableDemo() {
@@ -578,33 +461,17 @@ function renderTableDemo() {
       }
     }
   }
-  const tbodyEl = document.getElementById('tbodyDemo');
-  tbodyEl.textContent = '';
+  let tbody = '';
   list.forEach((r,idx)=>{
-    const tr = document.createElement('tr');
-
-    let td = document.createElement('td');
-    td.appendChild(createInput('demo', idx, '測点', r.測点, {inputmode:'decimal', pattern:'[0-9+\-.]*'}));
-    tr.appendChild(td);
-
-    td = document.createElement('td');
-    td.appendChild(createInput('demo', idx, '単距', r.単距, {inputmode:'decimal', pattern:'[0-9.+-]*'}));
-    tr.appendChild(td);
-
-    td = document.createElement('td');
-    td.appendChild(createReadOnly(r.追距));
-    tr.appendChild(td);
-
-    td = document.createElement('td');
-    td.appendChild(createInput('demo', idx, '幅員', r.幅員, {inputmode:'decimal', pattern:'[0-9.+-]*'}));
-    tr.appendChild(td);
-
-    td = document.createElement('td');
-    td.appendChild(createReadOnly(r.面積));
-    tr.appendChild(td);
-
-    tbodyEl.appendChild(tr);
+    tbody += `<tr>
+      <td><input data-type="demo" data-idx="${idx}" data-key="測点" value="${r.測点||''}" type="text" inputmode="decimal" pattern="[0-9+\-.]*" oninput="editRow('demo',${idx},'測点',this.value)" onblur="editRow('demo',${idx},'測点',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="demo" data-idx="${idx}" data-key="単距" value="${r.単距||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('demo',${idx},'単距',this.value)" onblur="editRow('demo',${idx},'単距',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input value="${r.追距||''}" class="readonly" readonly></td>
+      <td><input data-type="demo" data-idx="${idx}" data-key="幅員" value="${r.幅員||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('demo',${idx},'幅員',this.value)" onblur="editRow('demo',${idx},'幅員',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input value="${r.面積||''}" class="readonly" readonly></td>
+    </tr>`;
   });
+  document.getElementById('tbodyDemo').innerHTML = tbody;
 }
 
 // ▼ 土工集計
@@ -674,10 +541,12 @@ function renderKariInputs() {
 function renderPriceInputs() {
   if(!currentSite) return;
   const dat = allSites[currentSite].price || {};
-  priceKeys.forEach(k => {
-    const el = document.getElementById('price_' + k);
-    if(el) el.value = dat[k] || 0;
-  });
+  document.getElementById('priceEarth').value = dat.earth || 0;
+  document.getElementById('priceDemo').value = dat.demo || 0;
+  document.getElementById('pricePave').value = dat.pave || 0;
+  document.getElementById('priceAnzen').value = dat.anzen || 0;
+  document.getElementById('priceKari').value = dat.kari || 0;
+  document.getElementById('priceZatsu').value = dat.zatsu || 0;
 }
 function renderCurbInputs() {
   if(!currentSite) return;
@@ -709,45 +578,26 @@ function updateZatsuNameList() {
 function renderTableZatsu() {
   if(!currentSite) return;
   const list = allSites[currentSite].zatsu || [];
-  const tbodyEl = document.getElementById('tbodyZatsu');
-  tbodyEl.textContent = '';  
+  let tbody = '';
   list.forEach((r, idx) => {
-    const tr = document.createElement('tr');
-
-    let td = document.createElement('td');
-    td.appendChild(createInput('zatsu', idx, 'name', r.name, {list:'zatsuNameList'}));
-    tr.appendChild(td);
-
-    td = document.createElement('td');
-    td.appendChild(createInput('zatsu', idx, 'spec', r.spec));
-    tr.appendChild(td);
-
-    td = document.createElement('td');
-    td.appendChild(createInput('zatsu', idx, 'unit', r.unit));
-    tr.appendChild(td);
-
-    td = document.createElement('td');
-    td.appendChild(createInput('zatsu', idx, 'qty', r.qty, {inputmode:'decimal', pattern:'[0-9.+-]*'}));
-    tr.appendChild(td);
-
-    tbodyEl.appendChild(tr);
+    tbody += `<tr>
+      <td><input list="zatsuNameList" data-type="zatsu" data-idx="${idx}" data-key="name" value="${r.name||''}" type="text" oninput="editRow('zatsu',${idx},'name',this.value)" onblur="editRow('zatsu',${idx},'name',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="zatsu" data-idx="${idx}" data-key="spec" value="${r.spec||''}" type="text" oninput="editRow('zatsu',${idx},'spec',this.value)" onblur="editRow('zatsu',${idx},'spec',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="zatsu" data-idx="${idx}" data-key="unit" value="${r.unit||''}" type="text" oninput="editRow('zatsu',${idx},'unit',this.value)" onblur="editRow('zatsu',${idx},'unit',this.value,true)" onkeydown="handleKey(event)"></td>
+      <td><input data-type="zatsu" data-idx="${idx}" data-key="qty" value="${r.qty||''}" type="text" inputmode="decimal" pattern="[0-9.+-]*" oninput="editRow('zatsu',${idx},'qty',this.value)" onblur="editRow('zatsu',${idx},'qty',this.value,true)" onkeydown="handleKey(event)"></td>
+    </tr>`;
   });
+  document.getElementById('tbodyZatsu').innerHTML = tbody;
   const totals = {};
   list.forEach(r => {
     const n = r.name || '';
     totals[n] = (totals[n] || 0) + (parseFloat(r.qty) || 0);
   });
-  const resultEl = document.getElementById('zatsuResult');
-  resultEl.textContent = '';
-  const entries = Object.entries(totals).filter(([n, t]) => t && n);
-  if(entries.length){
-    const div = document.createElement('div');
-    entries.forEach(([n,t],i) => {
-      if(i>0) div.append(document.createTextNode('　'));
-      div.append(document.createTextNode(`${n}: ${t.toFixed(2)}`));
-    });
-    resultEl.appendChild(div);
-  }
+  const html = Object.entries(totals)
+    .filter(([n, t]) => t && n)
+    .map(([n, t]) => `${n}: ${t.toFixed(2)}`)
+    .join('　');
+  document.getElementById('zatsuResult').innerHTML = html ? `<div>${html}</div>` : '';
   updateZatsuNameList();
 }
 
@@ -1497,122 +1347,14 @@ function closeCalc() {
   document.getElementById('calcOverlay').classList.add('hidden');
 }
 
-function tokenize(expr) {
-  const tokens = [];
-  let i = 0;
-  while(i < expr.length) {
-    const c = expr[i];
-    if(/\s/.test(c)) { i++; continue; }
-    if(/[0-9.]/.test(c)) {
-      let num = c; i++;
-      while(i < expr.length && /[0-9.]/.test(expr[i])) {
-        if(expr[i] === '.' && num.includes('.')) throw new Error('Invalid number');
-        num += expr[i]; i++;
-      }
-      tokens.push(parseFloat(num));
-      continue;
-    }
-    if('+-*/()'.includes(c)) {
-      const prev = tokens[tokens.length-1];
-      const nextChar = expr.slice(i+1).trim()[0];
-      if((c === '+' || c === '-') && (tokens.length===0 || (typeof prev !== 'number' && prev !== ')'))) {
-        if(nextChar === '(') {
-          tokens.push(0);
-          tokens.push(c);
-          i++;
-          continue;
-        }
-        let j = i + 1;
-        let num = '';
-        while(j < expr.length && /[0-9.]/.test(expr[j])) {
-          if(expr[j] === '.' && num.includes('.')) throw new Error('Invalid number');
-          num += expr[j]; j++;
-        }
-        if(num === '') throw new Error('Expected number after sign');
-        tokens.push(parseFloat(c + num));
-        i = j;
-        continue;
-      }
-      tokens.push(c);
-      i++;
-      continue;
-    }
-    throw new Error(`Invalid character '${c}' at position ${i}`);
-  }
-  return tokens;
-}
-
-function toRPN(tokens) {
-  const output = [];
-  const ops = [];
-  const prec = { '+':1, '-':1, '*':2, '/':2 };
-  tokens.forEach(t => {
-    if(typeof t === 'number') {
-      output.push(t);
-    } else if(t in prec) {
-      while(ops.length && ops[ops.length-1] !== '(' && prec[ops[ops.length-1]] >= prec[t]) {
-        output.push(ops.pop());
-      }
-      ops.push(t);
-    } else if(t === '(') {
-      ops.push(t);
-    } else if(t === ')') {
-      let found = false;
-      while(ops.length) {
-        const op = ops.pop();
-        if(op === '(') { found = true; break; }
-        output.push(op);
-      }
-      if(!found) throw new Error('Mismatched parentheses');
-    } else {
-      throw new Error('Unknown token');
-    }
-  });
-  while(ops.length) {
-    const op = ops.pop();
-    if(op === '(') throw new Error('Mismatched parentheses');
-    output.push(op);
-  }
-  return output;
-}
-
-function evalRPN(rpn) {
-  const stack = [];
-  rpn.forEach(t => {
-    if(typeof t === 'number') {
-      stack.push(t);
-    } else {
-      if(stack.length < 2) throw new Error('Insufficient values');
-      const b = stack.pop();
-      const a = stack.pop();
-      switch(t) {
-        case '+': stack.push(a + b); break;
-        case '-': stack.push(a - b); break;
-        case '*': stack.push(a * b); break;
-        case '/':
-          if(b === 0) throw new Error('Division by zero');
-          stack.push(a / b);
-          break;
-        default: throw new Error('Unknown operator');
-      }
-    }
-  });
-  if(stack.length !== 1) throw new Error('Invalid expression');
-  return stack[0];
-}
-
-function safeEvaluate(expr) {
-  return evalRPN(toRPN(tokenize(expr)));
-}
-
 function calcKey(e) {
   if(e.key === 'Enter') {
     try {
       const v = document.getElementById('calcInput').value;
-      const r = safeEvaluate(v);
+      const r = eval(v);
       document.getElementById('calcResult').textContent = r;
     } catch(err) {
-      document.getElementById('calcResult').textContent = err.message;
+      document.getElementById('calcResult').textContent = 'Error';
     }
   }
 }
