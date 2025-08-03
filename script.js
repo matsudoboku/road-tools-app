@@ -6,6 +6,7 @@ let currentSite = '';
 let nextFocus = null;
 let prices = {};
 const paveTypes = ["アスファルト", "コンクリート", "オーバーレイ"];
+const priceKeys = [
   "machine_excavation", "residual_soil",
   "cutting", "break_as", "haizan_unpan_as", "haizan_shori_as",
   "break_con", "haizan_unpan_con", "haizan_shori_con",
@@ -13,7 +14,7 @@ const paveTypes = ["アスファルト", "コンクリート", "オーバーレ�
   "ovl_lt1_4", "ovl_ge1_4", "ovl_ge3_0", "con_total",
   "curb_std", "curb_small", "curb_hand",
   "line_outer", "line_stop", "line_symbol",
-  "traffic_b", "temp_signal", "machine_transport"
+  "traffic_b", "temp_signal", "machine_transport",
 ];
 const worksList = [
   { id: "Works", label: "工種設定", always: true, panel: "panelWorks" },
