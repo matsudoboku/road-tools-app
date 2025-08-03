@@ -297,7 +297,10 @@ function editPrice(key, val, update = false) {
       allSites[currentSite].price = {};
     }
   allSites[currentSite].price[key] = parseFloat(val) || 0;
-  if(update) renderAllAndSave();
+  if(update) {
+    renderAllAndSave();
+    renderPriceTotal();
+  }
 }
 function toggleCurbInputs() {
   if(!currentSite) return;
@@ -538,14 +541,106 @@ function renderKariInputs() {
   document.getElementById('kariTempSignal').value = dat.temp_signal || 0;
   document.getElementById('kariMachineTrans').value = dat.machine_transport || 0;
 }
-  function renderPriceInputs() {
-    if(!currentSite) return;
-    const dat = allSites[currentSite].price || {};
-    document.querySelectorAll('#panelPrice input[data-price-work]').forEach(el => {
-      const key = el.dataset.priceWork;
-      el.value = dat[key] || 0;
-    });
+function renderPriceInputs() {
+  if(!currentSite) return;
+  const dat = allSites[currentSite].price || {};
+  document.querySelectorAll('#panelPrice input[data-price-work]').forEach(el => {
+    const key = el.dataset.priceWork;
+    el.value = dat[key] || 0;
+  });
+}
+function renderPriceTotal() {
+  if(!currentSite) return;
+  const site = allSites[currentSite] || {};
+  const prices = site.price || {};
+  const works = site.works || {};
+  const paveList = site.pave || [];
+  const paveSum = paveList.reduce((a, r) => a + (parseFloat(r.面積) || 0), 0);
+  let total = 0;
+
+  if (works.earth) {
+    const set = site.earthSetting || {};
+    const area = set.same
+      ? paveSum
+      : (site.earth || []).reduce((a, r) => a + (parseFloat(r.面積) || 0), 0);
+    const thick = parseFloat(set.thick) || 0;
+    const vol = area * thick / 100;
+    total += vol * (prices.earth_machine || 0);
+    total += vol * (prices.earth_soil || 0);
   }
+
+  if (works.demo) {
+    const set = site.demoSetting || {};
+    const thick = parseFloat(set.thick) || 0;
+    const cutting = parseFloat(set.cutting) || 0;
+    total += cutting * (prices.demo_cut || 0);
+    const areaDemo = set.same
+      ? paveSum
+      : (site.demo || []).reduce((a, r) => a + (parseFloat(r.面積) || 0), 0);
+    let break_as = 0, break_con = 0;
+    if (set.type === 'As') break_as = areaDemo;
+    else if (set.type === 'Con') break_con = areaDemo;
+    else if (set.type === 'As+Con') { break_as = areaDemo; break_con = areaDemo; }
+    const haul_as = break_as * thick / 100;
+    const dispose_as = haul_as * 2.35;
+    const haul_con = break_con * thick / 100;
+    const dispose_con = haul_con * 2.35;
+    total += break_as * (prices.demo_break_as || 0);
+    total += haul_as * (prices.demo_haul_as || 0);
+    total += dispose_as * (prices.demo_dispose_as || 0);
+    total += break_con * (prices.demo_break_con || 0);
+    total += haul_con * (prices.demo_haul_con || 0);
+    total += dispose_con * (prices.demo_dispose_con || 0);
+  }
+
+  let as_lt1_4 = 0, as_ge1_4 = 0, as_ge3_0 = 0,
+      ovl_lt1_4 = 0, ovl_ge1_4 = 0, ovl_ge3_0 = 0, con_total = 0;
+  paveList.forEach(r => {
+    const area = parseFloat(r.面積) || 0;
+    if (r.種別 === 'アスファルト') {
+      if (r.平均幅員 === '1.4未満') as_lt1_4 += area;
+      else if (r.平均幅員 === '1.4以上') as_ge1_4 += area;
+      else if (r.平均幅員 === '3.0以上') as_ge3_0 += area;
+    } else if (r.種別 === 'オーバーレイ') {
+      if (r.平均幅員 === '1.4未満') ovl_lt1_4 += area;
+      else if (r.平均幅員 === '1.4以上') ovl_ge1_4 += area;
+      else if (r.平均幅員 === '3.0以上') ovl_ge3_0 += area;
+    } else if (r.種別 === 'コンクリート') {
+      con_total += area;
+    }
+  });
+  const base_area = as_lt1_4 + as_ge1_4 + as_ge3_0;
+  total += as_lt1_4 * (prices.pave_as_lt14 || 0);
+  total += as_ge1_4 * (prices.pave_as_ge14 || 0);
+  total += as_ge3_0 * (prices.pave_as_ge3 || 0);
+  total += base_area * (prices.pave_base || 0);
+  total += ovl_lt1_4 * (prices.pave_overlay_lt14 || 0);
+  total += ovl_ge1_4 * (prices.pave_overlay_ge14 || 0);
+  total += ovl_ge3_0 * (prices.pave_overlay_ge3 || 0);
+  total += con_total * (prices.pave_concrete || 0);
+
+  const curb = site.curb || {};
+  if (curb.use) {
+    total += (curb.std || 0) * (prices.curb_std || 0);
+    total += (curb.small || 0) * (prices.curb_small || 0);
+    total += (curb.hand || 0) * (prices.curb_hand || 0);
+  }
+
+  const anzen = site.anzen || {};
+  total += (anzen.line_outer || 0) * (prices.safety_line_outer || 0);
+  total += (anzen.line_stop || 0) * (prices.safety_line_stop || 0);
+  total += (anzen.line_symbol || 0) * (prices.safety_line_symbol || 0);
+
+  const kari = site.kari || {};
+  total += (kari.traffic_b || 0) * (prices.safety_traffic_b || 0);
+  total += (kari.temp_signal || 0) * (prices.safety_temp_signal || 0);
+  total += (kari.machine_transport || 0) * (prices.other_machine_transport || 0);
+
+  const el = document.getElementById('priceTotal');
+  if(el) {
+    el.textContent = `合計金額：${Math.round(total).toLocaleString()}円`;
+  }
+}
 function renderCurbInputs() {
   if(!currentSite) return;
   const dat = allSites[currentSite].curb || { use: false, std: 0, small: 0, hand: 0 };
@@ -636,6 +731,7 @@ function renderAll() {
   renderAnzenInputs();
   renderKariInputs();
   renderPriceInputs();
+  renderPriceTotal();
   showSummary();
 }
 
