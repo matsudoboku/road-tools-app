@@ -85,8 +85,13 @@ function loadData() {
           if(Array.isArray(s.zatsu)) {
             s.zatsu.forEach(z => { if(z.spec === undefined) z.spec = ''; });
           }
-          if(!s.demoSetting) s.demoSetting = { same: true, type: 'As', thick: 0, cutting: 0 };
-          else if(s.demoSetting.cutting === undefined) s.demoSetting.cutting = 0;
+          if(!s.demoSetting) {
+            s.demoSetting = { same: true, type: 'As', thick: 4, cutting: 0 };
+          } else {
+            if(s.demoSetting.thick === undefined || s.demoSetting.thick === 0)
+              s.demoSetting.thick = s.demoSetting.type === 'Con' ? 10 : 4;
+            if(s.demoSetting.cutting === undefined) s.demoSetting.cutting = 0;
+          }
         });
         allSites = dat;
       // サイトリスト描画
@@ -197,7 +202,7 @@ function addSite() {
     curb: { use: false, std: 0, small: 0, hand: 0 },
     works: { earth: false, demo: false, anzen: false, kari: false, zatsu: false },
     earthSetting: { same: true, type: '標準掘削', thick: 0 },
-    demoSetting: { same: true, type: 'As', thick: 0, cutting: 0 }
+    demoSetting: { same: true, type: 'As', thick: 4, cutting: 0 }
   };
   document.getElementById('siteList').innerHTML += `<option>${name}</option>`;
   document.getElementById('siteList').value = name;
@@ -528,11 +533,17 @@ function renderEarthSetting() {
 
 function renderDemoSetting() {
   if(!currentSite) return;
-  const set = allSites[currentSite].demoSetting || { same: true, type: 'As', thick: 0, cutting: 0 };
-  document.getElementById('demoSamePave').checked = set.same || false;
+  const set = allSites[currentSite].demoSetting || { same: true, type: 'As', thick: 4, cutting: 0 };
+  if(set.thick === undefined || set.thick === 0)
+    set.thick = set.type === 'Con' ? 10 : 4;  document.getElementById('demoSamePave').checked = set.same || false;
   document.getElementById('demoType').value = set.type || 'As';
-  document.getElementById('demoThick').value = set.thick || 0;
+  document.getElementById('demoThick').value = set.thick;
   document.getElementById('demoCutting').value = set.cutting || 0;
+}
+function updateDemoThickDefault() {
+  const type = document.getElementById('demoType').value;
+  document.getElementById('demoThick').value = type === 'Con' ? 10 : 4;
+  saveAndUpdate();
 }
 function renderKariInputs() {
   if(!currentSite) return;
@@ -571,7 +582,8 @@ function renderPriceTotal() {
 
   if (works.demo) {
     const set = site.demoSetting || {};
-    const thick = parseFloat(set.thick) || 0;
+    let thick = parseFloat(set.thick);
+    if(!thick) thick = set.type === 'Con' ? 10 : 4;
     const cutting = parseFloat(set.cutting) || 0;
     total += cutting * (prices.demo_cut || 0);
     const areaDemo = set.same
@@ -936,8 +948,8 @@ function getSummaryHtml(forExcel = false) {
     let haizan_unpan_as = 0, haizan_shori_as = 0, haizan_unpan_con = 0, haizan_shori_con = 0;
     let demoSetting = allSites[site].demoSetting || {};
     let demoType = demoSetting.type;
-    let demoThick = parseFloat(demoSetting.thick)||0;
-    if (allSites[site].works && allSites[site].works.demo) {
+    let demoThick = parseFloat(demoSetting.thick);
+    if(!demoThick) demoThick = demoType === 'Con' ? 10 : 4;    if (allSites[site].works && allSites[site].works.demo) {
       cutting = parseFloat(demoSetting.cutting) || 0;
       let areaDemo = demoSetting.same ? paveSum : (allSites[site].demo || []).reduce((a, r) => a + (parseFloat(r.面積) || 0), 0);
       if (demoType === "As") {
@@ -1142,7 +1154,8 @@ function getQuantityHtml() {
     if(dat.works && dat.works.demo) {
       const set = dat.demoSetting || {};
       const demoType = set.type;
-      const thick = parseFloat(set.thick) || 0;
+      let thick = parseFloat(set.thick);
+      if(!thick) thick = demoType === 'Con' ? 10 : 4;
       const demoList = set.same ? (dat.pave || []) : (dat.demo || []);
       const areaDemoFormula = demoList
         .map((_, i) => getAreaFormula(demoList, i))
