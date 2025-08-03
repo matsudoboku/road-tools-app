@@ -1361,14 +1361,122 @@ function closeCalc() {
   document.getElementById('calcOverlay').classList.add('hidden');
 }
 
+function tokenize(expr) {
+  const tokens = [];
+  let i = 0;
+  while(i < expr.length) {
+    const c = expr[i];
+    if(/\s/.test(c)) { i++; continue; }
+    if(/[0-9.]/.test(c)) {
+      let num = c; i++;
+      while(i < expr.length && /[0-9.]/.test(expr[i])) {
+        if(expr[i] === '.' && num.includes('.')) throw new Error('Invalid number');
+        num += expr[i]; i++;
+      }
+      tokens.push(parseFloat(num));
+      continue;
+    }
+    if('+-*/()'.includes(c)) {
+      const prev = tokens[tokens.length-1];
+      const nextChar = expr.slice(i+1).trim()[0];
+      if((c === '+' || c === '-') && (tokens.length===0 || (typeof prev !== 'number' && prev !== ')'))) {
+        if(nextChar === '(') {
+          tokens.push(0);
+          tokens.push(c);
+          i++;
+          continue;
+        }
+        let j = i + 1;
+        let num = '';
+        while(j < expr.length && /[0-9.]/.test(expr[j])) {
+          if(expr[j] === '.' && num.includes('.')) throw new Error('Invalid number');
+          num += expr[j]; j++;
+        }
+        if(num === '') throw new Error('Expected number after sign');
+        tokens.push(parseFloat(c + num));
+        i = j;
+        continue;
+      }
+      tokens.push(c);
+      i++;
+      continue;
+    }
+    throw new Error(`Invalid character '${c}' at position ${i}`);
+  }
+  return tokens;
+}
+
+function toRPN(tokens) {
+  const output = [];
+  const ops = [];
+  const prec = { '+':1, '-':1, '*':2, '/':2 };
+  tokens.forEach(t => {
+    if(typeof t === 'number') {
+      output.push(t);
+    } else if(t in prec) {
+      while(ops.length && ops[ops.length-1] !== '(' && prec[ops[ops.length-1]] >= prec[t]) {
+        output.push(ops.pop());
+      }
+      ops.push(t);
+    } else if(t === '(') {
+      ops.push(t);
+    } else if(t === ')') {
+      let found = false;
+      while(ops.length) {
+        const op = ops.pop();
+        if(op === '(') { found = true; break; }
+        output.push(op);
+      }
+      if(!found) throw new Error('Mismatched parentheses');
+    } else {
+      throw new Error('Unknown token');
+    }
+  });
+  while(ops.length) {
+    const op = ops.pop();
+    if(op === '(') throw new Error('Mismatched parentheses');
+    output.push(op);
+  }
+  return output;
+}
+
+function evalRPN(rpn) {
+  const stack = [];
+  rpn.forEach(t => {
+    if(typeof t === 'number') {
+      stack.push(t);
+    } else {
+      if(stack.length < 2) throw new Error('Insufficient values');
+      const b = stack.pop();
+      const a = stack.pop();
+      switch(t) {
+        case '+': stack.push(a + b); break;
+        case '-': stack.push(a - b); break;
+        case '*': stack.push(a * b); break;
+        case '/':
+          if(b === 0) throw new Error('Division by zero');
+          stack.push(a / b);
+          break;
+        default: throw new Error('Unknown operator');
+      }
+    }
+  });
+  if(stack.length !== 1) throw new Error('Invalid expression');
+  return stack[0];
+}
+
+function safeEvaluate(expr) {
+  return evalRPN(toRPN(tokenize(expr)));
+}
+
 function calcKey(e) {
   if(e.key === 'Enter') {
     try {
       const v = document.getElementById('calcInput').value;
-      const r = eval(v);
+      const r = safeEvaluate(v);
       document.getElementById('calcResult').textContent = r;
     } catch(err) {
-      document.getElementById('calcResult').textContent = 'Error';
+      document.getElementById('calcResult').textContent = err.message;
     }
   }
 }
