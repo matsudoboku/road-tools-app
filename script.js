@@ -1440,16 +1440,30 @@ function openCalc() {
 function closeCalc() {
   document.getElementById('calcOverlay').classList.add('hidden');
 }
+function calcInsert(char) {
+  const input = document.getElementById('calcInput');
+  input.value += char;
+  input.focus();
+}
+
+function calcClear() {
+  document.getElementById('calcInput').value = '';
+  document.getElementById('calcResult').textContent = '';
+}
+
+function calcCalculate() {
+  try {
+    const v = document.getElementById('calcInput').value;
+    const r = eval(v);
+    document.getElementById('calcResult').textContent = r;
+  } catch(err) {
+    document.getElementById('calcResult').textContent = 'Error';
+  }
+}
 
 function calcKey(e) {
   if(e.key === 'Enter') {
-    try {
-      const v = document.getElementById('calcInput').value;
-      const r = eval(v);
-      document.getElementById('calcResult').textContent = r;
-    } catch(err) {
-      document.getElementById('calcResult').textContent = 'Error';
-    }
+    calcCalculate();
   }
 }
 
