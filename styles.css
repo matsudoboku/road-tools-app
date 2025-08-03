@@ -269,6 +269,12 @@ body {
       overflow-x: auto;
       white-space: nowrap;
     }
+    .price-group { margin-bottom: 10px; }
+    .price-group h5 {
+      margin: 8px 0 4px 0;
+      color: #007aff;
+      font-size: 1.05em;
+    }
     @media (max-width: 900px) {
       .container {padding: 5px;}
       .block {padding: 8px;}
