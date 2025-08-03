@@ -41,7 +41,7 @@
       <label>取り壊し工 <input type="checkbox" id="chkWorksDemo" onchange="renderTabs()"></label>
       <div id="worksDemoSetting" class="works-setting hidden">
         <label>舗装面積と同じ <input type="checkbox" id="demoSamePave" onchange="saveAndUpdate();renderTabs()"></label>
-        <select id="demoType" onchange="saveAndUpdate()">
+        <select id="demoType" onchange="updateDemoThickDefault()">
           <option>As</option>
           <option>Con</option>
           <option>As+Con</option>
