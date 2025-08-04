@@ -15,9 +15,9 @@
   <div class="block controls" style="margin-bottom:26px">
     <label>現場名:</label>
     <input id="siteName" class="siteName" placeholder="例：〇〇号線">
-    <button class="btn" onclick="addSite()">追加</button>
-    <button class="btn" onclick="renameSite()">名称変更</button>
-    <select id="siteList" onchange="switchSite()"></select>
+    <button id="btnAddSite" class="btn">追加</button>
+    <button id="btnRenameSite" class="btn">名称変更</button>
+    <select id="siteList"></select>
   </div>
 
   <!-- タブ（動的生成） -->
@@ -28,20 +28,20 @@
   <div id="panelWorks" class="block">
     <h4>工種設定</h4>
     <div>
-      <label>土工 <input type="checkbox" id="chkWorksEarth" onchange="renderTabs()"></label>
+      <label>土工 <input type="checkbox" id="chkWorksEarth"></label>
       <div id="worksEarthSetting" class="works-setting hidden">
-        <label>舗装面積と同じ <input type="checkbox" id="earthSamePave" onchange="saveAndUpdate();renderTabs()"></label>
-        <select id="earthType" onchange="saveAndUpdate()">
+        <label>舗装面積と同じ <input type="checkbox" id="earthSamePave"></label>
+        <select id="earthType">
           <option>標準掘削</option>
           <option>標準以下掘削</option>
         </select>
-        <label>掘削厚（cm）：<input type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" id="earthThick" style="width:60px;" onchange="saveAndUpdate()"></label>      </div>
+        <label>掘削厚（cm）：<input type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" id="earthThick" style="width:60px;"></label>      </div>
     </div>
     <div>
-      <label>取り壊し工 <input type="checkbox" id="chkWorksDemo" onchange="renderTabs()"></label>
+      <label>取り壊し工 <input type="checkbox" id="chkWorksDemo"></label>
       <div id="worksDemoSetting" class="works-setting hidden">
-        <label>舗装面積と同じ <input type="checkbox" id="demoSamePave" onchange="saveAndUpdate();renderTabs()"></label>
-        <select id="demoType" onchange="updateDemoThickDefault()">
+        <label>舗装面積と同じ <input type="checkbox" id="demoSamePave"></label>
+        <select id="demoType">
           <option>As</option>
           <option>Con</option>
           <option>As+Con</option>
@@ -51,7 +51,7 @@
       </div>
     </div>
     <div>
-      <label>安全施設工 <input type="checkbox" id="chkWorksAnzen" onchange="renderTabs()"></label>
+      <label>安全施設工 <input type="checkbox" id="chkWorksAnzen"></label>
       <div id="worksAnzenSetting" class="works-setting hidden">
         <label>外側線：<input id="anzenLineOuter" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editAnzen('line_outer', this.value)" onblur="editAnzen('line_outer', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
         <label>停止線：<input id="anzenLineStop" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editAnzen('line_stop', this.value)" onblur="editAnzen('line_stop', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
@@ -59,7 +59,7 @@
       </div>
     </div>
     <div>
-      <label>仮設工 <input type="checkbox" id="chkWorksKari" onchange="renderTabs()"></label>
+      <label>仮設工 <input type="checkbox" id="chkWorksKari"></label>
       <div id="worksKariSetting" class="works-setting hidden">
         <label>交通誘導員B：<input id="kariTrafficB" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editKari('traffic_b', this.value)" onblur="editKari('traffic_b', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
         <label>仮設信号機：<input id="kariTempSignal" type="text" inputmode="decimal" pattern="[0-9.+-]*" class="numeric" oninput="editKari('temp_signal', this.value)" onblur="editKari('temp_signal', this.value, true)" onkeydown="if(event.key==='Enter') this.blur();"></label>
@@ -67,7 +67,7 @@
       </div>
     </div>
     <div>
-      <label>雑工 <input type="checkbox" id="chkWorksZatsu" onchange="renderTabs()"></label>
+      <label>雑工 <input type="checkbox" id="chkWorksZatsu"></label>
     </div>
     <div style="overflow-x:auto;">
       <div class="summary-table"></div>
