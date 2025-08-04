@@ -297,12 +297,14 @@ function editKari(key, val, update = false) {
   if(update) renderAllAndSave();
 }
 function editPrice(key, val, update = false) {
-  if(!currentSite) return;
-    if(!allSites[currentSite].price) {
-      allSites[currentSite].price = {};
-    }
-  allSites[currentSite].price[key] = parseFloat(val) || 0;
+  const num = parseFloat(val) || 0;
+  prices[key] = num;
+  Object.values(allSites).forEach(s => {
+    if(!s.price) s.price = {};
+    s.price[key] = num;
+  });
   if(update) {
+    savePrices();
     renderAllAndSave();
     renderPriceTotal();
   }
@@ -553,11 +555,9 @@ function renderKariInputs() {
   document.getElementById('kariMachineTrans').value = dat.machine_transport || 0;
 }
 function renderPriceInputs() {
-  if(!currentSite) return;
-  const dat = allSites[currentSite].price || {};
   document.querySelectorAll('#panelPrice input[data-price-work]').forEach(el => {
     const key = el.dataset.priceWork;
-    el.value = dat[key] || 0;
+    el.value = prices[key] || 0;
   });
 }
 function calculateSiteTotal(site, prices) {
