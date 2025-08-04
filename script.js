@@ -1501,4 +1501,17 @@ window.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('input[data-price-work]').forEach(el => {
     el.addEventListener('input', savePrices);
   });
+  document.getElementById('btnAddSite').addEventListener('click', addSite);
+  document.getElementById('btnRenameSite').addEventListener('click', renameSite);
+  document.getElementById('siteList').addEventListener('change', switchSite);
+  document.getElementById('chkWorksEarth').addEventListener('change', renderTabs);
+  document.getElementById('chkWorksDemo').addEventListener('change', renderTabs);
+  document.getElementById('chkWorksAnzen').addEventListener('change', renderTabs);
+  document.getElementById('chkWorksKari').addEventListener('change', renderTabs);
+  document.getElementById('chkWorksZatsu').addEventListener('change', renderTabs);
+  document.getElementById('earthSamePave').addEventListener('change', () => { saveAndUpdate(); renderTabs(); });
+  document.getElementById('earthType').addEventListener('change', saveAndUpdate);
+  document.getElementById('earthThick').addEventListener('change', saveAndUpdate);
+  document.getElementById('demoSamePave').addEventListener('change', () => { saveAndUpdate(); renderTabs(); });
+  document.getElementById('demoType').addEventListener('change', updateDemoThickDefault);
 });
