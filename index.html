@@ -15,8 +15,8 @@
   <div class="block controls" style="margin-bottom:26px">
     <label>現場名:</label>
     <input id="siteName" class="siteName" placeholder="例：〇〇号線">
-    <button id="btnAddSite" class="btn">追加</button>
-    <button id="btnRenameSite" class="btn">名称変更</button>
+    <button type="button" class="btn" onclick="addSite()">追加</button>
+    <button type="button" class="btn" onclick="renameSite()">名称変更</button>
     <select id="siteList"></select>
   </div>
 
@@ -77,7 +77,7 @@
   <!-- 土工タブ -->
   <div id="panelEarth" class="block hidden">
     <h4>土工（体積計算）</h4>
-    <button class="btn" onclick="addRow('earth')">行追加</button>
+    <button type="button" class="btn" onclick="addRow('earth')">行追加</button>
     <div id="earthTable" style="overflow-x:auto;">
       <div class="scroll-x-guide">(横スクロール可)</div>
       <table>
@@ -101,7 +101,7 @@
   <!-- 舗装工タブ -->
     <div id="panelPave" class="block hidden">
       <h4>舗装工</h4>
-      <button class="btn" onclick="addRow('pave')">行追加</button>
+      <button type="button" class="btn" onclick="addRow('pave')">行追加</button>
     <div style="overflow-x:auto;">
       <div class="scroll-x-guide">(横スクロール可)</div>
       <table>
@@ -137,7 +137,7 @@
   <!-- 取り壊し工タブ -->
   <div id="panelDemo" class="block hidden">
     <h4>取り壊し工</h4>
-    <button class="btn" onclick="addRow('demo')">行追加</button>
+    <button type="button" class="btn" onclick="addRow('demo')">行追加</button>
     <div id="demoTable" style="overflow-x:auto;">
       <div class="scroll-x-guide">(横スクロール可)</div>
       <table>
@@ -161,7 +161,7 @@
   <!-- 雑工タブ -->
   <div id="panelZatsu" class="block hidden">
     <h4>雑工</h4>
-    <button class="btn" onclick="addRow('zatsu')">行追加</button>
+    <button type="button" class="btn" onclick="addRow('zatsu')">行追加</button>
     <div style="overflow-x:auto;">
       <div class="scroll-x-guide">(横スクロール可)</div>
       <table>
@@ -236,15 +236,15 @@
   </div>
   <!-- データ管理・出力タブ -->
   <div id="panelData" class="block hidden">
-    <button class="btn" onclick="exportSummaryExcel()">合計表出力</button>
-    <button class="btn" onclick="exportQuantityExcel()">数量計算書出力</button>
+    <button type="button" class="btn" onclick="exportSummaryExcel()">合計表出力</button>
+    <button type="button" class="btn" onclick="exportQuantityExcel()">数量計算書出力</button>
     <div style="margin-top:10px;">
-      <button class="btn" onclick="exportDXF()">DXFエクスポート</button>
-      <button class="btn" onclick="exportAllZip()">一括出力</button>
+      <button type="button" class="btn" onclick="exportDXF()">DXFエクスポート</button>
+      <button type="button" class="btn" onclick="exportAllZip()">一括出力</button>
     </div>
     <div style="margin-top:10px;">
-      <button class="btn" onclick="backupData()">バックアップ</button>
-      <button class="btn" onclick="document.getElementById('importFile').click()">インポート</button>
+      <button type="button" class="btn" onclick="backupData()">バックアップ</button>
+      <button type="button" class="btn" onclick="document.getElementById('importFile').click()">インポート</button>
       <input id="importFile" type="file" accept="application/json" onchange="importData(event)" style="display:none;">
     </div>
   </div>
@@ -257,31 +257,31 @@
     </p>
   </div>
   <div id="fatalAlert" class="alert hidden"></div>
-  <button id="calcButton" class="calc-fab" onclick="openCalc()">🖩</button>
+  <button type="button" id="calcButton" class="calc-fab" onclick="openCalc()">🖩</button>
   <div id="calcOverlay" class="calc-overlay hidden" onclick="if(event.target.id==='calcOverlay') closeCalc()">
     <div class="calc-dialog" onclick="event.stopPropagation()">
       <input id="calcInput" type="text" onkeydown="calcKey(event)" placeholder="0" inputmode="decimal" pattern="[0-9.+\-*/()]*">
       <div class="calc-keypad">
-        <button class="calc-key" onclick="calcInsert('7')">7</button>
-        <button class="calc-key" onclick="calcInsert('8')">8</button>
-        <button class="calc-key" onclick="calcInsert('9')">9</button>
-        <button class="calc-key" onclick="calcInsert('/')">÷</button>
-        <button class="calc-key" onclick="calcInsert('4')">4</button>
-        <button class="calc-key" onclick="calcInsert('5')">5</button>
-        <button class="calc-key" onclick="calcInsert('6')">6</button>
-        <button class="calc-key" onclick="calcInsert('*')">×</button>
-        <button class="calc-key" onclick="calcInsert('1')">1</button>
-        <button class="calc-key" onclick="calcInsert('2')">2</button>
-        <button class="calc-key" onclick="calcInsert('3')">3</button>
-        <button class="calc-key" onclick="calcInsert('-')">−</button>
-        <button class="calc-key" onclick="calcInsert('0')">0</button>
-        <button class="calc-key" onclick="calcInsert('.')">.</button>
-        <button class="calc-key" onclick="calcClear()">C</button>
-        <button class="calc-key" onclick="calcInsert('+')">+</button>
-        <button class="calc-key calc-equal" onclick="calcCalculate()">=</button>
+        <button type="button" class="calc-key" onclick="calcInsert('7')">7</button>
+        <button type="button" class="calc-key" onclick="calcInsert('8')">8</button>
+        <button type="button" class="calc-key" onclick="calcInsert('9')">9</button>
+        <button type="button" class="calc-key" onclick="calcInsert('/')">÷</button>
+        <button type="button" class="calc-key" onclick="calcInsert('4')">4</button>
+        <button type="button" class="calc-key" onclick="calcInsert('5')">5</button>
+        <button type="button" class="calc-key" onclick="calcInsert('6')">6</button>
+        <button type="button" class="calc-key" onclick="calcInsert('*')">×</button>
+        <button type="button" class="calc-key" onclick="calcInsert('1')">1</button>
+        <button type="button" class="calc-key" onclick="calcInsert('2')">2</button>
+        <button type="button" class="calc-key" onclick="calcInsert('3')">3</button>
+        <button type="button" class="calc-key" onclick="calcInsert('-')">−</button>
+        <button type="button" class="calc-key" onclick="calcInsert('0')">0</button>
+        <button type="button" class="calc-key" onclick="calcInsert('.')">.</button>
+        <button type="button" class="calc-key" onclick="calcClear()">C</button>
+        <button type="button" class="calc-key" onclick="calcInsert('+')">+</button>
+        <button type="button" class="calc-key calc-equal" onclick="calcCalculate()">=</button>
       </div>
       <div id="calcResult" class="result"></div>
-      <button class="btn" onclick="closeCalc()">閉じる</button>
+      <button type="button" class="btn" onclick="closeCalc()">閉じる</button>
     </div>
   </div>
   <script src="script.js"></script>
