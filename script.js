@@ -232,8 +232,9 @@ function addSite() {
   renderAllAndSave();
 }
 function renameSite() {
+  if (!ensureCurrentSite()) return;
   const newName = document.getElementById('siteName').value.trim();
-  if (!currentSite || !newName || newName === currentSite || allSites[newName]) return;
+  if (!newName || newName === currentSite || allSites[newName]) return;
   saveAndUpdate(false);
   allSites[newName] = allSites[currentSite];
   delete allSites[currentSite];
@@ -276,7 +277,7 @@ function getDemoSetting() {
 
 // ▼ 舗装工タブ
 function addRow(type) {
-  if (!currentSite) return;
+  if (!ensureCurrentSite()) return;
   if(type === 'pave') {
     allSites[currentSite].pave.push({
       種別:"アスファルト", 測点:'', 単距:'', 追距:'', 幅員:'', 平均幅員:'', 面積:''
@@ -299,7 +300,7 @@ function editRow(type, idx, key, val, update = false) {
   // 入力中は再描画しない！
   if (update) renderAllAndSave();
 }
-function editAnzen(key, val, update = false) {  if (!currentSite) return;
+function editAnzen(key, val, update = false) {  if (!ensureCurrentSite()) return;
   if (!allSites[currentSite].anzen) {
     allSites[currentSite].anzen = { line_outer: 0, line_stop: 0, line_symbol: 0 };
   }
@@ -307,7 +308,7 @@ function editAnzen(key, val, update = false) {  if (!currentSite) return;
   if(update) renderAllAndSave();
 }
 function editKari(key, val, update = false) {
-  if (!currentSite) return;
+  if (!ensureCurrentSite()) return;
   if (!allSites[currentSite].kari) {
     allSites[currentSite].kari = { traffic_b: 0, temp_signal: 0, machine_transport: 0 };
   }
@@ -328,7 +329,7 @@ function editPrice(key, val, update = false) {
   }
 }
 function toggleCurbInputs() {
-  if(!currentSite) return;
+  if(!ensureCurrentSite()) { document.getElementById('chkCurbUse').checked = false; return; }
   const use = document.getElementById('chkCurbUse').checked;
   const area = document.getElementById('curbInputs');
   if(use) area.classList.remove('hidden');
@@ -340,7 +341,7 @@ function toggleCurbInputs() {
   renderAllAndSave();
 }
 function editCurb(key, val, update = false) {
-  if(!currentSite) return;
+  if(!ensureCurrentSite()) return;
   if(!allSites[currentSite].curb) {
     allSites[currentSite].curb = { use: false, std: 0, small: 0, hand: 0 };
   }
@@ -770,6 +771,7 @@ function renderAll() {
   renderPriceInputs();
   renderPriceTotal();
   showSummary();
+  updateSiteControls();
 }
 
 // ▼ DXF生成
@@ -1523,23 +1525,23 @@ window.addEventListener('DOMContentLoaded', () => {
   const siteList = document.getElementById('siteList');
   if (siteList) siteList.addEventListener('change', switchSite);
   const chkWorksEarth = document.getElementById('chkWorksEarth');
-  if (chkWorksEarth) chkWorksEarth.addEventListener('change', renderTabs);
+  if (chkWorksEarth) chkWorksEarth.addEventListener('change', () => { if (ensureCurrentSite()) renderTabs(); else chkWorksEarth.checked = false; });
   const chkWorksDemo = document.getElementById('chkWorksDemo');
-  if (chkWorksDemo) chkWorksDemo.addEventListener('change', renderTabs);
+  if (chkWorksDemo) chkWorksDemo.addEventListener('change', () => { if (ensureCurrentSite()) renderTabs(); else chkWorksDemo.checked = false; });
   const chkWorksAnzen = document.getElementById('chkWorksAnzen');
-  if (chkWorksAnzen) chkWorksAnzen.addEventListener('change', renderTabs);
+  if (chkWorksAnzen) chkWorksAnzen.addEventListener('change', () => { if (ensureCurrentSite()) renderTabs(); else chkWorksAnzen.checked = false; });
   const chkWorksKari = document.getElementById('chkWorksKari');
-  if (chkWorksKari) chkWorksKari.addEventListener('change', renderTabs);
+  if (chkWorksKari) chkWorksKari.addEventListener('change', () => { if (ensureCurrentSite()) renderTabs(); else chkWorksKari.checked = false; });
   const chkWorksZatsu = document.getElementById('chkWorksZatsu');
-  if (chkWorksZatsu) chkWorksZatsu.addEventListener('change', renderTabs);
+  if (chkWorksZatsu) chkWorksZatsu.addEventListener('change', () => { if (ensureCurrentSite()) renderTabs(); else chkWorksZatsu.checked = false; });
   const earthSamePave = document.getElementById('earthSamePave');
-  if (earthSamePave) earthSamePave.addEventListener('change', () => { saveAndUpdate(); renderTabs(); });
+  if (earthSamePave) earthSamePave.addEventListener('change', () => { if (!ensureCurrentSite()) { earthSamePave.checked = false; return; } saveAndUpdate(); renderTabs(); });
   const earthType = document.getElementById('earthType');
   if (earthType) earthType.addEventListener('change', saveAndUpdate);
   const earthThick = document.getElementById('earthThick');
   if (earthThick) earthThick.addEventListener('change', saveAndUpdate);
   const demoSamePave = document.getElementById('demoSamePave');
-  if (demoSamePave) demoSamePave.addEventListener('change', () => { saveAndUpdate(); renderTabs(); });
+  if (demoSamePave) demoSamePave.addEventListener('change', () => { if (!ensureCurrentSite()) { demoSamePave.checked = false; return; } saveAndUpdate(); renderTabs(); });
   const demoType = document.getElementById('demoType');
   if (demoType) demoType.addEventListener('change', updateDemoThickDefault);
 });
