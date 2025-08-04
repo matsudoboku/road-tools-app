@@ -560,10 +560,7 @@ function renderPriceInputs() {
     el.value = dat[key] || 0;
   });
 }
-function renderPriceTotal() {
-  if(!currentSite) return;
-  const site = allSites[currentSite] || {};
-  const prices = site.price || {};
+function calculateSiteTotal(site, prices) {
   const works = site.works || {};
   const paveList = site.pave || [];
   const paveSum = paveList.reduce((a, r) => a + (parseFloat(r.面積) || 0), 0);
@@ -648,10 +645,20 @@ function renderPriceTotal() {
   total += (kari.temp_signal || 0) * (prices.safety_temp_signal || 0);
   total += (kari.machine_transport || 0) * (prices.other_machine_transport || 0);
 
-  const el = document.getElementById('priceTotal');
-  if(el) {
-    el.textContent = `合計金額：${Math.round(total).toLocaleString()}円`;
-  }
+  return total;
+}
+function renderPriceTotal() {
+  const listEl = document.getElementById('priceSiteTotals');
+  const totalEl = document.getElementById('priceTotal');
+  let grandTotal = 0;
+  let listHtml = '';
+  Object.entries(allSites).forEach(([name, site]) => {
+    const subtotal = calculateSiteTotal(site, site.price || {});
+    grandTotal += subtotal;
+    listHtml += `<div>${name}：${Math.round(subtotal).toLocaleString()}円</div>`;
+  });
+  if(listEl) listEl.innerHTML = listHtml;
+  if(totalEl) totalEl.textContent = `合計金額：${Math.round(grandTotal).toLocaleString()}円`;
 }
 function renderCurbInputs() {
   if(!currentSite) return;
