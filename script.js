@@ -19,6 +19,21 @@ const worksList = [
   { id: "Disclaimer", label: "免責事項", always: true, panel: "panelDisclaimer"}
 ];
 
+// ▼ 現場選択ガードとUI制御
+function ensureCurrentSite() {
+  if (!currentSite) {
+    alert('現場が選択されていません。先に現場を追加または選択してください。');
+    return false;
+  }
+  return true;
+}
+
+function updateSiteControls() {
+  document.querySelectorAll('[data-site-required]').forEach(el => {
+    el.disabled = !currentSite;
+  });
+}
+
 // ▼ タブUI生成＆切り替え
 function renderTabs() {
   if(currentSite && allSites[currentSite]) saveWorksChk();
