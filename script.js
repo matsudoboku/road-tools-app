@@ -22,8 +22,10 @@ const worksList = [
 // ▼ タブUI生成＆切り替え
 function renderTabs() {
   if(currentSite && allSites[currentSite]) saveWorksChk();
-  const earthSame = document.getElementById('earthSamePave')?.checked;
-  const demoSame = document.getElementById('demoSamePave')?.checked;
+  const earthSameEl = document.getElementById('earthSamePave');
+  const earthSame = earthSameEl ? earthSameEl.checked : false;
+  const demoSameEl = document.getElementById('demoSamePave');
+  const demoSame = demoSameEl ? demoSameEl.checked : false;
   let tabHtml = '';
   for(const w of worksList) {
     const chkEl = document.getElementById(w.chk);
@@ -35,8 +37,9 @@ function renderTabs() {
     }
     if(w.setting) {
       const settingDiv = document.getElementById(w.setting);
+      const chk = document.getElementById(w.chk);
       if(settingDiv)
-        document.getElementById(w.chk).checked ? settingDiv.classList.remove('hidden') : settingDiv.classList.add('hidden');
+        chk && chk.checked ? settingDiv.classList.remove('hidden') : settingDiv.classList.add('hidden');
     }
     if(w.panel && w.chk) {
       const panelEl = document.getElementById(w.panel);
