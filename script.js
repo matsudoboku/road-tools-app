@@ -19,28 +19,11 @@ const worksList = [
   { id: "Disclaimer", label: "免責事項", always: true, panel: "panelDisclaimer"}
 ];
 
-// ▼ 現場選択ガードとUI制御
-function ensureCurrentSite() {
-  if (!currentSite) {
-    alert('現場が選択されていません。先に現場を追加または選択してください。');
-    return false;
-  }
-  return true;
-}
-
-function updateSiteControls() {
-  document.querySelectorAll('[data-site-required]').forEach(el => {
-    el.disabled = !currentSite;
-  });
-}
-
 // ▼ タブUI生成＆切り替え
 function renderTabs() {
   if(currentSite && allSites[currentSite]) saveWorksChk();
-  const earthSameEl = document.getElementById('earthSamePave');
-  const earthSame = earthSameEl ? earthSameEl.checked : false;
-  const demoSameEl = document.getElementById('demoSamePave');
-  const demoSame = demoSameEl ? demoSameEl.checked : false;
+  const earthSame = document.getElementById('earthSamePave')?.checked;
+  const demoSame = document.getElementById('demoSamePave')?.checked;
   let tabHtml = '';
   for(const w of worksList) {
     const chkEl = document.getElementById(w.chk);
@@ -52,9 +35,8 @@ function renderTabs() {
     }
     if(w.setting) {
       const settingDiv = document.getElementById(w.setting);
-      const chk = document.getElementById(w.chk);
       if(settingDiv)
-        chk && chk.checked ? settingDiv.classList.remove('hidden') : settingDiv.classList.add('hidden');
+        document.getElementById(w.chk).checked ? settingDiv.classList.remove('hidden') : settingDiv.classList.add('hidden');
     }
     if(w.panel && w.chk) {
       const panelEl = document.getElementById(w.panel);
@@ -103,13 +85,8 @@ function loadData() {
           if(Array.isArray(s.zatsu)) {
             s.zatsu.forEach(z => { if(z.spec === undefined) z.spec = ''; });
           }
-          if(!s.demoSetting) {
-            s.demoSetting = { same: true, type: 'As', thick: 4, cutting: 0 };
-          } else {
-            if(s.demoSetting.thick === undefined || s.demoSetting.thick === 0)
-              s.demoSetting.thick = s.demoSetting.type === 'Con' ? 10 : 4;
-            if(s.demoSetting.cutting === undefined) s.demoSetting.cutting = 0;
-          }
+          if(!s.demoSetting) s.demoSetting = { same: true, type: 'As', thick: 0, cutting: 0 };
+          else if(s.demoSetting.cutting === undefined) s.demoSetting.cutting = 0;
         });
         allSites = dat;
       // サイトリスト描画
@@ -220,7 +197,7 @@ function addSite() {
     curb: { use: false, std: 0, small: 0, hand: 0 },
     works: { earth: false, demo: false, anzen: false, kari: false, zatsu: false },
     earthSetting: { same: true, type: '標準掘削', thick: 0 },
-    demoSetting: { same: true, type: 'As', thick: 4, cutting: 0 }
+    demoSetting: { same: true, type: 'As', thick: 0, cutting: 0 }
   };
   document.getElementById('siteList').innerHTML += `<option>${name}</option>`;
   document.getElementById('siteList').value = name;
@@ -232,9 +209,8 @@ function addSite() {
   renderAllAndSave();
 }
 function renameSite() {
-  if (!ensureCurrentSite()) return;
   const newName = document.getElementById('siteName').value.trim();
-  if (!newName || newName === currentSite || allSites[newName]) return;
+  if (!currentSite || !newName || newName === currentSite || allSites[newName]) return;
   saveAndUpdate(false);
   allSites[newName] = allSites[currentSite];
   delete allSites[currentSite];
@@ -277,7 +253,7 @@ function getDemoSetting() {
 
 // ▼ 舗装工タブ
 function addRow(type) {
-  if (!ensureCurrentSite()) return;
+  if (!currentSite) return;
   if(type === 'pave') {
     allSites[currentSite].pave.push({
       種別:"アスファルト", 測点:'', 単距:'', 追距:'', 幅員:'', 平均幅員:'', 面積:''
@@ -300,7 +276,7 @@ function editRow(type, idx, key, val, update = false) {
   // 入力中は再描画しない！
   if (update) renderAllAndSave();
 }
-function editAnzen(key, val, update = false) {  if (!ensureCurrentSite()) return;
+function editAnzen(key, val, update = false) {  if (!currentSite) return;
   if (!allSites[currentSite].anzen) {
     allSites[currentSite].anzen = { line_outer: 0, line_stop: 0, line_symbol: 0 };
   }
@@ -308,7 +284,7 @@ function editAnzen(key, val, update = false) {  if (!ensureCurrentSite()) return
   if(update) renderAllAndSave();
 }
 function editKari(key, val, update = false) {
-  if (!ensureCurrentSite()) return;
+  if (!currentSite) return;
   if (!allSites[currentSite].kari) {
     allSites[currentSite].kari = { traffic_b: 0, temp_signal: 0, machine_transport: 0 };
   }
@@ -316,20 +292,18 @@ function editKari(key, val, update = false) {
   if(update) renderAllAndSave();
 }
 function editPrice(key, val, update = false) {
-  const num = parseFloat(val) || 0;
-  prices[key] = num;
-  Object.values(allSites).forEach(s => {
-    if(!s.price) s.price = {};
-    s.price[key] = num;
-  });
+  if(!currentSite) return;
+    if(!allSites[currentSite].price) {
+      allSites[currentSite].price = {};
+    }
+  allSites[currentSite].price[key] = parseFloat(val) || 0;
   if(update) {
-    savePrices();
     renderAllAndSave();
     renderPriceTotal();
   }
 }
 function toggleCurbInputs() {
-  if(!ensureCurrentSite()) { document.getElementById('chkCurbUse').checked = false; return; }
+  if(!currentSite) return;
   const use = document.getElementById('chkCurbUse').checked;
   const area = document.getElementById('curbInputs');
   if(use) area.classList.remove('hidden');
@@ -341,7 +315,7 @@ function toggleCurbInputs() {
   renderAllAndSave();
 }
 function editCurb(key, val, update = false) {
-  if(!ensureCurrentSite()) return;
+  if(!currentSite) return;
   if(!allSites[currentSite].curb) {
     allSites[currentSite].curb = { use: false, std: 0, small: 0, hand: 0 };
   }
@@ -554,17 +528,11 @@ function renderEarthSetting() {
 
 function renderDemoSetting() {
   if(!currentSite) return;
-  const set = allSites[currentSite].demoSetting || { same: true, type: 'As', thick: 4, cutting: 0 };
-  if(set.thick === undefined || set.thick === 0)
-    set.thick = set.type === 'Con' ? 10 : 4;  document.getElementById('demoSamePave').checked = set.same || false;
+  const set = allSites[currentSite].demoSetting || { same: true, type: 'As', thick: 0, cutting: 0 };
+  document.getElementById('demoSamePave').checked = set.same || false;
   document.getElementById('demoType').value = set.type || 'As';
-  document.getElementById('demoThick').value = set.thick;
+  document.getElementById('demoThick').value = set.thick || 0;
   document.getElementById('demoCutting').value = set.cutting || 0;
-}
-function updateDemoThickDefault() {
-  const type = document.getElementById('demoType').value;
-  document.getElementById('demoThick').value = type === 'Con' ? 10 : 4;
-  saveAndUpdate();
 }
 function renderKariInputs() {
   if(!currentSite) return;
@@ -574,12 +542,17 @@ function renderKariInputs() {
   document.getElementById('kariMachineTrans').value = dat.machine_transport || 0;
 }
 function renderPriceInputs() {
+  if(!currentSite) return;
+  const dat = allSites[currentSite].price || {};
   document.querySelectorAll('#panelPrice input[data-price-work]').forEach(el => {
     const key = el.dataset.priceWork;
-    el.value = prices[key] || 0;
+    el.value = dat[key] || 0;
   });
 }
-function calculateSiteTotal(site, prices) {
+function renderPriceTotal() {
+  if(!currentSite) return;
+  const site = allSites[currentSite] || {};
+  const prices = site.price || {};
   const works = site.works || {};
   const paveList = site.pave || [];
   const paveSum = paveList.reduce((a, r) => a + (parseFloat(r.面積) || 0), 0);
@@ -598,8 +571,7 @@ function calculateSiteTotal(site, prices) {
 
   if (works.demo) {
     const set = site.demoSetting || {};
-    let thick = parseFloat(set.thick);
-    if(!thick) thick = set.type === 'Con' ? 10 : 4;
+    const thick = parseFloat(set.thick) || 0;
     const cutting = parseFloat(set.cutting) || 0;
     total += cutting * (prices.demo_cut || 0);
     const areaDemo = set.same
@@ -664,20 +636,10 @@ function calculateSiteTotal(site, prices) {
   total += (kari.temp_signal || 0) * (prices.safety_temp_signal || 0);
   total += (kari.machine_transport || 0) * (prices.other_machine_transport || 0);
 
-  return total;
-}
-function renderPriceTotal() {
-  const listEl = document.getElementById('priceSiteTotals');
-  const totalEl = document.getElementById('priceTotal');
-  let grandTotal = 0;
-  let listHtml = '';
-  Object.entries(allSites).forEach(([name, site]) => {
-    const subtotal = calculateSiteTotal(site, site.price || {});
-    grandTotal += subtotal;
-    listHtml += `<div>${name}：${Math.round(subtotal).toLocaleString()}円</div>`;
-  });
-  if(listEl) listEl.innerHTML = listHtml;
-  if(totalEl) totalEl.textContent = `合計金額：${Math.round(grandTotal).toLocaleString()}円`;
+  const el = document.getElementById('priceTotal');
+  if(el) {
+    el.textContent = `合計金額：${Math.round(total).toLocaleString()}円`;
+  }
 }
 function renderCurbInputs() {
   if(!currentSite) return;
@@ -771,7 +733,6 @@ function renderAll() {
   renderPriceInputs();
   renderPriceTotal();
   showSummary();
-  updateSiteControls();
 }
 
 // ▼ DXF生成
@@ -975,8 +936,8 @@ function getSummaryHtml(forExcel = false) {
     let haizan_unpan_as = 0, haizan_shori_as = 0, haizan_unpan_con = 0, haizan_shori_con = 0;
     let demoSetting = allSites[site].demoSetting || {};
     let demoType = demoSetting.type;
-    let demoThick = parseFloat(demoSetting.thick);
-    if(!demoThick) demoThick = demoType === 'Con' ? 10 : 4;    if (allSites[site].works && allSites[site].works.demo) {
+    let demoThick = parseFloat(demoSetting.thick)||0;
+    if (allSites[site].works && allSites[site].works.demo) {
       cutting = parseFloat(demoSetting.cutting) || 0;
       let areaDemo = demoSetting.same ? paveSum : (allSites[site].demo || []).reduce((a, r) => a + (parseFloat(r.面積) || 0), 0);
       if (demoType === "As") {
@@ -1181,8 +1142,7 @@ function getQuantityHtml() {
     if(dat.works && dat.works.demo) {
       const set = dat.demoSetting || {};
       const demoType = set.type;
-      let thick = parseFloat(set.thick);
-      if(!thick) thick = demoType === 'Con' ? 10 : 4;
+      const thick = parseFloat(set.thick) || 0;
       const demoList = set.same ? (dat.pave || []) : (dat.demo || []);
       const areaDemoFormula = demoList
         .map((_, i) => getAreaFormula(demoList, i))
@@ -1518,30 +1478,4 @@ window.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('input[data-price-work]').forEach(el => {
     el.addEventListener('input', savePrices);
   });
-  const addBtn = document.getElementById('btnAddSite');
-  if (addBtn) addBtn.addEventListener('click', addSite);
-  const renameBtn = document.getElementById('btnRenameSite');
-  if (renameBtn) renameBtn.addEventListener('click', renameSite);
-  const siteList = document.getElementById('siteList');
-  if (siteList) siteList.addEventListener('change', switchSite);
-  const chkWorksEarth = document.getElementById('chkWorksEarth');
-  if (chkWorksEarth) chkWorksEarth.addEventListener('change', () => { if (ensureCurrentSite()) renderTabs(); else chkWorksEarth.checked = false; });
-  const chkWorksDemo = document.getElementById('chkWorksDemo');
-  if (chkWorksDemo) chkWorksDemo.addEventListener('change', () => { if (ensureCurrentSite()) renderTabs(); else chkWorksDemo.checked = false; });
-  const chkWorksAnzen = document.getElementById('chkWorksAnzen');
-  if (chkWorksAnzen) chkWorksAnzen.addEventListener('change', () => { if (ensureCurrentSite()) renderTabs(); else chkWorksAnzen.checked = false; });
-  const chkWorksKari = document.getElementById('chkWorksKari');
-  if (chkWorksKari) chkWorksKari.addEventListener('change', () => { if (ensureCurrentSite()) renderTabs(); else chkWorksKari.checked = false; });
-  const chkWorksZatsu = document.getElementById('chkWorksZatsu');
-  if (chkWorksZatsu) chkWorksZatsu.addEventListener('change', () => { if (ensureCurrentSite()) renderTabs(); else chkWorksZatsu.checked = false; });
-  const earthSamePave = document.getElementById('earthSamePave');
-  if (earthSamePave) earthSamePave.addEventListener('change', () => { if (!ensureCurrentSite()) { earthSamePave.checked = false; return; } saveAndUpdate(); renderTabs(); });
-  const earthType = document.getElementById('earthType');
-  if (earthType) earthType.addEventListener('change', saveAndUpdate);
-  const earthThick = document.getElementById('earthThick');
-  if (earthThick) earthThick.addEventListener('change', saveAndUpdate);
-  const demoSamePave = document.getElementById('demoSamePave');
-  if (demoSamePave) demoSamePave.addEventListener('change', () => { if (!ensureCurrentSite()) { demoSamePave.checked = false; return; } saveAndUpdate(); renderTabs(); });
-  const demoType = document.getElementById('demoType');
-  if (demoType) demoType.addEventListener('change', updateDemoThickDefault);
 });
